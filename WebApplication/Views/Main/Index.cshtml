@@ -1,0 +1,19 @@
+﻿<html>
+<head>
+  <title>Client-server app</title>
+  <script src="/js/jquery-3.1.0.min.js" type="text/javascript"></script>
+  <script src="/js/client.js" type="text/javascript"></script>
+  <link href="/css/style.css" type="text/css" rel="stylesheet" />
+</head>
+<body onload="app.init();">
+  <ul id="item-list"></ul>
+  <input type="text" id="text_input" />
+  <p onclick="app.addItem();">Добавити</p>
+  <ul id="buttons">
+    <li id="update_button" class="red" onclick="app.updateItem();">Зберегти</li>
+    <li id="up_button" class="red" onclick="app.moveUpItem();">Вгору</li>
+    <li id="down_button" class="red" onclick="app.moveDownItem();">Вниз</li>
+    <li id="delete_button" class="red" onclick="app.deleteItem();">Видалити</li>
+  </ul>
+</body>
+</html>

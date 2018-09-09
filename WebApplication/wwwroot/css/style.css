@@ -1,0 +1,18 @@
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
+
+#buttons li {
+    display: inline-block;
+    width: 75px;
+    text-align: center;
+    color: white;
+}
+
+#buttons {
+    padding: 0;
+}
