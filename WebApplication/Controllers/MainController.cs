@@ -7,7 +7,7 @@ namespace WebApplication.Controllers
     [HttpGet]
     public IActionResult Index()
     {
-      return this.View("Index");
+      return this.View();
     }
   }
 }
