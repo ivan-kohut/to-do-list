@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using WebApplication.Entities;
+﻿using Entities;
+using System.Collections.Generic;
 
-namespace WebApplication.Services
+namespace Services
 {
   public interface IItemService
   {

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApplication.Entities
+namespace Services
 {
   public class AppDbContext : DbContext
   {

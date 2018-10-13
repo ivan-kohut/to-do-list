@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using WebApplication.Entities;
 
-namespace WebApplication.Services
+namespace Services
 {
   public class ItemService : IItemService
   {

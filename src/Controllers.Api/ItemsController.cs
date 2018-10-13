@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication.Entities;
-using WebApplication.Services;
+﻿using Entities;
+using Microsoft.AspNetCore.Mvc;
+using Services;
 
-namespace WebApplication.Controllers.Api
+namespace Controllers
 {
   [Route("/[controller]")]
   public class ItemsController : Controller

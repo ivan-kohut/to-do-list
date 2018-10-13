@@ -1,4 +1,4 @@
-﻿namespace WebApplication.Entities
+﻿namespace Entities
 {
   public class Item
   {

@@ -3,25 +3,24 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using WebApplication.Entities;
-using WebApplication.Services;
+using Services;
 
 namespace WebApplication
 {
   public class Startup
   {
-    public IConfiguration Configuration { get; }
+    private readonly IConfiguration configuration;
 
     public Startup(IConfiguration configuration)
     {
-      Configuration = configuration;
+      this.configuration = configuration;
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+      services.AddDbContext<AppDbContext>(
+        options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+      );
 
       services.AddMvc();
       services.AddScoped<IItemService, ItemService>();
@@ -40,8 +39,8 @@ namespace WebApplication
       app.UseMvc(routes =>
       {
         routes.MapRoute(
-                  name: "default",
-                  template: "{controller=Main}/{action=Index}/{id?}");
+          name: "default",
+          template: "{controller=Main}/{action=Index}/{id?}");
       });
     }
   }
