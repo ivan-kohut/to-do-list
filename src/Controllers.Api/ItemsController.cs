@@ -1,4 +1,4 @@
-﻿using Entities;
+﻿using Controllers.Models;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
@@ -17,31 +17,39 @@ namespace Controllers
     [HttpGet]
     public IActionResult All()
     {
-      return this.Json(itemService.All());
+      return Json(itemService.All());
     }
 
     [HttpPost]
-    public IActionResult Save([FromBody] Item item)
+    public IActionResult Save([FromBody] ItemApiModel item)
     {
-      if (this.IsEmpty(item.Text))
-        return this.BadRequest();
+      if (!ModelState.IsValid)
+        return BadRequest();
 
-      return this.Json(itemService.Save(item));
+      return Json(itemService.Save(new ItemDTO { Text = item.Text }));
     }
 
-    [HttpPut]
-    public void Update([FromBody] Item item)
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, [FromBody] ItemApiModel item)
     {
-      if (!this.IsEmpty(item.Text))
-        itemService.Update(item);
+      if (!ModelState.IsValid)
+        return BadRequest();
+
+      return GenerateResponse(itemService.Update(new ItemDTO { Id = id, Text = item.Text }));
     }
 
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public IActionResult Delete(int id)
     {
-      itemService.RemoveById(id);
+      return GenerateResponse(itemService.Delete(id));
     }
 
-    private bool IsEmpty(string str) => str.Length == 0;
+    private IActionResult GenerateResponse(OperationResultDTO operationResult)
+    {
+      if (operationResult.Success)
+        return Ok();
+      else
+        return NotFound();
+    }
   }
 }
