@@ -25,9 +25,10 @@ namespace WebApplication
 
       services.AddMvc();
 
+      services.AddScoped<IItemRepository, ItemRepository>();
+
       services.AddScoped<IItemService, ItemService>();
       services.AddScoped<IDbTransactionManager, DbTransactionManager>();
-      services.AddScoped<IItemRepository, ItemRepository>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -39,7 +40,6 @@ namespace WebApplication
       }
 
       app.UseStaticFiles();
-
       app.UseMvc();
     }
   }
