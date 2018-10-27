@@ -1,7 +1,7 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Services
+namespace Repositories
 {
   public class AppDbContext : DbContext
   {

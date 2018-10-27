@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Repositories;
 using Services;
 
 namespace WebApplication
@@ -23,7 +24,10 @@ namespace WebApplication
       );
 
       services.AddMvc();
+
       services.AddScoped<IItemService, ItemService>();
+      services.AddScoped<IDbTransactionManager, DbTransactionManager>();
+      services.AddScoped<IItemRepository, ItemRepository>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)

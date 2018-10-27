@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Controllers\Controllers.csproj" />
     <ProjectReference Include="..\Services.Concrete\Services.Concrete.csproj" />
+    <ProjectReference Include="..\Repositories.Concrete\Repositories.Concrete.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using Entities;
-using Microsoft.EntityFrameworkCore;
+using Repositories;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,17 +7,18 @@ namespace Services
 {
   public class ItemService : IItemService
   {
-    private readonly AppDbContext dbContext;
+    private readonly IItemRepository itemRepository;
+    private readonly IDbTransactionManager dbTransactionManager;
 
-    public ItemService(AppDbContext dbContext)
+    public ItemService(IItemRepository itemRepository, IDbTransactionManager dbTransactionManager)
     {
-      this.dbContext = dbContext;
+      this.itemRepository = itemRepository;
+      this.dbTransactionManager = dbTransactionManager;
     }
 
     public IEnumerable<ItemDTO> All()
     {
-      return dbContext.Items
-        .AsNoTracking()
+      return itemRepository.All()
         .Select(i => new ItemDTO { Id = i.Id, Text = i.Text })
         .ToList();
     }
@@ -26,8 +27,8 @@ namespace Services
     {
       Item item = new Item { Text = itemDTO.Text };
 
-      dbContext.Add(item);
-      dbContext.SaveChanges();
+      itemRepository.Create(item);
+      dbTransactionManager.SaveChanges();
 
       itemDTO.Id = item.Id;
 
@@ -38,13 +39,15 @@ namespace Services
     {
       OperationResultDTO updateOperationResult = new OperationResultDTO();
 
-      Item item = dbContext.Items.Find(itemDTO.Id);
+      Item item = itemRepository.GetById(itemDTO.Id);
 
       if (item == null)
         return updateOperationResult;
 
-      dbContext.Update(item);
-      dbContext.SaveChanges();
+      item.Text = itemDTO.Text;
+
+      itemRepository.Update(item);
+      dbTransactionManager.SaveChanges();
 
       updateOperationResult.Success = true;
 
@@ -55,13 +58,13 @@ namespace Services
     {
       OperationResultDTO deleteOperationResult = new OperationResultDTO();
 
-      Item item = dbContext.Items.Find(id);
+      Item item = itemRepository.GetById(id);
 
       if (item == null)
         return deleteOperationResult;
 
-      dbContext.Remove(item);
-      dbContext.SaveChanges();
+      itemRepository.Delete(item);
+      dbTransactionManager.SaveChanges();
 
       deleteOperationResult.Success = true;
 
