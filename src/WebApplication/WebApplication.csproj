@@ -9,8 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Controllers.Api\Controllers.Api.csproj" />
-    <ProjectReference Include="..\Controllers.Mvc\Controllers.Mvc.csproj" />
+    <ProjectReference Include="..\Controllers\Controllers.csproj" />
     <ProjectReference Include="..\Services.Concrete\Services.Concrete.csproj" />
   </ItemGroup>
 
