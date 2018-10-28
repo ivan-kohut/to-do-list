@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories;
 using Services;
+using System.Reflection;
 
 namespace WebApplication
 {
@@ -23,7 +24,8 @@ namespace WebApplication
         options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
       );
 
-      services.AddMvc();
+      services.AddMvc()
+        .AddApplicationPart(Assembly.Load(new AssemblyName("Controllers")));
 
       services.AddScoped<IItemRepository, ItemRepository>();
 
