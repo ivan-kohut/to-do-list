@@ -9,13 +9,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Controllers.Tests
 {
   public class ItemsControllerTest : IClassFixture<TestServerFixture>, IDisposable
   {
+    private const string url = "/items";
+    private const string mediaType = "application/json";
+
     private readonly HttpClient client;
 
     public ItemsControllerTest(TestServerFixture testServerFixture)
@@ -24,27 +26,27 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public async void All_When_ItemsDoNotExist_Expect_EmptyList()
+    public void All_When_ItemsDoNotExist_Expect_EmptyList()
     {
-      HttpResponseMessage response = await client.GetAsync("/items");
+      HttpResponseMessage response = client.GetAsync(url).Result;
 
       response.EnsureSuccessStatusCode();
 
-      Assert.Empty(await DeserializeResponseBody<IEnumerable<ItemDTO>>(response));
+      Assert.Empty(DeserializeResponseBody<IEnumerable<ItemDTO>>(response));
     }
 
     [Fact]
-    public async void Save_When_InputModelIsValid_Expect_Saved()
+    public void Save_When_InputModelIsValid_Expect_Saved()
     {
       ItemApiModel itemToSave = new ItemApiModel { Text = "itemText" };
 
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToSave), Encoding.UTF8, "application/json"))
+      using (HttpContent httpContent = CreateHttpContent(itemToSave))
       {
-        HttpResponseMessage response = await client.PostAsync("/items", httpContent);
+        HttpResponseMessage response = client.PostAsync(url, httpContent).Result;
 
         response.EnsureSuccessStatusCode();
 
-        ItemDTO itemSaved = await DeserializeResponseBody<ItemDTO>(response);
+        ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
 
         Assert.NotEqual(0, itemSaved.Id);
         Assert.Equal(itemToSave.Text, itemSaved.Text);
@@ -52,20 +54,18 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public async void Save_When_InputModelIsNotValid_Expect_BadRequest()
+    public void Save_When_InputModelIsNotValid_Expect_BadRequest()
     {
-      ItemApiModel itemToSave = new ItemApiModel { Text = "" };
-
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToSave), Encoding.UTF8, "application/json"))
+      using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "" }))
       {
-        HttpResponseMessage response = await client.PostAsync("/items", httpContent);
+        HttpResponseMessage response = client.PostAsync(url, httpContent).Result;
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
     }
 
     [Fact]
-    public async void All_When_ItemsExist_Expect_Returned()
+    public void All_When_ItemsExist_Expect_Returned()
     {
       IEnumerable<ItemApiModel> itemApiModels = new List<ItemApiModel>
       {
@@ -74,45 +74,32 @@ namespace Controllers.Tests
       };
 
       IEnumerable<ItemDTO> expected = itemApiModels
-        .Select(i =>
-        {
-          using (HttpContent httpContent = new StringContent(SerializeRequestBody(i), Encoding.UTF8, "application/json"))
-          {
-            return DeserializeResponseBody<ItemDTO>(client.PostAsync("/items", httpContent).Result).Result;
-          }
-        })
+        .Select(i => SaveItem(i))
         .ToList();
 
-      HttpResponseMessage response = await client.GetAsync("/items");
+      HttpResponseMessage response = client.GetAsync(url).Result;
 
       response.EnsureSuccessStatusCode();
 
-      IEnumerable<ItemDTO> actual = await DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
+      IEnumerable<ItemDTO> actual = DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
 
       actual.ShouldBeEquivalentTo(expected);
     }
 
     [Fact]
-    public async void Update_When_InputModelIsValid_Expect_Updated()
+    public void Update_When_InputModelIsValid_Expect_Updated()
     {
-      ItemApiModel itemToSave = new ItemApiModel { Text = "itemText" };
-
-      ItemDTO itemToUpdate;
-
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToSave), Encoding.UTF8, "application/json"))
-      {
-        itemToUpdate = DeserializeResponseBody<ItemDTO>(client.PostAsync("/items", httpContent).Result).Result;
-      }
+      ItemDTO itemToUpdate = SaveItem(new ItemApiModel { Text = "itemText" });
 
       string newItemText = "newItemText";
 
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(new ItemApiModel { Text = newItemText }), Encoding.UTF8, "application/json"))
+      using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = newItemText }))
       {
-        HttpResponseMessage response = await client.PutAsync($"/items/{itemToUpdate.Id}", httpContent);
+        HttpResponseMessage response = client.PutAsync($"{url}/{itemToUpdate.Id}", httpContent).Result;
 
         response.EnsureSuccessStatusCode();
 
-        ItemDTO itemUpdated = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync("/items").Result).Result
+        ItemDTO itemUpdated = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result)
           .Where(i => i.Id == itemToUpdate.Id)
           .FirstOrDefault();
 
@@ -121,48 +108,37 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public async void Update_When_InputModelIsNotValid_Expect_BadRequest()
+    public void Update_When_InputModelIsNotValid_Expect_BadRequest()
     {
-      ItemApiModel itemToUpdate = new ItemApiModel { Text = "" };
-
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToUpdate), Encoding.UTF8, "application/json"))
+      using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "" }))
       {
-        HttpResponseMessage response = await client.PutAsync($"/items/{1}", httpContent);
+        HttpResponseMessage response = client.PutAsync($"{url}/{1}", httpContent).Result;
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
     }
 
     [Fact]
-    public async void Update_When_ItemIsNotFound_Expect_NotFound()
+    public void Update_When_ItemIsNotFound_Expect_NotFound()
     {
-      ItemApiModel itemToUpdate = new ItemApiModel { Text = "itemText" };
-
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToUpdate), Encoding.UTF8, "application/json"))
+      using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "itemText" }))
       {
-        HttpResponseMessage response = await client.PutAsync($"/items/{1}", httpContent);
+        HttpResponseMessage response = client.PutAsync($"{url}/{1}", httpContent).Result;
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
       }
     }
 
     [Fact]
-    public async void Delete_When_ItemIsFound_Expect_Deleted()
+    public void Delete_When_ItemIsFound_Expect_Deleted()
     {
-      ItemApiModel itemToSave = new ItemApiModel { Text = "itemText" };
+      ItemDTO itemSaved = SaveItem(new ItemApiModel { Text = "itemText" });
 
-      ItemDTO itemSaved;
-
-      using (HttpContent httpContent = new StringContent(SerializeRequestBody(itemToSave), Encoding.UTF8, "application/json"))
-      {
-        itemSaved = DeserializeResponseBody<ItemDTO>(client.PostAsync("/items", httpContent).Result).Result;
-      }
-
-      HttpResponseMessage response = await client.DeleteAsync($"/items/{itemSaved.Id}");
+      HttpResponseMessage response = client.DeleteAsync($"{url}/{itemSaved.Id}").Result;
 
       response.EnsureSuccessStatusCode();
 
-      ItemDTO itemDeleted = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync("/items").Result).Result
+      ItemDTO itemDeleted = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result)
         .Where(i => i.Id == itemSaved.Id)
         .FirstOrDefault();
 
@@ -170,29 +146,37 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public async void Delete_When_ItemIsNotFound_Expect_NotFound()
+    public void Delete_When_ItemIsNotFound_Expect_NotFound()
     {
-      HttpResponseMessage response = await client.DeleteAsync($"/items/{1}");
+      HttpResponseMessage response = client.DeleteAsync($"{url}/{1}").Result;
 
       Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     public void Dispose()
     {
-      foreach (ItemDTO item in DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync("/items").Result).Result)
+      foreach (ItemDTO item in DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result))
       {
-        HttpResponseMessage response = client.DeleteAsync($"/items/{item.Id}").Result;
+        HttpResponseMessage response = client.DeleteAsync($"{url}/{item.Id}").Result;
       }
     }
 
-    private string SerializeRequestBody(object requestBody)
+    private ItemDTO SaveItem(ItemApiModel itemToSave)
     {
-      return JsonConvert.SerializeObject(requestBody);
+      using (HttpContent httpContent = CreateHttpContent(itemToSave))
+      {
+        return DeserializeResponseBody<ItemDTO>(client.PostAsync(url, httpContent).Result);
+      }
     }
 
-    private async Task<T> DeserializeResponseBody<T>(HttpResponseMessage response)
+    private HttpContent CreateHttpContent(object requestBody)
     {
-      return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+      return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, mediaType);
+    }
+
+    private T DeserializeResponseBody<T>(HttpResponseMessage response)
+    {
+      return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
     }
   }
 }
