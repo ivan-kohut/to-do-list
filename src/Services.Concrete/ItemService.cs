@@ -58,12 +58,10 @@ namespace Services
     {
       OperationResultDTO deleteOperationResult = new OperationResultDTO();
 
-      Item item = itemRepository.GetById(id);
-
-      if (item == null)
+      if (itemRepository.GetById(id) == null)
         return deleteOperationResult;
 
-      itemRepository.Delete(item);
+      itemRepository.Delete(id);
       dbTransactionManager.SaveChanges();
 
       deleteOperationResult.Success = true;

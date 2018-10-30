@@ -33,9 +33,9 @@ namespace Repositories
       dbContext.Update(item);
     }
 
-    public void Delete(Item item)
+    public void Delete(int id)
     {
-      dbContext.Remove(item);
+      dbContext.Remove(GetById(id));
     }
   }
 }

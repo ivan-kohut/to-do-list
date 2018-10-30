@@ -108,6 +108,7 @@ namespace Services.Tests
 
       mockItemRepository.Verify(r => r.GetById(itemToUpdate.Id), Times.Once());
       mockItemRepository.Verify(r => r.Update(foundItem), Times.Once());
+
       mockDbTransactionManager.Verify(m => m.SaveChanges(), Times.Once());
     }
 
@@ -115,6 +116,7 @@ namespace Services.Tests
     public void Delete_When_ItemDoesNotExist_Expect_NotSuccessedOperation()
     {
       int itemToDeleteId = 1;
+
       Item notFoundItem = null;
 
       mockItemRepository.Setup(r => r.GetById(itemToDeleteId)).Returns(notFoundItem);
@@ -128,17 +130,19 @@ namespace Services.Tests
     public void Delete_When_ItemExists_Expect_SuccessedOperation()
     {
       int itemToDeleteId = 1;
+
       Item foundItem = new Item { Id = itemToDeleteId, Text = "itemText" };
 
       mockItemRepository.Setup(r => r.GetById(itemToDeleteId)).Returns(foundItem);
-      mockItemRepository.Setup(r => r.Delete(foundItem)).Verifiable();
+      mockItemRepository.Setup(r => r.Delete(itemToDeleteId)).Verifiable();
 
       mockDbTransactionManager.Setup(m => m.SaveChanges()).Verifiable();
 
       Assert.True(itemService.Delete(itemToDeleteId).Success);
 
       mockItemRepository.Verify(r => r.GetById(itemToDeleteId), Times.Once());
-      mockItemRepository.Verify(r => r.Delete(foundItem), Times.Once());
+      mockItemRepository.Verify(r => r.Delete(itemToDeleteId), Times.Once());
+
       mockDbTransactionManager.Verify(m => m.SaveChanges(), Times.Once());
     }
   }

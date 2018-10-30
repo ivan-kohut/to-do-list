@@ -1,7 +1,10 @@
 ﻿using Controllers.Models;
 using Controllers.Tests.Fixtures;
+using Entities;
 using FluentAssertions;
+using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
+using Repositories;
 using Services;
 using System;
 using System.Collections.Generic;
@@ -10,6 +13,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using Xunit;
+using static Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions;
 
 namespace Controllers.Tests
 {
@@ -18,10 +22,12 @@ namespace Controllers.Tests
     private const string url = "/items";
     private const string mediaType = "application/json";
 
+    private readonly TestServer server;
     private readonly HttpClient client;
 
     public ItemsControllerTest(TestServerFixture testServerFixture)
     {
+      this.server = testServerFixture.Server;
       this.client = testServerFixture.Client;
     }
 
@@ -67,13 +73,13 @@ namespace Controllers.Tests
     [Fact]
     public void All_When_ItemsExist_Expect_Returned()
     {
-      IEnumerable<ItemApiModel> itemApiModels = new List<ItemApiModel>
+      IEnumerable<Item> items = new List<Item>
       {
-        new ItemApiModel { Text = "firstItemText" },
-        new ItemApiModel { Text = "secondItemText" }
+        new Item { Text = "firstItemText" },
+        new Item { Text = "secondItemText" }
       };
 
-      IEnumerable<ItemDTO> expected = itemApiModels
+      IEnumerable<ItemDTO> expected = items
         .Select(i => SaveItem(i))
         .ToList();
 
@@ -89,7 +95,7 @@ namespace Controllers.Tests
     [Fact]
     public void Update_When_InputModelIsValid_Expect_Updated()
     {
-      ItemDTO itemToUpdate = SaveItem(new ItemApiModel { Text = "itemText" });
+      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText" });
 
       string newItemText = "newItemText";
 
@@ -99,7 +105,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        ItemDTO itemUpdated = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result)
+        Item itemUpdated = GetAllItems()
           .Where(i => i.Id == itemToUpdate.Id)
           .FirstOrDefault();
 
@@ -132,13 +138,13 @@ namespace Controllers.Tests
     [Fact]
     public void Delete_When_ItemIsFound_Expect_Deleted()
     {
-      ItemDTO itemSaved = SaveItem(new ItemApiModel { Text = "itemText" });
+      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText" });
 
       HttpResponseMessage response = client.DeleteAsync($"{url}/{itemSaved.Id}").Result;
 
       response.EnsureSuccessStatusCode();
 
-      ItemDTO itemDeleted = DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result)
+      Item itemDeleted = GetAllItems()
         .Where(i => i.Id == itemSaved.Id)
         .FirstOrDefault();
 
@@ -155,18 +161,30 @@ namespace Controllers.Tests
 
     public void Dispose()
     {
-      foreach (ItemDTO item in DeserializeResponseBody<IEnumerable<ItemDTO>>(client.GetAsync(url).Result))
-      {
-        HttpResponseMessage response = client.DeleteAsync($"{url}/{item.Id}").Result;
-      }
+      IItemRepository itemRepository = GetRepository<IItemRepository>();
+
+      foreach (Item item in itemRepository.All())
+        itemRepository.Delete(item.Id);
+
+      GetRepository<IDbTransactionManager>().SaveChanges();
     }
 
-    private ItemDTO SaveItem(ItemApiModel itemToSave)
+    private ItemDTO SaveItem(Item itemToSave)
     {
-      using (HttpContent httpContent = CreateHttpContent(itemToSave))
-      {
-        return DeserializeResponseBody<ItemDTO>(client.PostAsync(url, httpContent).Result);
-      }
+      GetRepository<IItemRepository>().Create(itemToSave);
+      GetRepository<IDbTransactionManager>().SaveChanges();
+
+      return new ItemDTO { Id = itemToSave.Id, Text = itemToSave.Text };
+    }
+
+    private IEnumerable<Item> GetAllItems()
+    {
+      return GetRepository<IItemRepository>().All();
+    }
+
+    private T GetRepository<T>()
+    {
+      return server.Host.Services.GetRequiredService<T>();
     }
 
     private HttpContent CreateHttpContent(object requestBody)

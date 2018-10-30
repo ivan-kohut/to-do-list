@@ -11,8 +11,7 @@ namespace Controllers.Tests.Fixtures
 {
   public class TestServerFixture : IDisposable
   {
-    private readonly TestServer server;
-
+    public TestServer Server { get; }
     public HttpClient Client { get; }
 
     public TestServerFixture()
@@ -27,15 +26,14 @@ namespace Controllers.Tests.Fixtures
         .UseContentRoot(projectRootPath)
         .UseStartup<Startup>();
 
-      this.server = new TestServer(webHostBuilder);
-
-      Client = server.CreateClient();
+      Server = new TestServer(webHostBuilder);
+      Client = Server.CreateClient();
     }
 
     public void Dispose()
     {
       Client?.Dispose();
-      server?.Dispose();
+      Server?.Dispose();
     }
   }
 }

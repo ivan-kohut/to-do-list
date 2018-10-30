@@ -9,6 +9,6 @@ namespace Repositories
     IEnumerable<Item> All();
     void Create(Item item);
     void Update(Item item);
-    void Delete(Item item);
+    void Delete(int id);
   }
 }
