@@ -35,6 +35,8 @@ namespace WebApplication
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
+      app.ApplyMigrations();
+
       if (env.IsDevelopment())
       {
         app.UseBrowserLink();
