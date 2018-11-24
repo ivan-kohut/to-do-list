@@ -1,6 +1,7 @@
 ﻿using Controllers.Models;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Threading.Tasks;
 
 namespace Controllers
 {
@@ -15,9 +16,9 @@ namespace Controllers
     }
 
     [HttpGet]
-    public IActionResult All()
+    public async Task<IActionResult> AllAsync()
     {
-      return Json(itemService.All());
+      return Json(await itemService.AllAsync());
     }
 
     [HttpPost]

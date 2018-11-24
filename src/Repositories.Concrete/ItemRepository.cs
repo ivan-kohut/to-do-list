@@ -1,6 +1,6 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Repositories
 {
@@ -18,7 +18,7 @@ namespace Repositories
       return dbContext.Items.Find(id);
     }
 
-    public IEnumerable<Item> All()
+    public IQueryable<Item> All()
     {
       return dbContext.Items.AsNoTracking();
     }

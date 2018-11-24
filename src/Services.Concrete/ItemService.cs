@@ -1,7 +1,9 @@
 ﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 using Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Services
 {
@@ -16,11 +18,11 @@ namespace Services
       this.dbTransactionManager = dbTransactionManager;
     }
 
-    public IEnumerable<ItemDTO> All()
+    public async Task<IEnumerable<ItemDTO>> AllAsync()
     {
-      return itemRepository.All()
+      return await itemRepository.All()
         .Select(i => new ItemDTO { Id = i.Id, Text = i.Text })
-        .ToList();
+        .ToListAsync();
     }
 
     public ItemDTO Save(ItemDTO itemDTO)

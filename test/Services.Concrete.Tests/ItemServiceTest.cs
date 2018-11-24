@@ -1,8 +1,10 @@
 ﻿using Entities;
 using FluentAssertions;
+using MockQueryable.Moq;
 using Moq;
 using Repositories;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Services.Tests
@@ -23,22 +25,24 @@ namespace Services.Tests
     }
 
     [Fact]
-    public void All_When_ItemsDoNotExist_Expect_EmptyList()
+    public void AllAsync_When_ItemsDoNotExist_Expect_EmptyList()
     {
-      mockItemRepository.Setup(r => r.All()).Returns(new List<Item>());
+      mockItemRepository.Setup(r => r.All()).Returns(new List<Item>().AsQueryable().BuildMock().Object);
 
-      Assert.Empty(itemService.All());
+      Assert.Empty(itemService.AllAsync().Result);
 
       mockItemRepository.Verify(r => r.All(), Times.Once());
     }
 
     [Fact]
-    public void All_When_ItemsExist_Expect_Returned()
+    public void AllAsync_When_ItemsExist_Expect_Returned()
     {
       Item firstItem = new Item { Id = 1, Text = "firstText" };
       Item secondItem = new Item { Id = 2, Text = "secondText" };
 
-      mockItemRepository.Setup(r => r.All()).Returns(new List<Item> { firstItem, secondItem });
+      mockItemRepository
+        .Setup(r => r.All())
+        .Returns(new List<Item> { firstItem, secondItem }.AsQueryable().BuildMock().Object);
 
       IEnumerable<ItemDTO> expected = new List<ItemDTO>
       {
@@ -46,7 +50,7 @@ namespace Services.Tests
         new ItemDTO { Id = secondItem.Id, Text = secondItem.Text }
       };
 
-      IEnumerable<ItemDTO> actual = itemService.All();
+      IEnumerable<ItemDTO> actual = itemService.AllAsync().Result;
 
       actual.ShouldBeEquivalentTo(expected);
 
