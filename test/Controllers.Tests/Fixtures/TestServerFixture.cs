@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Repositories;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -32,6 +34,7 @@ namespace Controllers.Tests.Fixtures
 
     public void Dispose()
     {
+      Server.Host.Services.GetRequiredService<AppDbContext>().Dispose();
       Client?.Dispose();
       Server?.Dispose();
     }

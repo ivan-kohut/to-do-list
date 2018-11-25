@@ -5,6 +5,7 @@ using Moq;
 using Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Services.Tests
@@ -58,96 +59,96 @@ namespace Services.Tests
     }
 
     [Fact]
-    public void Save_Expect_Saved()
+    public void SaveAsync_Expect_Saved()
     {
       int generatedItemId = 10;
 
       ItemDTO itemToSave = new ItemDTO { Text = "itemText" };
 
       mockItemRepository
-        .Setup(r => r.Create(It.IsAny<Item>()))
+        .Setup(r => r.CreateAsync(It.IsAny<Item>()))
         .Callback<Item>(i => i.Id = generatedItemId)
-        .Verifiable();
+        .Returns(Task.CompletedTask);
 
-      mockDbTransactionManager.Setup(m => m.SaveChanges()).Verifiable();
+      mockDbTransactionManager.Setup(m => m.SaveChangesAsync()).Returns(Task.CompletedTask);
 
       ItemDTO expected = new ItemDTO { Id = generatedItemId, Text = itemToSave.Text };
-      ItemDTO actual = itemService.Save(itemToSave);
+      ItemDTO actual = itemService.SaveAsync(itemToSave).Result;
 
       actual.ShouldBeEquivalentTo(expected);
 
-      mockItemRepository.Verify(r => r.Create(It.IsAny<Item>()), Times.Once());
-      mockDbTransactionManager.Verify((m => m.SaveChanges()), Times.Once());
+      mockItemRepository.Verify(r => r.CreateAsync(It.IsAny<Item>()), Times.Once());
+      mockDbTransactionManager.Verify((m => m.SaveChangesAsync()), Times.Once());
     }
 
     [Fact]
-    public void Update_When_ItemDoesNotExist_Expect_NotSuccessedOperation()
+    public void UpdateAsync_When_ItemDoesNotExist_Expect_NotSuccessedOperation()
     {
       ItemDTO itemToUpdate = new ItemDTO { Id = 1, Text = "itemText" };
       Item notFoundItem = null;
 
-      mockItemRepository.Setup(r => r.GetById(itemToUpdate.Id)).Returns(notFoundItem);
+      mockItemRepository.Setup(r => r.GetByIdAsync(itemToUpdate.Id)).Returns(Task.FromResult(notFoundItem));
 
-      Assert.False(itemService.Update(itemToUpdate).Success);
+      Assert.False(itemService.UpdateAsync(itemToUpdate).Result.Success);
 
-      mockItemRepository.Verify(r => r.GetById(itemToUpdate.Id), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAsync(itemToUpdate.Id), Times.Once());
     }
 
     [Fact]
-    public void Update_When_ItemExists_Expect_SuccessedOperation()
+    public void UpdateAsync_When_ItemExists_Expect_SuccessedOperation()
     {
       ItemDTO itemToUpdate = new ItemDTO { Id = 1, Text = "newItemText" };
       Item foundItem = new Item { Id = itemToUpdate.Id, Text = "itemText" };
 
-      mockItemRepository.Setup(r => r.GetById(itemToUpdate.Id)).Returns(foundItem);
+      mockItemRepository.Setup(r => r.GetByIdAsync(itemToUpdate.Id)).Returns(Task.FromResult(foundItem));
 
       mockItemRepository
         .Setup(r => r.Update(foundItem))
         .Callback<Item>(item => item.ShouldBeEquivalentTo(itemToUpdate))
         .Verifiable();
 
-      mockDbTransactionManager.Setup(m => m.SaveChanges()).Verifiable();
+      mockDbTransactionManager.Setup(m => m.SaveChangesAsync()).Returns(Task.CompletedTask);
 
-      Assert.True(itemService.Update(itemToUpdate).Success);
+      Assert.True(itemService.UpdateAsync(itemToUpdate).Result.Success);
 
-      mockItemRepository.Verify(r => r.GetById(itemToUpdate.Id), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAsync(itemToUpdate.Id), Times.Once());
       mockItemRepository.Verify(r => r.Update(foundItem), Times.Once());
 
-      mockDbTransactionManager.Verify(m => m.SaveChanges(), Times.Once());
+      mockDbTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
     }
 
     [Fact]
-    public void Delete_When_ItemDoesNotExist_Expect_NotSuccessedOperation()
+    public void DeleteAsync_When_ItemDoesNotExist_Expect_NotSuccessedOperation()
     {
       int itemToDeleteId = 1;
 
       Item notFoundItem = null;
 
-      mockItemRepository.Setup(r => r.GetById(itemToDeleteId)).Returns(notFoundItem);
+      mockItemRepository.Setup(r => r.GetByIdAsync(itemToDeleteId)).Returns(Task.FromResult(notFoundItem));
 
-      Assert.False(itemService.Delete(itemToDeleteId).Success);
+      Assert.False(itemService.DeleteAsync(itemToDeleteId).Result.Success);
 
-      mockItemRepository.Verify(r => r.GetById(itemToDeleteId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAsync(itemToDeleteId), Times.Once());
     }
 
     [Fact]
-    public void Delete_When_ItemExists_Expect_SuccessedOperation()
+    public void DeleteAsync_When_ItemExists_Expect_SuccessedOperation()
     {
       int itemToDeleteId = 1;
 
       Item foundItem = new Item { Id = itemToDeleteId, Text = "itemText" };
 
-      mockItemRepository.Setup(r => r.GetById(itemToDeleteId)).Returns(foundItem);
-      mockItemRepository.Setup(r => r.Delete(itemToDeleteId)).Verifiable();
+      mockItemRepository.Setup(r => r.GetByIdAsync(itemToDeleteId)).Returns(Task.FromResult(foundItem));
+      mockItemRepository.Setup(r => r.Delete(foundItem)).Verifiable();
 
-      mockDbTransactionManager.Setup(m => m.SaveChanges()).Verifiable();
+      mockDbTransactionManager.Setup(m => m.SaveChangesAsync()).Returns(Task.CompletedTask);
 
-      Assert.True(itemService.Delete(itemToDeleteId).Success);
+      Assert.True(itemService.DeleteAsync(itemToDeleteId).Result.Success);
 
-      mockItemRepository.Verify(r => r.GetById(itemToDeleteId), Times.Once());
-      mockItemRepository.Verify(r => r.Delete(itemToDeleteId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAsync(itemToDeleteId), Times.Once());
+      mockItemRepository.Verify(r => r.Delete(foundItem), Times.Once());
 
-      mockDbTransactionManager.Verify(m => m.SaveChanges(), Times.Once());
+      mockDbTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
     }
   }
 }

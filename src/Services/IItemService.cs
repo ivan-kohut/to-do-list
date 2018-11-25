@@ -6,8 +6,8 @@ namespace Services
   public interface IItemService
   {
     Task<IEnumerable<ItemDTO>> AllAsync();
-    ItemDTO Save(ItemDTO item);
-    OperationResultDTO Update(ItemDTO item);
-    OperationResultDTO Delete(int id);
+    Task<ItemDTO> SaveAsync(ItemDTO item);
+    Task<OperationResultDTO> UpdateAsync(ItemDTO item);
+    Task<OperationResultDTO> DeleteAsync(int id);
   }
 }

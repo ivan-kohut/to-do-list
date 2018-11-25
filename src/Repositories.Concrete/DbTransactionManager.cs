@@ -1,4 +1,6 @@
-﻿namespace Repositories
+﻿using System.Threading.Tasks;
+
+namespace Repositories
 {
   public class DbTransactionManager : IDbTransactionManager
   {
@@ -9,9 +11,9 @@
       this.dbContext = dbContext;
     }
 
-    public void SaveChanges()
+    public async Task SaveChangesAsync()
     {
-      dbContext.SaveChanges();
+      await dbContext.SaveChangesAsync();
     }
   }
 }

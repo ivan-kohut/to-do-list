@@ -1,14 +1,15 @@
 ﻿using Entities;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Repositories
 {
   public interface IItemRepository
   {
-    Item GetById(int id);
+    Task<Item> GetByIdAsync(int id);
     IQueryable<Item> All();
-    void Create(Item item);
+    Task CreateAsync(Item item);
     void Update(Item item);
-    void Delete(int id);
+    void Delete(Item item);
   }
 }

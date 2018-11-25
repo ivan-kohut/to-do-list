@@ -3,6 +3,7 @@ using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Repositories;
 using Services;
@@ -161,25 +162,25 @@ namespace Controllers.Tests
 
     public void Dispose()
     {
-      IItemRepository itemRepository = GetRepository<IItemRepository>();
+      AppDbContext appDbContext = GetRepository<AppDbContext>();
 
-      foreach (Item item in itemRepository.All())
-        itemRepository.Delete(item.Id);
-
-      GetRepository<IDbTransactionManager>().SaveChanges();
+      appDbContext.RemoveRange(appDbContext.Items);
+      appDbContext.SaveChanges();
     }
 
     private ItemDTO SaveItem(Item itemToSave)
     {
-      GetRepository<IItemRepository>().Create(itemToSave);
-      GetRepository<IDbTransactionManager>().SaveChanges();
+      AppDbContext appDbContext = GetRepository<AppDbContext>();
+
+      appDbContext.Add(itemToSave);
+      appDbContext.SaveChanges();
 
       return new ItemDTO { Id = itemToSave.Id, Text = itemToSave.Text };
     }
 
     private IEnumerable<Item> GetAllItems()
     {
-      return GetRepository<IItemRepository>().All();
+      return GetRepository<AppDbContext>().Items.AsNoTracking();
     }
 
     private T GetRepository<T>()

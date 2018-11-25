@@ -1,7 +1,9 @@
-﻿namespace Repositories
+﻿using System.Threading.Tasks;
+
+namespace Repositories
 {
   public interface IDbTransactionManager
   {
-    void SaveChanges();
+    Task SaveChangesAsync();
   }
 }

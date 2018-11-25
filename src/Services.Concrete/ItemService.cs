@@ -25,23 +25,23 @@ namespace Services
         .ToListAsync();
     }
 
-    public ItemDTO Save(ItemDTO itemDTO)
+    public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
       Item item = new Item { Text = itemDTO.Text };
 
-      itemRepository.Create(item);
-      dbTransactionManager.SaveChanges();
+      await itemRepository.CreateAsync(item);
+      await dbTransactionManager.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
 
       return itemDTO;
     }
 
-    public OperationResultDTO Update(ItemDTO itemDTO)
+    public async Task<OperationResultDTO> UpdateAsync(ItemDTO itemDTO)
     {
       OperationResultDTO updateOperationResult = new OperationResultDTO();
 
-      Item item = itemRepository.GetById(itemDTO.Id);
+      Item item = await itemRepository.GetByIdAsync(itemDTO.Id);
 
       if (item == null)
         return updateOperationResult;
@@ -49,22 +49,26 @@ namespace Services
       item.Text = itemDTO.Text;
 
       itemRepository.Update(item);
-      dbTransactionManager.SaveChanges();
+
+      await dbTransactionManager.SaveChangesAsync();
 
       updateOperationResult.Success = true;
 
       return updateOperationResult;
     }
 
-    public OperationResultDTO Delete(int id)
+    public async Task<OperationResultDTO> DeleteAsync(int id)
     {
       OperationResultDTO deleteOperationResult = new OperationResultDTO();
 
-      if (itemRepository.GetById(id) == null)
+      Item item = await itemRepository.GetByIdAsync(id);
+
+      if (item == null)
         return deleteOperationResult;
 
-      itemRepository.Delete(id);
-      dbTransactionManager.SaveChanges();
+      itemRepository.Delete(item);
+
+      await dbTransactionManager.SaveChangesAsync();
 
       deleteOperationResult.Success = true;
 

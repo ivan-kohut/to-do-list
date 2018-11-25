@@ -1,6 +1,7 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Repositories
 {
@@ -13,9 +14,9 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public Item GetById(int id)
+    public async Task<Item> GetByIdAsync(int id)
     {
-      return dbContext.Items.Find(id);
+      return await dbContext.Items.FindAsync(id);
     }
 
     public IQueryable<Item> All()
@@ -23,9 +24,9 @@ namespace Repositories
       return dbContext.Items.AsNoTracking();
     }
 
-    public void Create(Item item)
+    public async Task CreateAsync(Item item)
     {
-      dbContext.Add(item);
+      await dbContext.AddAsync(item);
     }
 
     public void Update(Item item)
@@ -33,9 +34,9 @@ namespace Repositories
       dbContext.Update(item);
     }
 
-    public void Delete(int id)
+    public void Delete(Item item)
     {
-      dbContext.Remove(GetById(id));
+      dbContext.Remove(item);
     }
   }
 }

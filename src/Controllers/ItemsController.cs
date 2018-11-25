@@ -22,27 +22,27 @@ namespace Controllers
     }
 
     [HttpPost]
-    public IActionResult Save([FromBody] ItemApiModel item)
+    public async Task<IActionResult> SaveAsync([FromBody] ItemApiModel item)
     {
       if (!ModelState.IsValid)
         return BadRequest();
 
-      return Json(itemService.Save(new ItemDTO { Text = item.Text }));
+      return Json(await itemService.SaveAsync(new ItemDTO { Text = item.Text }));
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] ItemApiModel item)
+    public async Task<IActionResult> UpdateAsync(int id, [FromBody] ItemApiModel item)
     {
       if (!ModelState.IsValid)
         return BadRequest();
 
-      return GenerateResponse(itemService.Update(new ItemDTO { Id = id, Text = item.Text }));
+      return GenerateResponse(await itemService.UpdateAsync(new ItemDTO { Id = id, Text = item.Text }));
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
-      return GenerateResponse(itemService.Delete(id));
+      return GenerateResponse(await itemService.DeleteAsync(id));
     }
 
     private IActionResult GenerateResponse(OperationResultDTO operationResult)
