@@ -35,19 +35,12 @@ namespace WebApplication
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
-      services.AddScoped<IDbTransactionManager, DbTransactionManager>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
-      if (env.IsDevelopment())
-      {
-        app.UseBrowserLink();
-        app.UseDeveloperExceptionPage();
-      }
-
+      app.UseDeveloperExceptionPage();
       app.UseMiniProfiler();
-
       app.UseStaticFiles();
       app.UseMvc();
     }

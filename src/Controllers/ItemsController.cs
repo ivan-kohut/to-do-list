@@ -1,10 +1,13 @@
 ﻿using Controllers.Models;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Controllers
 {
+  [ApiController]
   [Route("/[controller]")]
   public class ItemsController : Controller
   {
@@ -16,41 +19,45 @@ namespace Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> AllAsync()
+    public async Task<ActionResult<IEnumerable<ItemDTO>>> AllAsync()
     {
-      return Json(await itemService.AllAsync());
+      return new List<ItemDTO>(await itemService.AllAsync());
     }
 
     [HttpPost]
-    public async Task<IActionResult> SaveAsync([FromBody] ItemApiModel item)
+    public async Task<ActionResult<ItemDTO>> SaveAsync(ItemApiModel item)
     {
-      if (!ModelState.IsValid)
-        return BadRequest();
-
-      return Json(await itemService.SaveAsync(new ItemDTO { Text = item.Text }));
+      return await itemService.SaveAsync(new ItemDTO { Text = item.Text });
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, [FromBody] ItemApiModel item)
+    public async Task<IActionResult> UpdateAsync(int id, ItemApiModel item)
     {
-      if (!ModelState.IsValid)
-        return BadRequest();
+      try
+      {
+        await itemService.UpdateAsync(new ItemDTO { Id = id, Text = item.Text });
 
-      return GenerateResponse(await itemService.UpdateAsync(new ItemDTO { Id = id, Text = item.Text }));
+        return Ok();
+      }
+      catch (ArgumentException)
+      {
+        return NotFound();
+      }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-      return GenerateResponse(await itemService.DeleteAsync(id));
-    }
+      try
+      {
+        await itemService.DeleteAsync(id);
 
-    private IActionResult GenerateResponse(OperationResultDTO operationResult)
-    {
-      if (operationResult.Success)
         return Ok();
-      else
+      }
+      catch (ArgumentException)
+      {
         return NotFound();
+      }
     }
   }
 }

@@ -2,7 +2,7 @@
 
 namespace Repositories
 {
-  public interface IDbTransactionManager
+  public interface IRepository
   {
     Task SaveChangesAsync();
   }

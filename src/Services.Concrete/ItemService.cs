@@ -1,6 +1,7 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,10 @@ namespace Services
   public class ItemService : IItemService
   {
     private readonly IItemRepository itemRepository;
-    private readonly IDbTransactionManager dbTransactionManager;
 
-    public ItemService(IItemRepository itemRepository, IDbTransactionManager dbTransactionManager)
+    public ItemService(IItemRepository itemRepository)
     {
       this.itemRepository = itemRepository;
-      this.dbTransactionManager = dbTransactionManager;
     }
 
     public async Task<IEnumerable<ItemDTO>> AllAsync()
@@ -30,49 +29,37 @@ namespace Services
       Item item = new Item { Text = itemDTO.Text };
 
       await itemRepository.CreateAsync(item);
-      await dbTransactionManager.SaveChangesAsync();
+      await itemRepository.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
 
       return itemDTO;
     }
 
-    public async Task<OperationResultDTO> UpdateAsync(ItemDTO itemDTO)
+    public async Task UpdateAsync(ItemDTO itemDTO)
     {
-      OperationResultDTO updateOperationResult = new OperationResultDTO();
-
       Item item = await itemRepository.GetByIdAsync(itemDTO.Id);
 
       if (item == null)
-        return updateOperationResult;
+        throw new ArgumentException($"Item with id {itemDTO.Id} is not found");
 
       item.Text = itemDTO.Text;
 
       itemRepository.Update(item);
 
-      await dbTransactionManager.SaveChangesAsync();
-
-      updateOperationResult.Success = true;
-
-      return updateOperationResult;
+      await itemRepository.SaveChangesAsync();
     }
 
-    public async Task<OperationResultDTO> DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-      OperationResultDTO deleteOperationResult = new OperationResultDTO();
-
       Item item = await itemRepository.GetByIdAsync(id);
 
       if (item == null)
-        return deleteOperationResult;
+        throw new ArgumentException($"Item with id {id} is not found");
 
       itemRepository.Delete(item);
 
-      await dbTransactionManager.SaveChangesAsync();
-
-      deleteOperationResult.Success = true;
-
-      return deleteOperationResult;
+      await itemRepository.SaveChangesAsync();
     }
   }
 }

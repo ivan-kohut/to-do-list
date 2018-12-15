@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-  public class ItemRepository : IItemRepository
+  public class ItemRepository : BaseRepository, IItemRepository
   {
     private readonly AppDbContext dbContext;
 
-    public ItemRepository(AppDbContext dbContext)
+    public ItemRepository(AppDbContext dbContext) : base(dbContext)
     {
       this.dbContext = dbContext;
     }

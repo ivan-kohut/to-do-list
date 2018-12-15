@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-  public interface IItemRepository
+  public interface IItemRepository : IRepository
   {
     Task<Item> GetByIdAsync(int id);
     IQueryable<Item> All();

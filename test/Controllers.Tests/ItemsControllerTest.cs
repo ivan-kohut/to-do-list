@@ -35,6 +35,7 @@ namespace Controllers.Tests
     [Fact]
     public void All_When_ItemsDoNotExist_Expect_EmptyList()
     {
+      // Act
       HttpResponseMessage response = client.GetAsync(url).Result;
 
       response.EnsureSuccessStatusCode();
@@ -49,6 +50,7 @@ namespace Controllers.Tests
 
       using (HttpContent httpContent = CreateHttpContent(itemToSave))
       {
+        // Act
         HttpResponseMessage response = client.PostAsync(url, httpContent).Result;
 
         response.EnsureSuccessStatusCode();
@@ -65,6 +67,7 @@ namespace Controllers.Tests
     {
       using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "" }))
       {
+        // Act
         HttpResponseMessage response = client.PostAsync(url, httpContent).Result;
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -84,6 +87,7 @@ namespace Controllers.Tests
         .Select(i => SaveItem(i))
         .ToList();
 
+      // Act
       HttpResponseMessage response = client.GetAsync(url).Result;
 
       response.EnsureSuccessStatusCode();
@@ -102,6 +106,7 @@ namespace Controllers.Tests
 
       using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = newItemText }))
       {
+        // Act
         HttpResponseMessage response = client.PutAsync($"{url}/{itemToUpdate.Id}", httpContent).Result;
 
         response.EnsureSuccessStatusCode();
@@ -119,6 +124,7 @@ namespace Controllers.Tests
     {
       using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "" }))
       {
+        // Act
         HttpResponseMessage response = client.PutAsync($"{url}/{1}", httpContent).Result;
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -130,6 +136,7 @@ namespace Controllers.Tests
     {
       using (HttpContent httpContent = CreateHttpContent(new ItemApiModel { Text = "itemText" }))
       {
+        // Act
         HttpResponseMessage response = client.PutAsync($"{url}/{1}", httpContent).Result;
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -141,6 +148,7 @@ namespace Controllers.Tests
     {
       ItemDTO itemSaved = SaveItem(new Item { Text = "itemText" });
 
+      // Act
       HttpResponseMessage response = client.DeleteAsync($"{url}/{itemSaved.Id}").Result;
 
       response.EnsureSuccessStatusCode();
@@ -155,6 +163,7 @@ namespace Controllers.Tests
     [Fact]
     public void Delete_When_ItemIsNotFound_Expect_NotFound()
     {
+      // Act
       HttpResponseMessage response = client.DeleteAsync($"{url}/{1}").Result;
 
       Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
