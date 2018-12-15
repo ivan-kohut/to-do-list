@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repositories;
 using Services;
+using StackExchange.Profiling;
 using System.Reflection;
 
 namespace WebApplication
@@ -24,6 +25,10 @@ namespace WebApplication
         options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
       );
 
+      services
+        .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
+        .AddEntityFramework();
+
       services.AddMvc()
         .AddApplicationPart(Assembly.Load(new AssemblyName("Controllers")));
 
@@ -35,13 +40,13 @@ namespace WebApplication
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
-      app.ApplyMigrations();
-
       if (env.IsDevelopment())
       {
         app.UseBrowserLink();
         app.UseDeveloperExceptionPage();
       }
+
+      app.UseMiniProfiler();
 
       app.UseStaticFiles();
       app.UseMvc();
