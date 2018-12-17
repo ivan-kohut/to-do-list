@@ -42,6 +42,7 @@ namespace WebApplication
       app.UseDeveloperExceptionPage();
       app.UseMiniProfiler();
       app.UseStaticFiles();
+      app.UseHttpsRedirection();
       app.UseMvc();
     }
   }
