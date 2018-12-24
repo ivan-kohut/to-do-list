@@ -14,6 +14,8 @@ namespace WebApplication
   {
     private readonly IConfiguration configuration;
 
+    protected virtual string ConnectionStringName { get; } = "DefaultConnection";
+
     public Startup(IConfiguration configuration)
     {
       this.configuration = configuration;
@@ -22,7 +24,7 @@ namespace WebApplication
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<AppDbContext>(
-        options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+        options => options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName))
       );
 
       services

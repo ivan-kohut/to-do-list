@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Repositories;
 using System;
 using System.IO;
 using System.Net.Http;
-using WebApplication;
-using EnvironmentName = WebApplication.EnvironmentName;
+using Xunit;
 
 namespace Controllers.Tests.Fixtures
 {
+  [CollectionDefinition(nameof(IntegrationTestCollection))]
+  public class IntegrationTestCollection : ICollectionFixture<TestServerFixture> { }
+
   public class TestServerFixture : IDisposable
   {
     public TestServer Server { get; }
@@ -24,9 +24,8 @@ namespace Controllers.Tests.Fixtures
       );
 
       IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
-        .UseEnvironment(EnvironmentName.Testing)
         .UseContentRoot(projectRootPath)
-        .UseStartup<Startup>();
+        .UseStartup<TestStartup>();
 
       Server = new TestServer(webHostBuilder);
       Client = Server.CreateClient();
@@ -34,7 +33,6 @@ namespace Controllers.Tests.Fixtures
 
     public void Dispose()
     {
-      Server.Host.Services.GetRequiredService<AppDbContext>().Dispose();
       Client?.Dispose();
       Server?.Dispose();
     }
