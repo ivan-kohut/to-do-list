@@ -7,10 +7,14 @@ namespace WebApplication
   {
     static void Main(string[] args)
     {
-      WebHost.CreateDefaultBuilder(args)
+      BuildWebHost(args).Run();
+    }
+
+    public static IWebHost BuildWebHost(string[] args)
+    {
+      return WebHost.CreateDefaultBuilder(args)
         .UseStartup<Startup>()
-        .Build()
-        .Run();
+        .Build();
     }
   }
 }
