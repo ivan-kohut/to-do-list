@@ -20,18 +20,21 @@ namespace Services
     public async Task<IEnumerable<ItemDTO>> AllAsync()
     {
       return await itemRepository.All()
-        .Select(i => new ItemDTO { Id = i.Id, Text = i.Text })
+        .Select(i => new ItemDTO { Id = i.Id, Text = i.Text, Priority = i.Priority })
         .ToListAsync();
     }
 
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
-      Item item = new Item { Text = itemDTO.Text };
+      int maxPriority = await itemRepository.GetMaxItemPriorityAsync();
+
+      Item item = new Item { Text = itemDTO.Text, Priority = maxPriority + 1 };
 
       await itemRepository.CreateAsync(item);
       await itemRepository.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
+      itemDTO.Priority = item.Priority;
 
       return itemDTO;
     }
@@ -44,6 +47,17 @@ namespace Services
         throw new ArgumentException($"Item with id {itemDTO.Id} is not found");
 
       item.Text = itemDTO.Text;
+
+      if (itemDTO.Priority != item.Priority)
+      {
+        Item itemToSwapPriority = await itemRepository.GetByPriorityAsync(itemDTO.Priority);
+
+        if (itemToSwapPriority != null)
+        {
+          itemToSwapPriority.Priority = item.Priority;
+          item.Priority = itemDTO.Priority;
+        }
+      }
 
       itemRepository.Update(item);
 

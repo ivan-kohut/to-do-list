@@ -23,7 +23,7 @@
 
     callAPI(serverURL, "POST", { text: itemText }, function (data) {
       putItem(data);
-      cleatInputField();
+      clearInputField();
 
       if (isSelectedItem())
         resetItemState();
@@ -36,8 +36,11 @@
     if (!isSelectedItem() || !newTextValue)
       return false;
 
-    callAPI(serverURL + "/" + selectedId, "PUT", { text: newTextValue }, function () {
-      getSelectedItem().text(newTextValue);
+    var item = getSelectedItem();
+    var data = { text: newTextValue, priority: item.attr("data-priority") };
+
+    callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
+      item.text(newTextValue);
     });
   };
 
@@ -45,7 +48,7 @@
     if (!isSelectedItem())
       return false;
 
-    callAPI(serverURL + "/" + selectedId, "DELETE", null, function () {
+    callAPI(`${serverURL}/${selectedId}`, "DELETE", null, function () {
       var item = getSelectedItem();
       var nextItem = item.next();
 
@@ -53,7 +56,7 @@
 
       if (nextItem.length === 0) {
         resetItemState();
-        cleatInputField();
+        clearInputField();
       } else {
         selectedId = nextItem.attr('id');
         $inputField.val(getSelectedItem().text());
@@ -66,7 +69,18 @@
       return false;
 
     var item = getSelectedItem();
-    item.insertBefore(item.prev());
+    var previousItem = item.prev();
+
+    if (previousItem.length !== 0) {
+      var data = { text: item.text(), priority: previousItem.attr("data-priority") };
+
+      callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
+        previousItem.attr("data-priority", item.attr("data-priority"));
+        item.attr("data-priority", data.priority);
+
+        item.insertBefore(previousItem);
+      });
+    }
   };
 
   app.moveDownItem = function () {
@@ -74,7 +88,18 @@
       return false;
 
     var item = getSelectedItem();
-    item.insertAfter(item.next());
+    var nextItem = item.next();
+
+    if (nextItem.length !== 0) {
+      var data = { text: item.text(), priority: nextItem.attr("data-priority") };
+
+      callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
+        nextItem.attr("data-priority", item.attr("data-priority"));
+        item.attr("data-priority", data.priority);
+
+        item.insertAfter(nextItem);
+      });
+    }
   };
 
   app.onItemSelect = function (id) {
@@ -89,6 +114,7 @@
     $("#item-list").append(
       $("<li>")
         .attr("id", dataRow.id)
+        .attr("data-priority", dataRow.priority)
         .attr("onclick", "app.onItemSelect(" + dataRow.id + ")")
         .append(dataRow.text)
     );
@@ -110,7 +136,7 @@
     changeColor("blue", "red");
   }
 
-  function cleatInputField() {
+  function clearInputField() {
     $inputField.val("");
   }
 

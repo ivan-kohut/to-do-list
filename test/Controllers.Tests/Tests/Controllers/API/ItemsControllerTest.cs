@@ -37,7 +37,7 @@ namespace Controllers.Tests
     [Fact]
     public void Save_When_InputModelIsValid_Expect_Saved()
     {
-      ItemApiModel itemToSave = new ItemApiModel { Text = "itemText" };
+      ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
 
       // Act
       HttpResponseMessage response = Post(url, itemToSave);
@@ -54,7 +54,7 @@ namespace Controllers.Tests
     public void Save_When_InputModelIsNotValid_Expect_BadRequest()
     {
       // Act
-      HttpResponseMessage response = Post(url, new ItemApiModel { Text = "" });
+      HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -90,7 +90,7 @@ namespace Controllers.Tests
       string newItemText = "newItemText";
 
       // Act
-      HttpResponseMessage response = Put($"{url}/{itemToUpdate.Id}", new ItemApiModel { Text = newItemText });
+      HttpResponseMessage response = Put($"{url}/{itemToUpdate.Id}", new ItemUpdateApiModel { Text = newItemText });
 
       response.EnsureSuccessStatusCode();
 
@@ -105,7 +105,7 @@ namespace Controllers.Tests
     public void Update_When_InputModelIsNotValid_Expect_BadRequest()
     {
       // Act
-      HttpResponseMessage response = Put($"{url}/{1}", new ItemApiModel { Text = "" });
+      HttpResponseMessage response = Put($"{url}/{1}", new ItemUpdateApiModel { Text = "" });
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -114,7 +114,7 @@ namespace Controllers.Tests
     public void Update_When_ItemIsNotFound_Expect_NotFound()
     {
       // Act
-      HttpResponseMessage response = Put($"{url}/{1}", new ItemApiModel { Text = "itemText" });
+      HttpResponseMessage response = Put($"{url}/{1}", new ItemUpdateApiModel { Text = "itemText" });
 
       Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }

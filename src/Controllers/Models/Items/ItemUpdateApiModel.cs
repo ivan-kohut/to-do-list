@@ -2,10 +2,13 @@
 
 namespace Controllers.Models
 {
-  public class ItemApiModel
+  public class ItemUpdateApiModel
   {
     [Required]
     [StringLength(128, MinimumLength = 1)]
     public string Text { get; set; }
+
+    [Required]
+    public int Priority { get; set; }
   }
 }

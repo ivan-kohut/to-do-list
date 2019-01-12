@@ -25,17 +25,22 @@ namespace Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult<ItemDTO>> SaveAsync(ItemApiModel item)
+    public async Task<ActionResult<ItemDTO>> SaveAsync(ItemCreateApiModel item)
     {
       return await itemService.SaveAsync(new ItemDTO { Text = item.Text });
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, ItemApiModel item)
+    public async Task<IActionResult> UpdateAsync(int id, ItemUpdateApiModel item)
     {
       try
       {
-        await itemService.UpdateAsync(new ItemDTO { Id = id, Text = item.Text });
+        await itemService.UpdateAsync(new ItemDTO
+        {
+          Id = id,
+          Text = item.Text,
+          Priority = item.Priority
+        });
 
         return Ok();
       }
