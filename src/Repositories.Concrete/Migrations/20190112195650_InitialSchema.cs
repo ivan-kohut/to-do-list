@@ -13,12 +13,18 @@ namespace Repositories.Concrete.Migrations
           {
             Id = table.Column<int>(nullable: false)
                   .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-            Text = table.Column<string>(nullable: false, maxLength: 255)
+            Text = table.Column<string>(maxLength: 255, nullable: false),
+            Priority = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
             table.PrimaryKey("PK_Items", x => x.Id);
           });
+
+      migrationBuilder.CreateIndex(
+          name: "IX_Items_Id",
+          table: "Items",
+          column: "Id");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)

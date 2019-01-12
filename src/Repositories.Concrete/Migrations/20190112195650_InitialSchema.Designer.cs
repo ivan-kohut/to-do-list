@@ -7,24 +7,32 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repositories.Concrete.Migrations
 {
   [DbContext(typeof(AppDbContext))]
-  [Migration("20181103210736_InitialSchema")]
+  [Migration("20190112195650_InitialSchema")]
   partial class InitialSchema
   {
     protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
       modelBuilder
-          .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
+          .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+          .HasAnnotation("Relational:MaxIdentifierLength", 128)
           .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
       modelBuilder.Entity("Entities.Item", b =>
           {
             b.Property<int>("Id")
-                      .ValueGeneratedOnAdd();
+                      .ValueGeneratedOnAdd()
+                      .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            b.Property<string>("Text");
+            b.Property<int>("Priority");
+
+            b.Property<string>("Text")
+                      .IsRequired()
+                      .HasMaxLength(255);
 
             b.HasKey("Id");
+
+            b.HasIndex("Id");
 
             b.ToTable("Items");
           });
