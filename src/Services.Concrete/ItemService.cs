@@ -20,7 +20,8 @@ namespace Services
 
     public async Task<IEnumerable<ItemDTO>> AllAsync()
     {
-      return await itemRepository.All()
+      return await itemRepository
+        .All()
         .Select(i => new ItemDTO { Id = i.Id, Text = i.Text, Priority = i.Priority })
         .ToListAsync();
     }

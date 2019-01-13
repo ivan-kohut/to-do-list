@@ -1,6 +1,6 @@
 (function (app) {
 
-  var serverURL = "/items";
+  var serverURL = "/api/v1/items";
   var selectedId = -1; // not selected
 
   var $inputField;

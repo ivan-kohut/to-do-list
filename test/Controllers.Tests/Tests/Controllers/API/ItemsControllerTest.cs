@@ -17,7 +17,7 @@ namespace Controllers.Tests
   [Collection(nameof(IntegrationTestCollection))]
   public class ItemsControllerTest : ApiControllerTestBase, IDisposable
   {
-    private const string url = "/items";
+    private const string url = "/api/v1/items";
 
     public ItemsControllerTest(TestServerFixture testServerFixture) : base(testServerFixture)
     {
@@ -35,41 +35,17 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public void Save_When_InputModelIsValid_Expect_Saved()
-    {
-      ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
-
-      // Act
-      HttpResponseMessage response = Post(url, itemToSave);
-
-      response.EnsureSuccessStatusCode();
-
-      ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
-
-      Assert.NotEqual(0, itemSaved.Id);
-      Assert.Equal(itemToSave.Text, itemSaved.Text);
-    }
-
-    [Fact]
-    public void Save_When_InputModelIsNotValid_Expect_BadRequest()
-    {
-      // Act
-      HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
-
-      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
     public void All_When_ItemsExist_Expect_Returned()
     {
       IEnumerable<Item> items = new List<Item>
       {
-        new Item { Text = "firstItemText" },
-        new Item { Text = "secondItemText" }
+        new Item { Text = "firstItemText", Priority = 2 },
+        new Item { Text = "secondItemText", Priority = 1 }
       };
 
       IEnumerable<ItemDTO> expected = items
         .Select(i => SaveItem(i))
+        .OrderBy(i => i.Priority)
         .ToList();
 
       // Act
@@ -83,57 +59,76 @@ namespace Controllers.Tests
     }
 
     [Fact]
-    public void Update_When_InputModelIsValid_Expect_Updated()
-    {
-      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText" });
-
-      string newItemText = "newItemText";
-
-      // Act
-      HttpResponseMessage response = Put($"{url}/{itemToUpdate.Id}", new ItemUpdateApiModel { Text = newItemText });
-
-      response.EnsureSuccessStatusCode();
-
-      Item itemUpdated = GetAllItems()
-        .Where(i => i.Id == itemToUpdate.Id)
-        .FirstOrDefault();
-
-      Assert.Equal(newItemText, itemUpdated.Text);
-    }
-
-    [Fact]
-    public void Update_When_InputModelIsNotValid_Expect_BadRequest()
+    public void Save_When_InputModelIsNotValid_Expect_BadRequest()
     {
       // Act
-      HttpResponseMessage response = Put($"{url}/{1}", new ItemUpdateApiModel { Text = "" });
+      HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
 
       Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
-    public void Update_When_ItemIsNotFound_Expect_NotFound()
+    public void Save_When_InputModelIsValid_Expect_Saved()
+    {
+      ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
+
+      // Act
+      HttpResponseMessage response = Post(url, itemToSave);
+
+      response.EnsureSuccessStatusCode();
+
+      ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
+
+      Assert.NotEqual(0, itemSaved.Id);
+      Assert.Equal(itemToSave.Text, itemSaved.Text);
+      Assert.Equal(1, itemSaved.Priority);
+    }
+
+    [Fact]
+    public void UpdatePartially_When_InputModelIsNotValid_Expect_BadRequest()
     {
       // Act
-      HttpResponseMessage response = Put($"{url}/{1}", new ItemUpdateApiModel { Text = "itemText" });
+      HttpResponseMessage response = Patch($"{url}/{1}", null);
+
+      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public void UpdatePartially_When_ItemIsNotFound_Expect_NotFound()
+    {
+      // Act
+      HttpResponseMessage response = Patch($"{url}/{1}", Enumerable.Empty<PatchDTO>());
 
       Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public void Delete_When_ItemIsFound_Expect_Deleted()
+    public void UpdatePartially_When_InputModelIsValid_Expect_Updated()
     {
-      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText" });
+      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText", Priority = 1 });
+
+      PatchDTO textPatchDTO = new PatchDTO
+      {
+        Name = "Text",
+        Value = "newItemText"
+      };
+
+      PatchDTO priorityPatchDTO = new PatchDTO
+      {
+        Name = "Priority",
+        Value = 2
+      };
 
       // Act
-      HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
+      HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO });
 
       response.EnsureSuccessStatusCode();
 
-      Item itemDeleted = GetAllItems()
-        .Where(i => i.Id == itemSaved.Id)
-        .FirstOrDefault();
+      Item itemUpdated = GetAllItems()
+        .Single(i => i.Id == itemToUpdate.Id);
 
-      Assert.Null(itemDeleted);
+      Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
+      Assert.Equal(priorityPatchDTO.Value, itemUpdated.Priority);
     }
 
     [Fact]
@@ -143,6 +138,22 @@ namespace Controllers.Tests
       HttpResponseMessage response = Delete($"{url}/{1}");
 
       Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public void Delete_When_ItemIsFound_Expect_Deleted()
+    {
+      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText", Priority = 1 });
+
+      // Act
+      HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
+
+      response.EnsureSuccessStatusCode();
+
+      Item itemDeleted = GetAllItems()
+        .SingleOrDefault(i => i.Id == itemSaved.Id);
+
+      Assert.Null(itemDeleted);
     }
 
     public void Dispose()
@@ -162,7 +173,7 @@ namespace Controllers.Tests
         appDbContext.Add(itemToSave);
         appDbContext.SaveChanges();
 
-        return new ItemDTO { Id = itemToSave.Id, Text = itemToSave.Text };
+        return new ItemDTO { Id = itemToSave.Id, Text = itemToSave.Text, Priority = itemToSave.Priority };
       }
     }
 
@@ -170,7 +181,9 @@ namespace Controllers.Tests
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
-        return Server.GetService<AppDbContext>().Items;
+        return appDbContext
+          .Items
+          .ToList();
       }
     }
   }

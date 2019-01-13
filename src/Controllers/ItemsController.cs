@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Controllers
 {
   [ApiController]
-  [Route("/[controller]")]
+  [Route("/api/v1/[controller]")]
   public class ItemsController : Controller
   {
     private readonly IItemService itemService;

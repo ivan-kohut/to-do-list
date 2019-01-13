@@ -22,11 +22,11 @@ namespace Controllers.Tests
       }
     }
 
-    protected HttpResponseMessage Put(string url, object requestBody)
+    protected HttpResponseMessage Patch(string url, object requestBody)
     {
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        return Client.PutAsync(url, httpContent).Result;
+        return Client.PatchAsync(url, httpContent).Result;
       }
     }
 
