@@ -7,7 +7,7 @@ namespace Services
   {
     Task<IEnumerable<ItemDTO>> AllAsync();
     Task<ItemDTO> SaveAsync(ItemDTO item);
-    Task UpdateAsync(ItemDTO item);
+    Task UpdatePartiallyAsync(int id, ICollection<PatchDTO> patches);
     Task DeleteAsync(int id);
   }
 }

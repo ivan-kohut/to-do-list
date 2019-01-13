@@ -1,5 +1,7 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,11 +19,6 @@ namespace Repositories
     public async Task<Item> GetByIdAsync(int id)
     {
       return await dbContext.Items.FindAsync(id);
-    }
-
-    public async Task<Item> GetByPriorityAsync(int priority)
-    {
-      return await dbContext.Items.SingleOrDefaultAsync(i => i.Priority == priority);
     }
 
     public async Task<int> GetMaxItemPriorityAsync()
@@ -47,9 +44,12 @@ namespace Repositories
       await dbContext.AddAsync(item);
     }
 
-    public void Update(Item item)
+    public void UpdatePartially(Item item, IDictionary<string, object> fieldsToUpdate)
     {
-      dbContext.Update(item);
+      EntityEntry<Item> entityEntry = dbContext.Entry(item);
+
+      entityEntry.CurrentValues.SetValues(fieldsToUpdate);
+      entityEntry.State = EntityState.Modified;
     }
 
     public void Delete(Item item)

@@ -1,6 +1,7 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
+using Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,27 +40,17 @@ namespace Services
       return itemDTO;
     }
 
-    public async Task UpdateAsync(ItemDTO itemDTO)
+    public async Task UpdatePartiallyAsync(int id, ICollection<PatchDTO> patches)
     {
-      Item item = await itemRepository.GetByIdAsync(itemDTO.Id);
+      if (patches == null)
+        throw new ArgumentException("Collection of PatchDTO must not be null");
+
+      Item item = await itemRepository.GetByIdAsync(id);
 
       if (item == null)
-        throw new ArgumentException($"Item with id {itemDTO.Id} is not found");
+        throw new EntityNotFoundException($"Item with id {id} is not found");
 
-      item.Text = itemDTO.Text;
-
-      if (itemDTO.Priority != item.Priority)
-      {
-        Item itemToSwapPriority = await itemRepository.GetByPriorityAsync(itemDTO.Priority);
-
-        if (itemToSwapPriority != null)
-        {
-          itemToSwapPriority.Priority = item.Priority;
-          item.Priority = itemDTO.Priority;
-        }
-      }
-
-      itemRepository.Update(item);
+      itemRepository.UpdatePartially(item, patches.ToDictionary(p => p.Name, p => p.Value));
 
       await itemRepository.SaveChangesAsync();
     }
@@ -69,7 +60,7 @@ namespace Services
       Item item = await itemRepository.GetByIdAsync(id);
 
       if (item == null)
-        throw new ArgumentException($"Item with id {id} is not found");
+        throw new EntityNotFoundException($"Item with id {id} is not found");
 
       itemRepository.Delete(item);
 

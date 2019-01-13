@@ -1,8 +1,10 @@
 ﻿using Controllers.Models;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using Services.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Controllers
@@ -30,38 +32,54 @@ namespace Controllers
       return await itemService.SaveAsync(new ItemDTO { Text = item.Text });
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync(int id, ItemUpdateApiModel item)
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> PatchAsync(int id, [FromBody]ICollection<PatchDTO> patches)
     {
+      IActionResult actionResult = Ok();
+
       try
       {
-        await itemService.UpdateAsync(new ItemDTO
-        {
-          Id = id,
-          Text = item.Text,
-          Priority = item.Priority
-        });
+        CorrectPatchDTOs(patches);
 
-        return Ok();
+        await itemService.UpdatePartiallyAsync(id, patches);
+      }
+      catch (EntityNotFoundException)
+      {
+        actionResult = NotFound();
       }
       catch (ArgumentException)
       {
-        return NotFound();
+        actionResult = BadRequest();
       }
+
+      return actionResult;
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
+      IActionResult actionResult = Ok();
+
       try
       {
         await itemService.DeleteAsync(id);
-
-        return Ok();
       }
-      catch (ArgumentException)
+      catch (EntityNotFoundException)
       {
-        return NotFound();
+        actionResult = NotFound();
+      }
+
+      return actionResult;
+    }
+
+    private void CorrectPatchDTOs(ICollection<PatchDTO> patches)
+    {
+      foreach (PatchDTO patchDTO in patches ?? Enumerable.Empty<PatchDTO>())
+      {
+        if (patchDTO.Name == nameof(ItemDTO.Priority))
+        {
+          patchDTO.Value = (int)(long)patchDTO.Value;
+        }
       }
     }
   }

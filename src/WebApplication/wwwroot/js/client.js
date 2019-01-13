@@ -30,16 +30,15 @@
     });
   };
 
-  app.updateItem = function () {
+  app.updateItemText = function () {
     var newTextValue = $inputField.val();
 
     if (!isSelectedItem() || !newTextValue)
       return false;
 
     var item = getSelectedItem();
-    var data = { text: newTextValue, priority: item.attr("data-priority") };
 
-    callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
+    callAPI(`${serverURL}/${selectedId}`, "PATCH", [{ name: "Text", value: newTextValue }], function () {
       item.text(newTextValue);
     });
   };
@@ -72,13 +71,17 @@
     var previousItem = item.prev();
 
     if (previousItem.length !== 0) {
-      var data = { text: item.text(), priority: previousItem.attr("data-priority") };
 
-      callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
-        previousItem.attr("data-priority", item.attr("data-priority"));
-        item.attr("data-priority", data.priority);
+      var selectedItemReplaceOperation = { name: "Priority", value: parseInt(previousItem.attr("data-priority")) };
+      var previousItemReplaceOperation = { name: "Priority", value: parseInt(item.attr("data-priority")) };
 
+      callAPI(`${serverURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
+        item.attr("data-priority", selectedItemReplaceOperation.value);
         item.insertBefore(previousItem);
+      });
+
+      callAPI(`${serverURL}/${previousItem.attr("id")}`, "PATCH", [previousItemReplaceOperation], function () {
+        previousItem.attr("data-priority", previousItemReplaceOperation.value);
       });
     }
   };
@@ -91,13 +94,17 @@
     var nextItem = item.next();
 
     if (nextItem.length !== 0) {
-      var data = { text: item.text(), priority: nextItem.attr("data-priority") };
 
-      callAPI(`${serverURL}/${selectedId}`, "PUT", data, function () {
-        nextItem.attr("data-priority", item.attr("data-priority"));
-        item.attr("data-priority", data.priority);
+      var selectedItemReplaceOperation = { name: "Priority", value: parseInt(nextItem.attr("data-priority")) };
+      var nextItemReplaceOperation = { name: "Priority", value: parseInt(item.attr("data-priority")) };
 
+      callAPI(`${serverURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
+        item.attr("data-priority", selectedItemReplaceOperation.value);
         item.insertAfter(nextItem);
+      });
+
+      callAPI(`${serverURL}/${nextItem.attr("id")}`, "PATCH", [nextItemReplaceOperation], function () {
+        nextItem.attr("data-priority", nextItemReplaceOperation.value);
       });
     }
   };
