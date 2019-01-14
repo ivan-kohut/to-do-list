@@ -4,7 +4,6 @@ using Services;
 using Services.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Controllers
@@ -39,8 +38,6 @@ namespace Controllers
 
       try
       {
-        CorrectPatchDTOs(patches);
-
         await itemService.UpdatePartiallyAsync(id, patches);
       }
       catch (EntityNotFoundException)
@@ -70,17 +67,6 @@ namespace Controllers
       }
 
       return actionResult;
-    }
-
-    private void CorrectPatchDTOs(ICollection<PatchDTO> patches)
-    {
-      foreach (PatchDTO patchDTO in patches ?? Enumerable.Empty<PatchDTO>())
-      {
-        if (patchDTO.Name == nameof(ItemDTO.Priority))
-        {
-          patchDTO.Value = (int)(long)patchDTO.Value;
-        }
-      }
     }
   }
 }

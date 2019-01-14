@@ -121,6 +121,7 @@
     $("#item-list").append(
       $("<li>")
         .attr("id", dataRow.id)
+        .attr("status-id", dataRow.statusId)
         .attr("data-priority", dataRow.priority)
         .attr("onclick", "app.onItemSelect(" + dataRow.id + ")")
         .append(dataRow.text)

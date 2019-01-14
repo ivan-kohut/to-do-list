@@ -22,7 +22,13 @@ namespace Services
     {
       return await itemRepository
         .All()
-        .Select(i => new ItemDTO { Id = i.Id, Text = i.Text, Priority = i.Priority })
+        .Select(i => new ItemDTO
+        {
+          Id = i.Id,
+          StatusId = (int)i.Status,
+          Text = i.Text,
+          Priority = i.Priority
+        })
         .ToListAsync();
     }
 
@@ -51,6 +57,8 @@ namespace Services
       if (item == null)
         throw new EntityNotFoundException($"Item with id {id} is not found");
 
+      CorrectPatchDTOs(patches);
+
       itemRepository.UpdatePartially(item, patches.ToDictionary(p => p.Name, p => p.Value));
 
       await itemRepository.SaveChangesAsync();
@@ -66,6 +74,17 @@ namespace Services
       itemRepository.Delete(item);
 
       await itemRepository.SaveChangesAsync();
+    }
+
+    private void CorrectPatchDTOs(ICollection<PatchDTO> patches)
+    {
+      foreach (PatchDTO patchDTO in patches)
+      {
+        if (patchDTO.Name == nameof(ItemDTO.Priority))
+        {
+          patchDTO.Value = (int)(long)patchDTO.Value;
+        }
+      }
     }
   }
 }
