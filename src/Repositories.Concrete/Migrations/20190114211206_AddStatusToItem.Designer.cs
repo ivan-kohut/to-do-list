@@ -2,13 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Repositories.Concrete.Migrations
 {
   [DbContext(typeof(AppDbContext))]
-  partial class AppDbContextModelSnapshot : ModelSnapshot
+  [Migration("20190114211206_AddStatusToItem")]
+  partial class AddStatusToItem
   {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
       modelBuilder

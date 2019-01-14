@@ -11,6 +11,9 @@ namespace Repositories
       builder.HasKey(e => e.Id);
       builder.HasIndex(e => e.Id);
 
+      builder.Property(e => e.Status)
+        .IsRequired();
+
       builder.Property(e => e.Text)
         .IsRequired()
         .HasMaxLength(255);
