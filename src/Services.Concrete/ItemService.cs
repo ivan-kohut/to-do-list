@@ -32,16 +32,29 @@ namespace Services
         .ToListAsync();
     }
 
+    public IEnumerable<SelectListItemDTO> GetStatusesSelectList()
+    {
+      return Enum.GetValues(typeof(ItemStatus))
+        .Cast<ItemStatus>()
+        .Select(s => new SelectListItemDTO
+        {
+          Value = ((int)s).ToString(),
+          Text = s.ToString()
+        })
+        .ToList();
+    }
+
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
       int maxPriority = await itemRepository.GetMaxItemPriorityAsync();
 
-      Item item = new Item { Text = itemDTO.Text, Priority = maxPriority + 1 };
+      Item item = new Item { Text = itemDTO.Text, Status = ItemStatus.Todo, Priority = maxPriority + 1 };
 
       await itemRepository.CreateAsync(item);
       await itemRepository.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
+      itemDTO.StatusId = (int)item.Status;
       itemDTO.Priority = item.Priority;
 
       return itemDTO;
@@ -78,11 +91,20 @@ namespace Services
 
     private void CorrectPatchDTOs(ICollection<PatchDTO> patches)
     {
+      const string statusPropertyName = nameof(ItemDTO.StatusId);
+      const string priorityPropertyName = nameof(ItemDTO.Priority);
+
       foreach (PatchDTO patchDTO in patches)
       {
-        if (patchDTO.Name == nameof(ItemDTO.Priority))
+        switch (patchDTO.Name)
         {
-          patchDTO.Value = (int)(long)patchDTO.Value;
+          case statusPropertyName:
+            patchDTO.Name = "Status";
+            patchDTO.Value = (int)(long)patchDTO.Value;
+            break;
+          case priorityPropertyName:
+            patchDTO.Value = (int)(long)patchDTO.Value;
+            break;
         }
       }
     }

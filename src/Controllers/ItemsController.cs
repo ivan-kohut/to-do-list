@@ -25,6 +25,12 @@ namespace Controllers
       return new List<ItemDTO>(await itemService.AllAsync());
     }
 
+    [HttpGet("statuses")]
+    public ActionResult<IEnumerable<SelectListItemDTO>> GetStatusesSelectList() // move from this controller!
+    {
+      return new List<SelectListItemDTO>(itemService.GetStatusesSelectList());
+    }
+
     [HttpPost]
     public async Task<ActionResult<ItemDTO>> SaveAsync(ItemCreateApiModel item)
     {

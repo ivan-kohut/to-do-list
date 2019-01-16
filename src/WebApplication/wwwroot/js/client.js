@@ -13,6 +13,13 @@
         putItem(data[i]);
       }
     });
+
+    callAPI(`${serverURL}/statuses`, "GET", null, function (data) {
+      buildSelectList(data)
+        .attr("id", "statuses-select-list")
+        .attr("disabled", "disabled")
+        .insertAfter($("#buttons"));
+    });
   };
 
   app.addItem = function () {
@@ -36,10 +43,13 @@
     if (!isSelectedItem() || !newTextValue)
       return false;
 
+    var statusId = parseInt($("#statuses-select-list").val());
     var item = getSelectedItem();
+    var data = [{ name: "Text", value: newTextValue }, { name: "StatusId", value: statusId }];
 
-    callAPI(`${serverURL}/${selectedId}`, "PATCH", [{ name: "Text", value: newTextValue }], function () {
+    callAPI(`${serverURL}/${selectedId}`, "PATCH", data, function () {
       item.text(newTextValue);
+      item.attr("data-status-id", statusId);
     });
   };
 
@@ -110,22 +120,46 @@
   };
 
   app.onItemSelect = function (id) {
-    if (!isSelectedItem())
+
+    var statusesSelectListSelector = "#statuses-select-list"; 
+
+    if (!isSelectedItem()) {
       changeColor("red", "blue");
+      enableOrDisable(statusesSelectListSelector, true);
+    }
 
     selectedId = id;
-    $inputField.val(getSelectedItem().text());
+
+    var item = getSelectedItem();
+
+    $inputField.val(item.text());
+    $(statusesSelectListSelector).val(item.attr("data-status-id"));
   };
 
   function putItem(dataRow) {
     $("#item-list").append(
       $("<li>")
         .attr("id", dataRow.id)
-        .attr("status-id", dataRow.statusId)
+        .attr("data-status-id", dataRow.statusId)
         .attr("data-priority", dataRow.priority)
         .attr("onclick", "app.onItemSelect(" + dataRow.id + ")")
         .append(dataRow.text)
     );
+  }
+
+  function buildSelectList(selectListItems) {
+
+    var $selectList = $("<select>");
+
+    selectListItems.forEach(function (selectListItem) {
+      $selectList.append(
+        $("<option>")
+          .attr("value", selectListItem.value)
+          .append(selectListItem.text)
+      );
+    });
+
+    return $selectList;
   }
 
   function changeColor(from, to) {
@@ -142,6 +176,7 @@
   function resetItemState() {
     selectedId = -1;
     changeColor("blue", "red");
+    enableOrDisable("#statuses-select-list", false);
   }
 
   function clearInputField() {
@@ -150,6 +185,18 @@
 
   function getSelectedItem() {
     return $("#" + selectedId);
+  }
+
+  function enableOrDisable(selector, isEnabling) {
+
+    var disabled = "disabled";
+    var $selector = $(selector);
+
+    if (isEnabling) {
+      $selector.removeAttr(disabled);
+    } else {
+      $selector.attr(disabled, disabled);
+    }
   }
 
   function callAPI(url, method, data, callback) {
@@ -161,4 +208,5 @@
       success: callback
     });
   }
+
 })(app = window.app || {});
