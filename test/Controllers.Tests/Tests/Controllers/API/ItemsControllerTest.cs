@@ -39,8 +39,8 @@ namespace Controllers.Tests
     {
       IEnumerable<Item> items = new List<Item>
       {
-        new Item { Text = "firstItemText", Priority = 2 },
-        new Item { Text = "secondItemText", Priority = 1 }
+        new Item { Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
+        new Item { Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
       };
 
       IEnumerable<ItemDTO> expected = items
@@ -82,6 +82,7 @@ namespace Controllers.Tests
       Assert.NotEqual(0, itemSaved.Id);
       Assert.Equal(itemToSave.Text, itemSaved.Text);
       Assert.Equal(1, itemSaved.Priority);
+      Assert.Equal((int)ItemStatus.Todo, itemSaved.StatusId);
     }
 
     [Fact]
@@ -105,7 +106,7 @@ namespace Controllers.Tests
     [Fact]
     public void UpdatePartially_When_InputModelIsValid_Expect_Updated()
     {
-      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText", Priority = 1 });
+      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
       PatchDTO textPatchDTO = new PatchDTO
       {
@@ -119,8 +120,14 @@ namespace Controllers.Tests
         Value = 2
       };
 
+      PatchDTO statusPatchDTO = new PatchDTO
+      {
+        Name = "StatusId",
+        Value = 2
+      };
+
       // Act
-      HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO });
+      HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
 
       response.EnsureSuccessStatusCode();
 
@@ -129,6 +136,7 @@ namespace Controllers.Tests
 
       Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
       Assert.Equal(priorityPatchDTO.Value, itemUpdated.Priority);
+      Assert.Equal(statusPatchDTO.Value, (int)itemUpdated.Status);
     }
 
     [Fact]
@@ -143,7 +151,7 @@ namespace Controllers.Tests
     [Fact]
     public void Delete_When_ItemIsFound_Expect_Deleted()
     {
-      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText", Priority = 1 });
+      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
       // Act
       HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
@@ -173,7 +181,13 @@ namespace Controllers.Tests
         appDbContext.Add(itemToSave);
         appDbContext.SaveChanges();
 
-        return new ItemDTO { Id = itemToSave.Id, Text = itemToSave.Text, Priority = itemToSave.Priority };
+        return new ItemDTO
+        {
+          Id = itemToSave.Id,
+          Text = itemToSave.Text,
+          StatusId = (int)itemToSave.Status,
+          Priority = itemToSave.Priority
+        };
       }
     }
 

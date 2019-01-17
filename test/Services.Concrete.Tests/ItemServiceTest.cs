@@ -41,8 +41,8 @@ namespace Services.Tests
     [Fact]
     public void AllAsync_When_ItemsExist_Expect_Returned()
     {
-      Item firstItem = new Item { Id = 1, Text = "firstText", Priority = 1 };
-      Item secondItem = new Item { Id = 2, Text = "secondText", Priority = 2 };
+      Item firstItem = new Item { Id = 1, Text = "firstText", Priority = 1, Status = ItemStatus.Todo };
+      Item secondItem = new Item { Id = 2, Text = "secondText", Priority = 2, Status = ItemStatus.Done };
 
       mockItemRepository
         .Setup(r => r.All())
@@ -50,8 +50,8 @@ namespace Services.Tests
 
       IEnumerable<ItemDTO> expected = new List<ItemDTO>
       {
-        new ItemDTO { Id = firstItem.Id, Text = firstItem.Text, Priority = firstItem.Priority },
-        new ItemDTO { Id = secondItem.Id, Text = secondItem.Text, Priority = secondItem.Priority }
+        new ItemDTO { Id = firstItem.Id, Text = firstItem.Text, Priority = firstItem.Priority, StatusId = (int)firstItem.Status },
+        new ItemDTO { Id = secondItem.Id, Text = secondItem.Text, Priority = secondItem.Priority, StatusId = (int)secondItem.Status }
       };
 
       // Act
@@ -83,7 +83,13 @@ namespace Services.Tests
         .Setup(m => m.SaveChangesAsync())
         .Returns(Task.CompletedTask);
 
-      ItemDTO expected = new ItemDTO { Id = generatedItemId, Text = itemToSave.Text, Priority = maxPriority + 1 };
+      ItemDTO expected = new ItemDTO
+      {
+        Id = generatedItemId,
+        Text = itemToSave.Text,
+        Priority = maxPriority + 1,
+        StatusId = (int)ItemStatus.Todo
+      };
 
       // Act
       ItemDTO actual = itemService.SaveAsync(itemToSave).Result;
@@ -124,18 +130,25 @@ namespace Services.Tests
     {
       int itemId = 1;
 
+      PatchDTO statusPatchDTO = new PatchDTO { Name = "StatusId", Value = (long)(int)ItemStatus.Done };
+
       ICollection<PatchDTO> patches = new List<PatchDTO>()
       {
-        new PatchDTO { Name = "Text", Value = "newItemText" }
+        new PatchDTO { Name = "Text", Value = "newItemText" },
+        new PatchDTO { Name = "Priority", Value = 2L },
+        statusPatchDTO
       };
 
-      Item foundItem = new Item { Id = itemId, Text = "itemText", Priority = 1 };
+      Item foundItem = new Item { Id = itemId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo };
 
       mockItemRepository
         .Setup(r => r.GetByIdAsync(itemId))
         .Returns(Task.FromResult(foundItem));
 
       IDictionary<string, object> expectedDictionary = patches.ToDictionary(p => p.Name, p => p.Value);
+
+      expectedDictionary.Remove("StatusId");
+      expectedDictionary.Add("Status", statusPatchDTO.Value);
 
       mockItemRepository
         .Setup(r => r.UpdatePartially(foundItem, It.IsAny<IDictionary<string, object>>()))
