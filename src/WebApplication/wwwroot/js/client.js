@@ -1,6 +1,8 @@
 (function (app) {
 
-  var serverURL = "/api/v1/items";
+  var itemsURL = "/api/v1/items";
+  var itemsStatusesURL = "/api/v1/select-lists/item-statuses";
+
   var selectedId = -1; // not selected
 
   var $inputField;
@@ -8,13 +10,13 @@
   app.init = function () {
     $inputField = $('#text_input');
 
-    callAPI(serverURL, "GET", null, function (data) {
+    callAPI(itemsURL, "GET", null, function (data) {
       for (var i = 0; i < data.length; i++) {
         putItem(data[i]);
       }
     });
 
-    callAPI(`${serverURL}/statuses`, "GET", null, function (data) {
+    callAPI(itemsStatusesURL, "GET", null, function (data) {
       buildSelectList(data)
         .attr("id", "statuses-select-list")
         .attr("disabled", "disabled")
@@ -28,7 +30,7 @@
     if (!itemText)
       return false;
 
-    callAPI(serverURL, "POST", { text: itemText }, function (data) {
+    callAPI(itemsURL, "POST", { text: itemText }, function (data) {
       putItem(data);
       clearInputField();
 
@@ -47,7 +49,7 @@
     var item = getSelectedItem();
     var data = [{ name: "Text", value: newTextValue }, { name: "StatusId", value: statusId }];
 
-    callAPI(`${serverURL}/${selectedId}`, "PATCH", data, function () {
+    callAPI(`${itemsURL}/${selectedId}`, "PATCH", data, function () {
       item.text(newTextValue);
       item.attr("data-status-id", statusId);
     });
@@ -57,7 +59,7 @@
     if (!isSelectedItem())
       return false;
 
-    callAPI(`${serverURL}/${selectedId}`, "DELETE", null, function () {
+    callAPI(`${itemsURL}/${selectedId}`, "DELETE", null, function () {
       var item = getSelectedItem();
       var nextItem = item.next();
 
@@ -85,12 +87,12 @@
       var selectedItemReplaceOperation = { name: "Priority", value: parseInt(previousItem.attr("data-priority")) };
       var previousItemReplaceOperation = { name: "Priority", value: parseInt(item.attr("data-priority")) };
 
-      callAPI(`${serverURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
+      callAPI(`${itemsURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
         item.attr("data-priority", selectedItemReplaceOperation.value);
         item.insertBefore(previousItem);
       });
 
-      callAPI(`${serverURL}/${previousItem.attr("id")}`, "PATCH", [previousItemReplaceOperation], function () {
+      callAPI(`${itemsURL}/${previousItem.attr("id")}`, "PATCH", [previousItemReplaceOperation], function () {
         previousItem.attr("data-priority", previousItemReplaceOperation.value);
       });
     }
@@ -108,12 +110,12 @@
       var selectedItemReplaceOperation = { name: "Priority", value: parseInt(nextItem.attr("data-priority")) };
       var nextItemReplaceOperation = { name: "Priority", value: parseInt(item.attr("data-priority")) };
 
-      callAPI(`${serverURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
+      callAPI(`${itemsURL}/${selectedId}`, "PATCH", [selectedItemReplaceOperation], function () {
         item.attr("data-priority", selectedItemReplaceOperation.value);
         item.insertAfter(nextItem);
       });
 
-      callAPI(`${serverURL}/${nextItem.attr("id")}`, "PATCH", [nextItemReplaceOperation], function () {
+      callAPI(`${itemsURL}/${nextItem.attr("id")}`, "PATCH", [nextItemReplaceOperation], function () {
         nextItem.attr("data-priority", nextItemReplaceOperation.value);
       });
     }

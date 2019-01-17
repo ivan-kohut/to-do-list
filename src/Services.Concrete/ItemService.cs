@@ -32,18 +32,6 @@ namespace Services
         .ToListAsync();
     }
 
-    public IEnumerable<SelectListItemDTO> GetStatusesSelectList()
-    {
-      return Enum.GetValues(typeof(ItemStatus))
-        .Cast<ItemStatus>()
-        .Select(s => new SelectListItemDTO
-        {
-          Value = ((int)s).ToString(),
-          Text = s.ToString()
-        })
-        .ToList();
-    }
-
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
       int maxPriority = await itemRepository.GetMaxItemPriorityAsync();

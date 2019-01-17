@@ -37,6 +37,7 @@ namespace WebApplication
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
+      services.AddSingleton<ISelectListService, SelectListService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
