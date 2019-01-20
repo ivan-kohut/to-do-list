@@ -1,9 +1,11 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repositories
 {
-  public class AppDbContext : DbContext
+  public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
   {
     public DbSet<Item> Items { get; set; }
 
