@@ -5,12 +5,12 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.0.138" />
     <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.0.138" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Controllers\Controllers.csproj" />
     <ProjectReference Include="..\Services.Concrete\Services.Concrete.csproj" />
     <ProjectReference Include="..\Repositories.Concrete\Repositories.Concrete.csproj" />
   </ItemGroup>

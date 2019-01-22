@@ -1,4 +1,4 @@
-﻿using Controllers.Models;
+﻿using Models;
 using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;

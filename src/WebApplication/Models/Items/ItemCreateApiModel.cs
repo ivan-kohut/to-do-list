@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Controllers.Models
+namespace Models
 {
   public class ItemCreateApiModel
   {

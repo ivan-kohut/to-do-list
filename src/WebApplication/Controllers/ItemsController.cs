@@ -1,5 +1,5 @@
-﻿using Controllers.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services;
 using Services.Exceptions;
 using System;

@@ -36,12 +36,7 @@ namespace WebApplication
         .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
         .AddEntityFramework();
 
-      services.AddMvc()
-        .AddRazorPagesOptions(options =>
-        {
-          options.Conventions.AuthorizePage("/Index");
-        })
-        .AddApplicationPart(Assembly.Load(new AssemblyName("Controllers")));
+      services.AddMvc();
 
       services.AddScoped<IItemRepository, ItemRepository>();
 
