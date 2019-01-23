@@ -2,14 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
 namespace Repositories.Concrete.Migrations
 {
   [DbContext(typeof(AppDbContext))]
-  partial class AppDbContextModelSnapshot : ModelSnapshot
+  [Migration("20190123202947_AddRolesToDB")]
+  partial class AddRolesToDB
   {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
 #pragma warning disable 612, 618
       modelBuilder
