@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 namespace Controllers
 {
   [ApiController]
+  [Authorize(Roles = "user")]
   [Route("/api/v1/select-lists")]
   public class SelectListsController : Controller
   {

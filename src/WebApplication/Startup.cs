@@ -19,7 +19,6 @@ namespace WebApplication
     private const string secret = "peRhtr7oth7nh98rtx78Tdy0g98graKfYrovjhaz5dX75h56trOdKvnghruGYdxm";
 
     protected virtual string ConnectionStringName { get; } = "DefaultConnection";
-    private SecurityKey SecurityKey { get; } = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
 
     private readonly IConfiguration configuration;
 
@@ -43,6 +42,8 @@ namespace WebApplication
         .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
         .AddEntityFramework();
 
+      SecurityKey securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
+
       services
         .AddAuthentication(o =>
         {
@@ -55,19 +56,18 @@ namespace WebApplication
           {
             ValidateAudience = false,
             ValidateIssuer = false,
-            IssuerSigningKey = SecurityKey
+            IssuerSigningKey = securityKey
           };
         });
 
       services.AddMvc();
 
-      services.Configure<JwtOptions>(o => o.SecurityKey = SecurityKey);
+      services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
 
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
       services.AddSingleton<ISelectListService, SelectListService>();
-      services.AddSingleton<IJwtTokenService, JwtTokenService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)

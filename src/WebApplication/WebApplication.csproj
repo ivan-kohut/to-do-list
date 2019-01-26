@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.0.138" />
     <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.0.138" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
   </ItemGroup>
 
   <ItemGroup>

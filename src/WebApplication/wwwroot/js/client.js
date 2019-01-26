@@ -8,20 +8,29 @@
   var $inputField;
 
   app.init = function () {
+
     $inputField = $('#text_input');
 
-    callAPI(itemsURL, "GET", null, function (data) {
-      for (var i = 0; i < data.length; i++) {
-        putItem(data[i]);
-      }
-    });
+    if (getAuthToken() === null) {
 
-    callAPI(itemsStatusesURL, "GET", null, function (data) {
-      buildSelectList(data)
-        .attr("id", "statuses-select-list")
-        .attr("disabled", "disabled")
-        .insertAfter($("#buttons"));
-    });
+      $("#sign-in").show();
+      $("#sign-up").show();
+
+    } else {
+
+      callAPI(itemsURL, "GET", null, function (data) {
+        for (var i = 0; i < data.length; i++) {
+          putItem(data[i]);
+        }
+      });
+
+      callAPI(itemsStatusesURL, "GET", null, function (data) {
+        buildSelectList(data)
+          .attr("id", "statuses-select-list")
+          .attr("disabled", "disabled")
+          .insertAfter($("#buttons"));
+      });
+    }
   };
 
   app.addItem = function () {
@@ -201,8 +210,15 @@
     }
   }
 
+  function getAuthToken() {
+    return localStorage.getItem("auth-token");
+  }
+
   function callAPI(url, method, data, callback) {
     $.ajax({
+      beforeSend: function(request) {
+        request.setRequestHeader("Authorization", `Bearer ${getAuthToken()}`);
+      },
       url: url,
       type: method,
       contentType: 'application/json',

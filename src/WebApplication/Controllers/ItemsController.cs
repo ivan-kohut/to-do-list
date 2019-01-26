@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
 using Services.Exceptions;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace Controllers
 {
   [ApiController]
+  [Authorize(Roles = "user")]
   [Route("/api/v1/[controller]")]
   public class ItemsController : Controller
   {

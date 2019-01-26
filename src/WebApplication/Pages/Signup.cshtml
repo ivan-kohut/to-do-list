@@ -1,0 +1,27 @@
+﻿@page
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Client-server app</title>
+  <script src="/js/jquery-3.1.0.min.js" type="text/javascript"></script>
+  <script src="~/js/registration.js" type="text/javascript"></script>
+  <link href="/css/style.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+  <label for="name">Ім'я</label>
+  <input id="name" type="text" /><br />
+
+  <label for="email">Електронна пошта</label>
+  <input id="email" type="text" /> <br />
+
+  <label for="password">Пароль</label>
+  <input id="password" type="password" /> <br />
+
+  <p onclick="app.createUser();">Зареєструватися</p>
+
+  <ul id="errors"></ul>
+
+  <mini-profiler />
+</body>
+</html>

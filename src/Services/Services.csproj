@@ -4,8 +4,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-  </ItemGroup>
-
 </Project>
