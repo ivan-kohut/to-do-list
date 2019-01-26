@@ -9,8 +9,16 @@ namespace Repositories
     public void Configure(EntityTypeBuilder<Item> builder)
     {
       builder.HasKey(e => e.Id);
+
       builder.HasIndex(e => e.Id);
 
+      builder.Property(e => e.UserId)
+        .IsRequired();
+
+      builder
+        .HasOne(e => e.User)
+        .WithMany(e => e.Items);
+      
       builder.Property(e => e.Status)
         .IsRequired();
 
