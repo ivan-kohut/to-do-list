@@ -5,6 +5,7 @@ using Services;
 using Services.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Controllers
@@ -24,13 +25,13 @@ namespace Controllers
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemDTO>>> AllAsync()
     {
-      return new List<ItemDTO>(await itemService.AllAsync());
+      return new List<ItemDTO>(await itemService.AllAsync(GetUserId()));
     }
 
     [HttpPost]
     public async Task<ActionResult<ItemDTO>> SaveAsync(ItemCreateApiModel item)
     {
-      return await itemService.SaveAsync(new ItemDTO { Text = item.Text });
+      return await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
     }
 
     [HttpPatch("{id}")]
@@ -40,7 +41,7 @@ namespace Controllers
 
       try
       {
-        await itemService.UpdatePartiallyAsync(id, patches);
+        await itemService.UpdatePartiallyAsync(id, GetUserId(), patches);
       }
       catch (EntityNotFoundException)
       {
@@ -61,7 +62,7 @@ namespace Controllers
 
       try
       {
-        await itemService.DeleteAsync(id);
+        await itemService.DeleteAsync(id, GetUserId());
       }
       catch (EntityNotFoundException)
       {
@@ -69,6 +70,11 @@ namespace Controllers
       }
 
       return actionResult;
+    }
+
+    private int GetUserId()
+    {
+      return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
     }
   }
 }

@@ -18,10 +18,10 @@ namespace Services
       this.itemRepository = itemRepository;
     }
 
-    public async Task<IEnumerable<ItemDTO>> AllAsync()
+    public async Task<IEnumerable<ItemDTO>> AllAsync(int userId)
     {
       return await itemRepository
-        .All()
+        .All(userId)
         .Select(i => new ItemDTO
         {
           Id = i.Id,
@@ -34,9 +34,15 @@ namespace Services
 
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
-      int maxPriority = await itemRepository.GetMaxItemPriorityAsync();
+      int maxPriority = await itemRepository.GetMaxItemPriorityAsync(itemDTO.UserId);
 
-      Item item = new Item { Text = itemDTO.Text, Status = ItemStatus.Todo, Priority = maxPriority + 1 };
+      Item item = new Item
+      {
+        UserId = itemDTO.UserId,
+        Text = itemDTO.Text,
+        Status = ItemStatus.Todo,
+        Priority = maxPriority + 1
+      };
 
       await itemRepository.CreateAsync(item);
       await itemRepository.SaveChangesAsync();
@@ -48,12 +54,12 @@ namespace Services
       return itemDTO;
     }
 
-    public async Task UpdatePartiallyAsync(int id, ICollection<PatchDTO> patches)
+    public async Task UpdatePartiallyAsync(int id, int userId, ICollection<PatchDTO> patches)
     {
       if (patches == null)
         throw new ArgumentException("Collection of PatchDTO must not be null");
 
-      Item item = await itemRepository.GetByIdAsync(id);
+      Item item = await itemRepository.GetByIdAndUserIdAsync(id, userId);
 
       if (item == null)
         throw new EntityNotFoundException($"Item with id {id} is not found");
@@ -65,9 +71,9 @@ namespace Services
       await itemRepository.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, int userId)
     {
-      Item item = await itemRepository.GetByIdAsync(id);
+      Item item = await itemRepository.GetByIdAndUserIdAsync(id, userId);
 
       if (item == null)
         throw new EntityNotFoundException($"Item with id {id} is not found");

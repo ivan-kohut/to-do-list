@@ -5,9 +5,9 @@ namespace Services
 {
   public interface IItemService
   {
-    Task<IEnumerable<ItemDTO>> AllAsync();
+    Task<IEnumerable<ItemDTO>> AllAsync(int userId);
     Task<ItemDTO> SaveAsync(ItemDTO item);
-    Task UpdatePartiallyAsync(int id, ICollection<PatchDTO> patches);
-    Task DeleteAsync(int id);
+    Task UpdatePartiallyAsync(int id, int userId, ICollection<PatchDTO> patches);
+    Task DeleteAsync(int id, int userId);
   }
 }
