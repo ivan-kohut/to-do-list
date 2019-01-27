@@ -1,9 +1,18 @@
-﻿using Microsoft.AspNetCore;
+﻿using Controllers.Tests.Extensions;
+using Entities;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Newtonsoft.Json;
+using Repositories;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using Xunit;
 
 namespace Controllers.Tests.Fixtures
@@ -15,6 +24,7 @@ namespace Controllers.Tests.Fixtures
   {
     public TestServer Server { get; }
     public HttpClient Client { get; }
+    public int UserId { get; }
 
     public TestServerFixture()
     {
@@ -29,10 +39,39 @@ namespace Controllers.Tests.Fixtures
 
       Server = new TestServer(webHostBuilder);
       Client = Server.CreateClient();
+
+      object user = new
+      {
+        name = "testUserName",
+        email = "test@test.com",
+        password = "abcABC123."
+      };
+
+      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"))
+      {
+        string userToken = JsonConvert.DeserializeObject<string>(
+          Client.PostAsync("/api/v1/users", httpContent).Result.Content.ReadAsStringAsync().Result
+        );
+
+        UserId = int.Parse(
+          (new JwtSecurityTokenHandler().ReadToken(userToken) as JwtSecurityToken)
+            .Claims
+            .Single(c => c.Type == ClaimTypes.NameIdentifier)
+            .Value
+        );
+
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+      }
     }
 
     public void Dispose()
     {
+      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
+      {
+        appDbContext.Rollback<User>();
+        appDbContext.SaveChanges();
+      }
+
       Client?.Dispose();
       Server?.Dispose();
     }

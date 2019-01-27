@@ -39,8 +39,8 @@ namespace Controllers.Tests
     {
       IEnumerable<Item> items = new List<Item>
       {
-        new Item { Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
-        new Item { Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
+        new Item { UserId = UserId, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
+        new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
       };
 
       IEnumerable<ItemDTO> expected = items
@@ -106,7 +106,7 @@ namespace Controllers.Tests
     [Fact]
     public void UpdatePartially_When_InputModelIsValid_Expect_Updated()
     {
-      ItemDTO itemToUpdate = SaveItem(new Item { Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+      ItemDTO itemToUpdate = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
       PatchDTO textPatchDTO = new PatchDTO
       {
@@ -151,7 +151,7 @@ namespace Controllers.Tests
     [Fact]
     public void Delete_When_ItemIsFound_Expect_Deleted()
     {
-      ItemDTO itemSaved = SaveItem(new Item { Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+      ItemDTO itemSaved = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
       // Act
       HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");

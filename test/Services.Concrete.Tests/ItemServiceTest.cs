@@ -14,6 +14,8 @@ namespace Services.Tests
 {
   public class ItemServiceTest
   {
+    private const int userId = 10;
+
     private readonly Mock<IItemRepository> mockItemRepository;
 
     private readonly ItemService itemService;
@@ -29,13 +31,13 @@ namespace Services.Tests
     public void AllAsync_When_ItemsDoNotExist_Expect_EmptyList()
     {
       mockItemRepository
-        .Setup(r => r.All())
+        .Setup(r => r.All(userId))
         .Returns(new List<Item>().AsQueryable().BuildMock().Object);
 
       // Act
-      Assert.Empty(itemService.AllAsync().Result);
+      Assert.Empty(itemService.AllAsync(userId).Result);
 
-      mockItemRepository.Verify(r => r.All(), Times.Once());
+      mockItemRepository.Verify(r => r.All(userId), Times.Once());
     }
 
     [Fact]
@@ -45,7 +47,7 @@ namespace Services.Tests
       Item secondItem = new Item { Id = 2, Text = "secondText", Priority = 2, Status = ItemStatus.Done };
 
       mockItemRepository
-        .Setup(r => r.All())
+        .Setup(r => r.All(userId))
         .Returns(new List<Item> { firstItem, secondItem }.AsQueryable().BuildMock().Object);
 
       IEnumerable<ItemDTO> expected = new List<ItemDTO>
@@ -55,11 +57,11 @@ namespace Services.Tests
       };
 
       // Act
-      IEnumerable<ItemDTO> actual = itemService.AllAsync().Result;
+      IEnumerable<ItemDTO> actual = itemService.AllAsync(userId).Result;
 
       actual.ShouldBeEquivalentTo(expected);
 
-      mockItemRepository.Verify(r => r.All(), Times.Once());
+      mockItemRepository.Verify(r => r.All(userId), Times.Once());
     }
 
     [Fact]
@@ -68,10 +70,10 @@ namespace Services.Tests
       int generatedItemId = 10;
       int maxPriority = 1;
 
-      ItemDTO itemToSave = new ItemDTO { Text = "itemText" };
+      ItemDTO itemToSave = new ItemDTO { UserId = userId, Text = "itemText" };
 
       mockItemRepository
-        .Setup(r => r.GetMaxItemPriorityAsync())
+        .Setup(r => r.GetMaxItemPriorityAsync(userId))
         .Returns(Task.FromResult(maxPriority));
 
       mockItemRepository
@@ -86,6 +88,7 @@ namespace Services.Tests
       ItemDTO expected = new ItemDTO
       {
         Id = generatedItemId,
+        UserId = itemToSave.UserId,
         Text = itemToSave.Text,
         Priority = maxPriority + 1,
         StatusId = (int)ItemStatus.Todo
@@ -96,7 +99,7 @@ namespace Services.Tests
 
       actual.ShouldBeEquivalentTo(expected);
 
-      mockItemRepository.Verify(r => r.GetMaxItemPriorityAsync(), Times.Once());
+      mockItemRepository.Verify(r => r.GetMaxItemPriorityAsync(userId), Times.Once());
       mockItemRepository.Verify(r => r.CreateAsync(It.IsAny<Item>()), Times.Once());
       mockItemRepository.Verify(r => r.SaveChangesAsync(), Times.Once());
     }
@@ -105,7 +108,7 @@ namespace Services.Tests
     public void UpdatePartiallyAsync_When_PatchCollectionIsNull_Expect_ArgumentException()
     {
       // Act
-      Assert.ThrowsAsync<ArgumentException>(() => itemService.UpdatePartiallyAsync(default(int), null));
+      Assert.ThrowsAsync<ArgumentException>(() => itemService.UpdatePartiallyAsync(default(int), default(int), null));
     }
 
     [Fact]
@@ -116,13 +119,13 @@ namespace Services.Tests
       Item notFoundItem = null;
 
       mockItemRepository
-        .Setup(r => r.GetByIdAsync(itemId))
+        .Setup(r => r.GetByIdAndUserIdAsync(itemId, userId))
         .Returns(Task.FromResult(notFoundItem));
 
       // Act
-      Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdatePartiallyAsync(itemId, Enumerable.Empty<PatchDTO>().ToList()));
+      Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdatePartiallyAsync(itemId, userId, Enumerable.Empty<PatchDTO>().ToList()));
 
-      mockItemRepository.Verify(r => r.GetByIdAsync(itemId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemId, userId), Times.Once());
     }
 
     [Fact]
@@ -139,10 +142,10 @@ namespace Services.Tests
         statusPatchDTO
       };
 
-      Item foundItem = new Item { Id = itemId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo };
+      Item foundItem = new Item { Id = itemId, UserId = userId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo };
 
       mockItemRepository
-        .Setup(r => r.GetByIdAsync(itemId))
+        .Setup(r => r.GetByIdAndUserIdAsync(itemId, userId))
         .Returns(Task.FromResult(foundItem));
 
       IDictionary<string, object> expectedDictionary = patches.ToDictionary(p => p.Name, p => p.Value);
@@ -165,9 +168,9 @@ namespace Services.Tests
         .Returns(Task.CompletedTask);
 
       // Act
-      itemService.UpdatePartiallyAsync(itemId, patches).Wait();
+      itemService.UpdatePartiallyAsync(itemId, userId, patches).Wait();
 
-      mockItemRepository.Verify(r => r.GetByIdAsync(itemId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemId, userId), Times.Once());
       mockItemRepository.Verify(r => r.UpdatePartially(foundItem, It.IsAny<IDictionary<string, object>>()), Times.Once());
 
       mockItemRepository.Verify(r => r.SaveChangesAsync(), Times.Once());
@@ -181,13 +184,13 @@ namespace Services.Tests
       Item notFoundItem = null;
 
       mockItemRepository
-        .Setup(r => r.GetByIdAsync(itemToDeleteId))
+        .Setup(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId))
         .Returns(Task.FromResult(notFoundItem));
 
       // Act
-      Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.DeleteAsync(itemToDeleteId));
+      Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.DeleteAsync(itemToDeleteId, userId));
 
-      mockItemRepository.Verify(r => r.GetByIdAsync(itemToDeleteId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId), Times.Once());
     }
 
     [Fact]
@@ -198,7 +201,7 @@ namespace Services.Tests
       Item foundItem = new Item { Id = itemToDeleteId, Text = "itemText", Priority = 1 };
 
       mockItemRepository
-        .Setup(r => r.GetByIdAsync(itemToDeleteId))
+        .Setup(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId))
         .Returns(Task.FromResult(foundItem));
 
       mockItemRepository
@@ -210,9 +213,9 @@ namespace Services.Tests
         .Returns(Task.CompletedTask);
 
       // Act
-      itemService.DeleteAsync(itemToDeleteId).Wait();
+      itemService.DeleteAsync(itemToDeleteId, userId).Wait();
 
-      mockItemRepository.Verify(r => r.GetByIdAsync(itemToDeleteId), Times.Once());
+      mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId), Times.Once());
       mockItemRepository.Verify(r => r.Delete(foundItem), Times.Once());
 
       mockItemRepository.Verify(m => m.SaveChangesAsync(), Times.Once());
