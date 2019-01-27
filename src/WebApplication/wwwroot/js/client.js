@@ -13,10 +13,11 @@
 
     if (getAuthToken() === null) {
 
-      $("#sign-in").show();
-      $("#sign-up").show();
+      $("#auth").show();
 
     } else {
+
+      $("#items").show();
 
       callAPI(itemsURL, "GET", null, function (data) {
         for (var i = 0; i < data.length; i++) {

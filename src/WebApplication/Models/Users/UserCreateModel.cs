@@ -2,7 +2,7 @@
 
 namespace Models
 {
-  public class UserCreateApiModel
+  public class UserCreateModel
   {
     [Required]
     public string Name { get; set; }
