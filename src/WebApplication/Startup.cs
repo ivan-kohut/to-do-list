@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Options;
 using Repositories;
 using Services;
 using StackExchange.Profiling;
@@ -16,8 +17,6 @@ namespace WebApplication
 {
   public class Startup
   {
-    private const string secret = "peRhtr7oth7nh98rtx78Tdy0g98graKfYrovjhaz5dX75h56trOdKvnghruGYdxm";
-
     protected virtual string ConnectionStringName { get; } = "DefaultConnection";
 
     private readonly IConfiguration configuration;
@@ -42,7 +41,7 @@ namespace WebApplication
         .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
         .AddEntityFramework();
 
-      SecurityKey securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
+      SecurityKey securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]));
 
       services
         .AddAuthentication(o =>
@@ -67,6 +66,7 @@ namespace WebApplication
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
+      services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
       services.AddSingleton<ISelectListService, SelectListService>();
     }
 
