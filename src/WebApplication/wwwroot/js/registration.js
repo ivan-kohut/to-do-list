@@ -7,7 +7,8 @@
     var data = {
       name: $("#name").val(),
       email: $("#email").val(),
-      password: $("#password").val()
+      password: $("#password").val(),
+      confirmPassword: $("#confirm-password").val()
     };
 
     callAPI(usersURL, "POST", data, function (authToken) {
@@ -20,7 +21,7 @@
 
       $("#errors").empty();
 
-      ["Name", "Email", "Password", "errors"].forEach(function (s) {
+      ["Name", "Email", "Password", "ConfirmPassword", "errors"].forEach(function (s) {
         if (responseJson[s] !== undefined) {
           showErrors(responseJson[s]);
         }

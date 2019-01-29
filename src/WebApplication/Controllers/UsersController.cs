@@ -48,16 +48,16 @@ namespace Controllers
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateApiModel)
+    public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
-      if (await userManager.FindByEmailAsync(userCreateApiModel.Email) != null)
+      if (await userManager.FindByEmailAsync(userCreateModel.Email) != null)
       {
-        return BadRequest(new { errors = new List<string> { $"User with email '{userCreateApiModel.Email}' exists already" } });
+        return BadRequest(new { errors = new List<string> { $"User with email '{userCreateModel.Email}' exists already" } });
       }
 
-      User user = new User { UserName = userCreateApiModel.Name, Email = userCreateApiModel.Email };
+      User user = new User { UserName = userCreateModel.Name, Email = userCreateModel.Email };
 
-      IdentityResult identityCreateResult = await userManager.CreateAsync(user, userCreateApiModel.Password);
+      IdentityResult identityCreateResult = await userManager.CreateAsync(user, userCreateModel.Password);
 
       if (identityCreateResult.Succeeded)
       {
