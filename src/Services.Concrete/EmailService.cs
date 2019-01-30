@@ -17,7 +17,7 @@ namespace Services
     {
       SendGridMessage msg = new SendGridMessage
       {
-        From = new EmailAddress("todo-list@app.com"),
+        From = new EmailAddress("todo-list@test"),
         Subject = subject,
         PlainTextContent = message,
         HtmlContent = message

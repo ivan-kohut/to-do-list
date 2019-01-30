@@ -11,10 +11,9 @@
       confirmPassword: $("#confirm-password").val()
     };
 
-    callAPI(usersURL, "POST", data, function (authToken) {
+    callAPI(usersURL, "POST", data, function () {
 
-      localStorage.setItem("auth-token", authToken);
-      window.location.href = "/";
+      window.location.href = "/signin";
 
     }, function (error) {
       var responseJson = error.responseJSON;
