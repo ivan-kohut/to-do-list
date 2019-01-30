@@ -66,7 +66,7 @@ namespace WebApplication
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
-      services.AddSingleton<IEmailService>(p => new EmailService("api-key"));
+      services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGridApiKey"]));
       services.AddSingleton<ISelectListService, SelectListService>();
     }
 
