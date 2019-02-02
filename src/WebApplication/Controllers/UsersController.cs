@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -89,7 +90,7 @@ namespace Controllers
       }
       else
       {
-        return BadRequest(new { errors = identityCreateResult.Errors.Select(e => e.Description).ToList() });
+        return BadRequest(new { errors = GenerateErrorMessages(identityCreateResult) });
       }
     }
 
@@ -137,6 +138,26 @@ namespace Controllers
       return Ok();
     }
 
+    [Authorize(Roles = "user")]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
+    {
+      User user = await userManager.GetUserAsync(User);
+
+      IdentityResult identityChangePasswordResult = await userManager.ChangePasswordAsync(
+        user, userChangePasswordModel.OldPassword, userChangePasswordModel.NewPassword
+      );
+
+      if (identityChangePasswordResult.Succeeded)
+      {
+        return Ok();
+      }
+      else
+      {
+        return BadRequest(new { errors = GenerateErrorMessages(identityChangePasswordResult) });
+      }
+    }
+
     private async Task<string> GenerateTokenAsync(User user)
     {
       IList<Claim> userClaims = (await userManager.GetRolesAsync(user))
@@ -179,6 +200,14 @@ namespace Controllers
           .Select(s => s[random.Next(s.Length)])
           .ToArray()
       );
+    }
+
+    private IEnumerable<string> GenerateErrorMessages(IdentityResult identityResult)
+    {
+      return identityResult
+        .Errors
+        .Select(e => e.Description)
+        .ToList();
     }
   }
 }
