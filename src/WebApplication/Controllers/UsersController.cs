@@ -158,6 +158,56 @@ namespace Controllers
       }
     }
 
+    [Authorize(Roles = "user")]
+    [HttpGet("authenticator-uri")]
+    public async Task<ActionResult<string>> GetAuthenticatorUri()
+    {
+      User user = await userManager.GetUserAsync(User);
+
+      string authenticatorKey = await userManager.GetAuthenticatorKeyAsync(user);
+      string authenticatorUri = null;
+
+      if (!string.IsNullOrWhiteSpace(authenticatorKey))
+      {
+        return $"otpauth://totp/ToDoList:{user.UserName}?secret={authenticatorKey}&issuer=ToDoList&digits=6";
+      }
+
+      return authenticatorUri;
+    }
+
+    [Authorize(Roles = "user")]
+    [HttpPut("authenticator-key")]
+    public async Task<IActionResult> ResetAuthenticatorKey()
+    {
+      await userManager.ResetAuthenticatorKeyAsync(await userManager.GetUserAsync(User));
+
+      return Ok();
+    }
+
+    [Authorize(Roles = "user")]
+    [HttpPut("enable-authenticator")]
+    public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
+    {
+      User user = await userManager.GetUserAsync(User);
+
+      bool isTwoFactorTokenValid = await userManager.VerifyTwoFactorTokenAsync(
+        user,
+        userManager.Options.Tokens.AuthenticatorTokenProvider,
+        userEnableAuthenticatorModel.Code
+      );
+
+      if (isTwoFactorTokenValid)
+      {
+        await userManager.SetTwoFactorEnabledAsync(user, true);
+
+        return Ok();
+      }
+      else
+      {
+        return BadRequest(new { errors = new[] { "Verification code is invalid." } });
+      }
+    }
+
     private async Task<string> GenerateTokenAsync(User user)
     {
       IList<Claim> userClaims = (await userManager.GetRolesAsync(user))
