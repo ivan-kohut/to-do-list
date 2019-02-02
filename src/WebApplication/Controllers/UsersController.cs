@@ -20,6 +20,8 @@ namespace Controllers
   [Route("/api/v1/[controller]")]
   public class UsersController : Controller
   {
+    private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
     private readonly JwtOptions jwtOptions;
@@ -115,6 +117,26 @@ namespace Controllers
       }
     }
 
+    [HttpPost("password-recovery")]
+    public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
+    {
+      User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);
+
+      if (user == null)
+      {
+        return NotFound(new { errors = new[] { $"User with email '{userForgotPasswordModel.Email}' is not found" } });
+      }
+
+      string randomPassword = GenerateRandomPassword();
+
+      user.PasswordHash = userManager.PasswordHasher.HashPassword(user, randomPassword);
+
+      await userManager.UpdateAsync(user);
+      await emailService.SendEmailAsync(user.Email, "Password recovery", GeneratePasswordRecoveryMessage(randomPassword));
+
+      return Ok();
+    }
+
     private async Task<string> GenerateTokenAsync(User user)
     {
       IList<Claim> userClaims = (await userManager.GetRolesAsync(user))
@@ -140,6 +162,23 @@ namespace Controllers
       );
 
       return $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
+    }
+
+    private string GeneratePasswordRecoveryMessage(string password)
+    {
+      return $"The '{password}' is your new random password for login. Please change it in your account for security.";
+    }
+
+    private string GenerateRandomPassword()
+    {
+      Random random = new Random();
+
+      return new string(
+        Enumerable
+          .Repeat(symbols, 10)
+          .Select(s => s[random.Next(s.Length)])
+          .ToArray()
+      );
     }
   }
 }
