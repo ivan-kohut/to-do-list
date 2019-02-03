@@ -55,7 +55,34 @@ namespace Controllers
         }
         else
         {
-          actionResult = Json(await GenerateTokenAsync(user));
+          if (user.TwoFactorEnabled)
+          {
+            if (string.IsNullOrWhiteSpace(userLoginModel.TwoFactorToken))
+            {
+              actionResult = StatusCode(427, new { errors = new[] { "Enter authentication code" } });
+            }
+            else
+            {
+              bool isTwoFactorTokenValid = await userManager.VerifyTwoFactorTokenAsync(
+                user,
+                userManager.Options.Tokens.AuthenticatorTokenProvider,
+                userLoginModel.TwoFactorToken
+              );
+
+              if (isTwoFactorTokenValid)
+              {
+                actionResult = Json(await GenerateTokenAsync(user));
+              }
+              else
+              {
+                actionResult = BadRequest(new { errors = new[] { "Verification code is invalid." } });
+              }
+            }
+          }
+          else
+          {
+            actionResult = Json(await GenerateTokenAsync(user));
+          }
         }
       }
       else

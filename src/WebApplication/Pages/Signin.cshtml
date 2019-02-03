@@ -16,6 +16,11 @@
   <label for="password">Пароль</label>
   <input id="password" type="password" /> <br />
 
+  <div id="two-factor-authentication-block" style="display: none;">
+    <label for="authentication-code">Код автентифікації</label>
+    <input id="authentication-code" type="text" /> <br />
+  </div>
+
   <p onclick="app.login();">Увійти</p>
 
   <ul id="errors"></ul>

@@ -10,5 +10,8 @@ namespace Models
 
     [Required]
     public string Password { get; set; }
+
+    [RegularExpression("[0-9]{6}")]
+    public string TwoFactorToken { get; set; }
   }
 }

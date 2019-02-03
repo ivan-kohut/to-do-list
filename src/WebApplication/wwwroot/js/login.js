@@ -6,7 +6,8 @@
 
     var data = {
       email: $("#email").val(),
-      password: $("#password").val()
+      password: $("#password").val(),
+      twoFactorToken: $("#authentication-code").val()
     };
 
     callAPI(`${usersURL}/login`, "POST", data, function (authToken) {
@@ -16,11 +17,15 @@
 
     }, function (error) {
 
+      if (error.status === 427) {
+        $("#two-factor-authentication-block").show();
+      }
+
       var responseJson = error.responseJSON;
 
       $("#errors").empty();
 
-      ["Email", "Password", "errors"].forEach(function (s) {
+      ["Email", "Password", "TwoFactorToken", "errors"].forEach(function (s) {
         if (responseJson[s] !== undefined) {
           showErrors(responseJson[s]);
         }
