@@ -38,22 +38,6 @@
     window.location.href = "/";
   };
 
-  app.generateQrCode = function () {
-
-    callAPI(`${usersURL}/authenticator-uri`, "GET", null, function (authenticatorUri) {
-
-      if (authenticatorUri === undefined) {
-        callAPI(`${usersURL}/authenticator-key`, "PUT", null, function () {
-          callAPI(`${usersURL}/authenticator-uri`, "GET", null, function (authenticatorUri) {
-            generateQrCode(authenticatorUri);
-          });
-        });
-      } else {
-        generateQrCode(authenticatorUri);
-      }
-    });
-  };
-
   function showErrors(errors) {
 
     var $errors = $("#errors");
@@ -63,15 +47,6 @@
         $("<li>").append(error)
       );
     });
-  }
-
-  function generateQrCode(authenticatorUri) {
-    new QRCode($("#qrCode")[0],
-      {
-        text: authenticatorUri,
-        width: 150,
-        height: 150
-      });
   }
 
   function callAPI(url, method, data, successCallback, errorCallback) {

@@ -1,0 +1,45 @@
+﻿@page
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Client-server app</title>
+  <script src="/js/jquery-3.1.0.min.js" type="text/javascript"></script>
+  <script src="/js/account.js" type="text/javascript"></script>
+  <script src="/js/qrcode.js" type="text/javascript"></script>
+  <link href="/css/style.css" type="text/css" rel="stylesheet" />
+</head>
+<body onload="app.initTwoFactorAuthenticationLogic()">
+
+  <div id="enable">
+
+    <div id="enable-link">
+      <a href="#" onclick="app.initQrCode();">Включити двофакторну аутентифікацію</a>
+    </div>
+
+    <div id="authentication-code" style="display: none;">
+      <div id="qrCode"></div>
+
+      <div>
+        Відскануйте зображення вище за допомогою програми (наприклад, Google Authenticator)
+      </div>
+
+      <div>
+        <label for="two-factor-token">Введіть шестизначний код з програми</label>
+        <input id="two-factor-token" type="text" />
+      </div>
+
+      <p onclick="app.enableTwoFactorAuthentication();">Увімкнути</p>
+
+      <ul id="errors"></ul>
+    </div>
+
+  </div>
+
+  <div id="disable">
+    <a href="#" onclick="app.disableTwoFactorAuthentication();">Відключити двофакторну аутентифікацію</a>
+  </div>
+
+  <mini-profiler />
+</body>
+</html>

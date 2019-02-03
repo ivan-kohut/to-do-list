@@ -217,6 +217,11 @@ namespace Controllers
     {
       User user = await userManager.GetUserAsync(User);
 
+      if (user.TwoFactorEnabled)
+      {
+        return BadRequest();
+      }
+
       bool isTwoFactorTokenValid = await userManager.VerifyTwoFactorTokenAsync(
         user,
         userManager.Options.Tokens.AuthenticatorTokenProvider,
@@ -233,6 +238,30 @@ namespace Controllers
       {
         return BadRequest(new { errors = new[] { "Verification code is invalid." } });
       }
+    }
+
+    [Authorize(Roles = "user")]
+    [HttpPut("disable-two-factor-authentication")]
+    public async Task<IActionResult> DisableTwoFactorAuthentication()
+    {
+      User user = await userManager.GetUserAsync(User);
+
+      if (!user.TwoFactorEnabled)
+      {
+        return BadRequest();
+      }
+
+      await userManager.SetTwoFactorEnabledAsync(user, false);
+      await userManager.ResetAuthenticatorKeyAsync(user);
+
+      return Ok();
+    }
+
+    [Authorize(Roles = "user")]
+    [HttpGet("two-factor-authentication-enabled")]
+    public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
+    {
+      return (await userManager.GetUserAsync(User)).TwoFactorEnabled;
     }
 
     private async Task<string> GenerateTokenAsync(User user)
