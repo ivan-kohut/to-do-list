@@ -121,7 +121,22 @@ namespace Controllers
 
       UserFacebookData userFacebookData = JsonConvert.DeserializeObject<UserFacebookData>(userInfoResponse);
 
-      return Json(await GenerateTokenAsync(await userManager.FindByEmailAsync(userFacebookData.Email)));
+      User user = await userManager.FindByEmailAsync(userFacebookData.Email);
+
+      if (user == null)
+      {
+        user = new User { UserName = userFacebookData.Email, Email = userFacebookData.Email };
+
+        await userManager.CreateAsync(user);
+        await userManager.AddToRoleAsync(user, "user");
+        await AddLoginAsync(user, "Facebook", userFacebookData.Id.ToString());
+      }
+      else if (!(await userManager.GetLoginsAsync(user)).Any(l => l.LoginProvider == "Facebook"))
+      {
+        await AddLoginAsync(user, "Facebook", userFacebookData.Id.ToString());
+      }
+
+      return Json(await GenerateTokenAsync(user));
     }
 
     [HttpPost]
@@ -345,6 +360,11 @@ namespace Controllers
         .Errors
         .Select(e => e.Description)
         .ToList();
+    }
+
+    private async Task AddLoginAsync(User user, string loginProvider, string providerKey)
+    {
+      await userManager.AddLoginAsync(user, new UserLoginInfo(loginProvider, providerKey, loginProvider));
     }
   }
 }
