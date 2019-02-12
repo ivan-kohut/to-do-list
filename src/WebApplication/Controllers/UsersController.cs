@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using Newtonsoft.Json;
 using Options;
 using Services;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -25,15 +27,21 @@ namespace Controllers
 
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
+    private readonly IHttpClientFactory httpClientFactory;
     private readonly JwtOptions jwtOptions;
+    private readonly FacebookOptions facebookOptions;
 
     public UsersController(IEmailService emailService,
                            UserManager<User> userManager,
-                           IOptions<JwtOptions> jwtOptions)
+                           IHttpClientFactory httpClientFactory,
+                           IOptions<JwtOptions> jwtOptions,
+                           IOptions<FacebookOptions> facebookOptions)
     {
       this.emailService = emailService;
       this.userManager = userManager;
+      this.httpClientFactory = httpClientFactory;
       this.jwtOptions = jwtOptions.Value;
+      this.facebookOptions = facebookOptions.Value;
     }
 
     [HttpPost("login")]
@@ -91,6 +99,29 @@ namespace Controllers
       }
 
       return actionResult;
+    }
+
+    [HttpPost("facebook-login")]
+    public async Task<IActionResult> LoginByFacebookAsync(UserFacebookLoginModel userFacebookLoginModel)
+    {
+      HttpClient httpClient = httpClientFactory.CreateClient();
+
+      HttpResponseMessage accessTokenResponse = await httpClient
+        .GetAsync($"{facebookOptions.GraphApiEndpoint}/oauth/access_token?client_id={facebookOptions.AppId}&client_secret={facebookOptions.AppSecret}&redirect_uri={userFacebookLoginModel.RedirectUri}&code={userFacebookLoginModel.Code}");
+
+      if (!accessTokenResponse.IsSuccessStatusCode)
+      {
+        return BadRequest();
+      }
+
+      UserFacebookAccessToken userFacebookAccessToken = JsonConvert.DeserializeObject<UserFacebookAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+
+      string userInfoResponse = await httpClient
+        .GetStringAsync($"{facebookOptions.GraphApiEndpoint}/me?fields=email&access_token={userFacebookAccessToken.AccessToken}");
+
+      UserFacebookData userFacebookData = JsonConvert.DeserializeObject<UserFacebookData>(userInfoResponse);
+
+      return Json(await GenerateTokenAsync(await userManager.FindByEmailAsync(userFacebookData.Email)));
     }
 
     [HttpPost]

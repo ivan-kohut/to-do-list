@@ -41,6 +41,9 @@ namespace WebApplication
         .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
         .AddEntityFramework();
 
+      services
+        .AddHttpClient();
+
       SecurityKey securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]));
 
       services
@@ -62,11 +65,12 @@ namespace WebApplication
       services.AddMvc();
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
+      services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
 
       services.AddScoped<IItemRepository, ItemRepository>();
 
       services.AddScoped<IItemService, ItemService>();
-      services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGridApiKey"]));
+      services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
       services.AddSingleton<ISelectListService, SelectListService>();
     }
 
