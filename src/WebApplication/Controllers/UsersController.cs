@@ -142,29 +142,54 @@ namespace Controllers
     [HttpPost]
     public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
-      if (await userManager.FindByEmailAsync(userCreateModel.Email) != null)
+      User user = await userManager.FindByEmailAsync(userCreateModel.Email);
+
+      if (user != null && user.PasswordHash != null)
       {
         return BadRequest(new { errors = new[] { $"User with email '{userCreateModel.Email}' exists already" } });
       }
-
-      User user = new User { UserName = userCreateModel.Name, Email = userCreateModel.Email };
-
-      IdentityResult identityCreateResult = await userManager.CreateAsync(user, userCreateModel.Password);
-
-      if (identityCreateResult.Succeeded)
+      else if (user == null)
       {
-        await userManager.AddToRoleAsync(user, "user");
+        user = new User { UserName = userCreateModel.Name, Email = userCreateModel.Email };
 
-        string emailConfirmationMessage = await GenerateEmailConfirmationMessageAsync(user);
+        IdentityResult identityCreateResult = await userManager.CreateAsync(user, userCreateModel.Password);
 
-        await emailService.SendEmailAsync(user.Email, "Confirm your email", emailConfirmationMessage);
-
-        return Ok();
+        if (identityCreateResult.Succeeded)
+        {
+          await userManager.AddToRoleAsync(user, "user");
+        }
+        else
+        {
+          return BadRequest(new { errors = GenerateErrorMessages(identityCreateResult) });
+        }
       }
       else
       {
-        return BadRequest(new { errors = GenerateErrorMessages(identityCreateResult) });
+        user.UserName = userCreateModel.Name;
+
+        foreach (IUserValidator<User> userValidator in userManager.UserValidators)
+        {
+          IdentityResult identityValidateResult = await userValidator.ValidateAsync(userManager, user);
+
+          if (!identityValidateResult.Succeeded)
+          {
+            return BadRequest(new { errors = GenerateErrorMessages(identityValidateResult) });
+          }
+        }
+
+        IdentityResult identityUpdateResult = await userManager.AddPasswordAsync(user, userCreateModel.Password);
+
+        if (!identityUpdateResult.Succeeded)
+        {
+          return BadRequest(new { errors = GenerateErrorMessages(identityUpdateResult) });
+        }
       }
+
+      string emailConfirmationMessage = await GenerateEmailConfirmationMessageAsync(user);
+
+      await emailService.SendEmailAsync(user.Email, "Confirm your email", emailConfirmationMessage);
+
+      return Ok();
     }
 
     [HttpGet("{id}/email-confirmation")]
