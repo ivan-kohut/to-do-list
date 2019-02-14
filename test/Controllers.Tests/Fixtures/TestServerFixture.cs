@@ -1,10 +1,7 @@
-﻿using Controllers.Tests.Extensions;
-using Entities;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
-using Repositories;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -42,15 +39,14 @@ namespace Controllers.Tests.Fixtures
 
       object user = new
       {
-        name = "testUserName",
-        email = "test@test.com",
+        email = "admin@admin.admin",
         password = "abcABC123."
       };
 
       using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"))
       {
         string userToken = JsonConvert.DeserializeObject<string>(
-          Client.PostAsync("/api/v1/users", httpContent).Result.Content.ReadAsStringAsync().Result
+          Client.PostAsync("/api/v1/users/login", httpContent).Result.Content.ReadAsStringAsync().Result
         );
 
         UserId = int.Parse(
@@ -66,12 +62,6 @@ namespace Controllers.Tests.Fixtures
 
     public void Dispose()
     {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
-      {
-        appDbContext.Rollback<User>();
-        appDbContext.SaveChanges();
-      }
-
       Client?.Dispose();
       Server?.Dispose();
     }
