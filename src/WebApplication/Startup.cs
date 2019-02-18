@@ -66,6 +66,7 @@ namespace WebApplication
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
       services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
+      services.Configure<GoogleOptions>(configuration.GetSection("Google"));
 
       services.AddScoped<IItemRepository, ItemRepository>();
 

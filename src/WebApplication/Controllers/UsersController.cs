@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
@@ -30,18 +31,21 @@ namespace Controllers
     private readonly IHttpClientFactory httpClientFactory;
     private readonly JwtOptions jwtOptions;
     private readonly FacebookOptions facebookOptions;
+    private readonly GoogleOptions googleOptions;
 
     public UsersController(IEmailService emailService,
                            UserManager<User> userManager,
                            IHttpClientFactory httpClientFactory,
                            IOptions<JwtOptions> jwtOptions,
-                           IOptions<FacebookOptions> facebookOptions)
+                           IOptions<FacebookOptions> facebookOptions,
+                           IOptions<GoogleOptions> googleOptions)
     {
       this.emailService = emailService;
       this.userManager = userManager;
       this.httpClientFactory = httpClientFactory;
       this.jwtOptions = jwtOptions.Value;
       this.facebookOptions = facebookOptions.Value;
+      this.googleOptions = googleOptions.Value;
     }
 
     [HttpPost("login")]
@@ -102,41 +106,56 @@ namespace Controllers
     }
 
     [HttpPost("facebook-login")]
-    public async Task<IActionResult> LoginByFacebookAsync(UserFacebookLoginModel userFacebookLoginModel)
+    public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
 
       HttpResponseMessage accessTokenResponse = await httpClient
-        .GetAsync($"{facebookOptions.GraphApiEndpoint}/oauth/access_token?client_id={facebookOptions.AppId}&client_secret={facebookOptions.AppSecret}&redirect_uri={userFacebookLoginModel.RedirectUri}&code={userFacebookLoginModel.Code}");
+        .GetAsync($"{facebookOptions.GraphApiEndpoint}/oauth/access_token?client_id={facebookOptions.AppId}&client_secret={facebookOptions.AppSecret}&redirect_uri={userExternalLoginModel.RedirectUri}&code={userExternalLoginModel.Code}");
 
       if (!accessTokenResponse.IsSuccessStatusCode)
       {
         return BadRequest();
       }
 
-      UserFacebookAccessToken userFacebookAccessToken = JsonConvert.DeserializeObject<UserFacebookAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+      UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
 
       string userInfoResponse = await httpClient
-        .GetStringAsync($"{facebookOptions.GraphApiEndpoint}/me?fields=email&access_token={userFacebookAccessToken.AccessToken}");
+        .GetStringAsync($"{facebookOptions.GraphApiEndpoint}/me?fields=email&access_token={userExternalLoginAccessToken.AccessToken}");
 
-      UserFacebookData userFacebookData = JsonConvert.DeserializeObject<UserFacebookData>(userInfoResponse);
+      return Json(await GenerateTokenAsync("Facebook", userInfoResponse));
+    }
 
-      User user = await userManager.FindByEmailAsync(userFacebookData.Email);
+    [HttpPost("google-login")]
+    public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
+    {
+      HttpClient httpClient = httpClientFactory.CreateClient();
 
-      if (user == null)
+      object requestBody = new
       {
-        user = new User { UserName = userFacebookData.Email, Email = userFacebookData.Email };
+        grant_type = "authorization_code",
+        code = userExternalLoginModel.Code,
+        client_id = googleOptions.ClientId,
+        client_secret = googleOptions.ClientSecret,
+        redirect_uri = userExternalLoginModel.RedirectUri
+      };
 
-        await userManager.CreateAsync(user);
-        await userManager.AddToRoleAsync(user, "user");
-        await AddLoginAsync(user, "Facebook", userFacebookData.Id.ToString());
-      }
-      else if (!(await userManager.GetLoginsAsync(user)).Any(l => l.LoginProvider == "Facebook"))
+      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json"))
       {
-        await AddLoginAsync(user, "Facebook", userFacebookData.Id.ToString());
-      }
+        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(googleOptions.AccessTokenEndpoint, httpContent);
 
-      return Json(await GenerateTokenAsync(user));
+        if (!accessTokenResponse.IsSuccessStatusCode)
+        {
+          return BadRequest();
+        }
+
+        UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+
+        string userInfoResponse = await httpClient
+          .GetStringAsync($"{googleOptions.UserInfoEndpoint}?access_token={userExternalLoginAccessToken.AccessToken}");
+
+        return Json(await GenerateTokenAsync("Google", userInfoResponse));
+      }
     }
 
     [HttpPost]
@@ -333,6 +352,28 @@ namespace Controllers
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
     {
       return (await userManager.GetUserAsync(User)).TwoFactorEnabled;
+    }
+
+    private async Task<string> GenerateTokenAsync(string loginProvider, string userInfoResponse)
+    {
+      UserExternalLoginData userExternalLoginData = JsonConvert.DeserializeObject<UserExternalLoginData>(userInfoResponse);
+
+      User user = await userManager.FindByEmailAsync(userExternalLoginData.Email);
+
+      if (user == null)
+      {
+        user = new User { UserName = userExternalLoginData.Email, Email = userExternalLoginData.Email };
+
+        await userManager.CreateAsync(user);
+        await userManager.AddToRoleAsync(user, "user");
+        await AddLoginAsync(user, loginProvider, userExternalLoginData.Id);
+      }
+      else if (!(await userManager.GetLoginsAsync(user)).Any(l => l.LoginProvider == loginProvider))
+      {
+        await AddLoginAsync(user, loginProvider, userExternalLoginData.Id);
+      }
+
+      return await GenerateTokenAsync(user);
     }
 
     private async Task<string> GenerateTokenAsync(User user)

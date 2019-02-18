@@ -1,6 +1,6 @@
 ﻿namespace Models
 {
-  public class UserFacebookLoginModel
+  public class UserExternalLoginModel
   {
     public string Code { get; set; }
     public string RedirectUri { get; set; }
