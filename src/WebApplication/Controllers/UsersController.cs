@@ -32,13 +32,15 @@ namespace Controllers
     private readonly JwtOptions jwtOptions;
     private readonly FacebookOptions facebookOptions;
     private readonly GoogleOptions googleOptions;
+    private readonly GithubOptions githubOptions;
 
     public UsersController(IEmailService emailService,
                            UserManager<User> userManager,
                            IHttpClientFactory httpClientFactory,
                            IOptions<JwtOptions> jwtOptions,
                            IOptions<FacebookOptions> facebookOptions,
-                           IOptions<GoogleOptions> googleOptions)
+                           IOptions<GoogleOptions> googleOptions,
+                           IOptions<GithubOptions> githubOptions)
     {
       this.emailService = emailService;
       this.userManager = userManager;
@@ -46,6 +48,7 @@ namespace Controllers
       this.jwtOptions = jwtOptions.Value;
       this.facebookOptions = facebookOptions.Value;
       this.googleOptions = googleOptions.Value;
+      this.githubOptions = githubOptions.Value;
     }
 
     [HttpPost("login")]
@@ -155,6 +158,42 @@ namespace Controllers
           .GetStringAsync($"{googleOptions.UserInfoEndpoint}?access_token={userExternalLoginAccessToken.AccessToken}");
 
         return Json(await GenerateTokenAsync("Google", userInfoResponse));
+      }
+    }
+
+    [HttpPost("github-login")]
+    public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
+    {
+      HttpClient httpClient = httpClientFactory.CreateClient();
+
+      object requestBody = new
+      {
+        code = userExternalLoginModel.Code,
+        client_id = githubOptions.ClientId,
+        client_secret = githubOptions.ClientSecret
+      };
+
+      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json"))
+      {
+        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(githubOptions.AccessTokenEndpoint, httpContent);
+
+        if (!accessTokenResponse.IsSuccessStatusCode)
+        {
+          return BadRequest();
+        }
+
+        string accessToken = (await accessTokenResponse.Content.ReadAsStringAsync())
+          .Split("&")
+          .Where(p => p.StartsWith("access_token"))
+          .Select(p => p.Split("=").Last())
+          .Single();
+
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "Todo List API");
+
+        string userInfoResponse = await httpClient
+          .GetStringAsync($"{githubOptions.UserInfoEndpoint}?access_token={accessToken}");
+
+        return Json(await GenerateTokenAsync("Github", userInfoResponse));
       }
     }
 
