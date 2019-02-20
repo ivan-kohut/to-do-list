@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -33,6 +34,7 @@ namespace Controllers
     private readonly FacebookOptions facebookOptions;
     private readonly GoogleOptions googleOptions;
     private readonly GithubOptions githubOptions;
+    private readonly LinkedInOptions linkedInOptions;
 
     public UsersController(IEmailService emailService,
                            UserManager<User> userManager,
@@ -40,7 +42,8 @@ namespace Controllers
                            IOptions<JwtOptions> jwtOptions,
                            IOptions<FacebookOptions> facebookOptions,
                            IOptions<GoogleOptions> googleOptions,
-                           IOptions<GithubOptions> githubOptions)
+                           IOptions<GithubOptions> githubOptions,
+                           IOptions<LinkedInOptions> linkedInOptions)
     {
       this.emailService = emailService;
       this.userManager = userManager;
@@ -49,6 +52,7 @@ namespace Controllers
       this.facebookOptions = facebookOptions.Value;
       this.googleOptions = googleOptions.Value;
       this.githubOptions = githubOptions.Value;
+      this.linkedInOptions = linkedInOptions.Value;
     }
 
     [HttpPost("login")]
@@ -194,6 +198,45 @@ namespace Controllers
           .GetStringAsync($"{githubOptions.UserInfoEndpoint}?access_token={accessToken}");
 
         return Json(await GenerateTokenAsync("Github", userInfoResponse));
+      }
+    }
+
+    [HttpPost("linkedin-login")]
+    public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
+    {
+      HttpClient httpClient = httpClientFactory.CreateClient();
+
+      object requestBody = new
+      {
+        grant_type = "authorization_code",
+        code = userExternalLoginModel.Code,
+        client_id = linkedInOptions.ClientId,
+        client_secret = linkedInOptions.ClientSecret,
+        redirect_uri = userExternalLoginModel.RedirectUri
+      };
+
+      using (HttpContent httpContent = new FormUrlEncodedContent(JsonConvert.DeserializeObject<IDictionary<string, string>>(JsonConvert.SerializeObject(requestBody))))
+      {
+        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(linkedInOptions.AccessTokenEndpoint, httpContent);
+
+        if (!accessTokenResponse.IsSuccessStatusCode)
+        {
+          return BadRequest();
+        }
+
+        UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userExternalLoginAccessToken.AccessToken);
+
+        LinkedInUserIdModel linkedInUserIdModel = JsonConvert.DeserializeObject<LinkedInUserIdModel>(await httpClient.GetStringAsync(linkedInOptions.IdEndpoint));
+
+        string userEmail = JsonConvert.DeserializeObject<LinkedInUserEmailModel>(await httpClient.GetStringAsync(linkedInOptions.EmailAddressEndpoint))
+          .Elements
+          .Single()
+          .Handle
+          .EmailAddress;
+
+        return Json(await GenerateTokenAsync("LinkedIn", linkedInUserIdModel.Id, userEmail));
       }
     }
 
@@ -397,19 +440,24 @@ namespace Controllers
     {
       UserExternalLoginData userExternalLoginData = JsonConvert.DeserializeObject<UserExternalLoginData>(userInfoResponse);
 
-      User user = await userManager.FindByEmailAsync(userExternalLoginData.Email);
+      return await GenerateTokenAsync(loginProvider, userExternalLoginData.Id, userExternalLoginData.Email);
+    }
+
+    private async Task<string> GenerateTokenAsync(string loginProvider, string id, string email)
+    {
+      User user = await userManager.FindByEmailAsync(email);
 
       if (user == null)
       {
-        user = new User { UserName = userExternalLoginData.Email, Email = userExternalLoginData.Email };
+        user = new User { UserName = email, Email = email };
 
         await userManager.CreateAsync(user);
         await userManager.AddToRoleAsync(user, "user");
-        await AddLoginAsync(user, loginProvider, userExternalLoginData.Id);
+        await AddLoginAsync(user, loginProvider, id);
       }
       else if (!(await userManager.GetLoginsAsync(user)).Any(l => l.LoginProvider == loginProvider))
       {
-        await AddLoginAsync(user, loginProvider, userExternalLoginData.Id);
+        await AddLoginAsync(user, loginProvider, id);
       }
 
       return await GenerateTokenAsync(user);

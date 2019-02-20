@@ -68,6 +68,7 @@ namespace WebApplication
       services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
       services.Configure<GoogleOptions>(configuration.GetSection("Google"));
       services.Configure<GithubOptions>(configuration.GetSection("Github"));
+      services.Configure<LinkedInOptions>(configuration.GetSection("LinkedIn"));
 
       services.AddScoped<IItemRepository, ItemRepository>();
 
