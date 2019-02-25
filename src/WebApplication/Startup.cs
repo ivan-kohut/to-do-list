@@ -71,6 +71,7 @@ namespace WebApplication
       services.Configure<LinkedInOptions>(configuration.GetSection("LinkedIn"));
 
       services.AddScoped<IItemRepository, ItemRepository>();
+      services.AddScoped<ITransactionManager, TransactionManager>();
 
       services.AddScoped<IItemService, ItemService>();
       services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));

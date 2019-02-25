@@ -17,14 +17,16 @@ namespace Services.Tests
     private const int userId = 10;
 
     private readonly Mock<IItemRepository> mockItemRepository;
+    private readonly Mock<ITransactionManager> mockTransactionManager;
 
     private readonly ItemService itemService;
 
     public ItemServiceTest()
     {
       this.mockItemRepository = new Mock<IItemRepository>(MockBehavior.Strict);
+      this.mockTransactionManager = new Mock<ITransactionManager>(MockBehavior.Strict);
 
-      this.itemService = new ItemService(mockItemRepository.Object);
+      this.itemService = new ItemService(mockItemRepository.Object, mockTransactionManager.Object);
     }
 
     [Fact]
@@ -81,7 +83,7 @@ namespace Services.Tests
         .Callback<Item>(i => i.Id = generatedItemId)
         .Returns(Task.CompletedTask);
 
-      mockItemRepository
+      mockTransactionManager
         .Setup(m => m.SaveChangesAsync())
         .Returns(Task.CompletedTask);
 
@@ -101,7 +103,7 @@ namespace Services.Tests
 
       mockItemRepository.Verify(r => r.GetMaxItemPriorityAsync(userId), Times.Once());
       mockItemRepository.Verify(r => r.CreateAsync(It.IsAny<Item>()), Times.Once());
-      mockItemRepository.Verify(r => r.SaveChangesAsync(), Times.Once());
+      mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
     }
 
     [Fact]
@@ -163,7 +165,7 @@ namespace Services.Tests
         )
         .Verifiable();
 
-      mockItemRepository
+      mockTransactionManager
         .Setup(m => m.SaveChangesAsync())
         .Returns(Task.CompletedTask);
 
@@ -173,7 +175,7 @@ namespace Services.Tests
       mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemId, userId), Times.Once());
       mockItemRepository.Verify(r => r.UpdatePartially(foundItem, It.IsAny<IDictionary<string, object>>()), Times.Once());
 
-      mockItemRepository.Verify(r => r.SaveChangesAsync(), Times.Once());
+      mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
     }
 
     [Fact]
@@ -208,7 +210,7 @@ namespace Services.Tests
         .Setup(r => r.Delete(foundItem))
         .Verifiable();
 
-      mockItemRepository
+      mockTransactionManager
         .Setup(m => m.SaveChangesAsync())
         .Returns(Task.CompletedTask);
 
@@ -218,7 +220,7 @@ namespace Services.Tests
       mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId), Times.Once());
       mockItemRepository.Verify(r => r.Delete(foundItem), Times.Once());
 
-      mockItemRepository.Verify(m => m.SaveChangesAsync(), Times.Once());
+      mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
     }
   }
 }

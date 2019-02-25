@@ -2,11 +2,11 @@
 
 namespace Repositories
 {
-  public abstract class BaseRepository
+  public class TransactionManager : ITransactionManager
   {
     private readonly AppDbContext dbContext;
 
-    protected BaseRepository(AppDbContext dbContext)
+    public TransactionManager(AppDbContext dbContext)
     {
       this.dbContext = dbContext;
     }

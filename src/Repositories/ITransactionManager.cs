@@ -2,7 +2,7 @@
 
 namespace Repositories
 {
-  public interface IRepository
+  public interface ITransactionManager
   {
     Task SaveChangesAsync();
   }

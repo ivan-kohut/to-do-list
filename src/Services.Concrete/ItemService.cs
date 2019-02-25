@@ -12,10 +12,12 @@ namespace Services
   public class ItemService : IItemService
   {
     private readonly IItemRepository itemRepository;
+    private readonly ITransactionManager transactionManager;
 
-    public ItemService(IItemRepository itemRepository)
+    public ItemService(IItemRepository itemRepository, ITransactionManager transactionManager)
     {
       this.itemRepository = itemRepository;
+      this.transactionManager = transactionManager;
     }
 
     public async Task<IEnumerable<ItemDTO>> AllAsync(int userId)
@@ -45,7 +47,7 @@ namespace Services
       };
 
       await itemRepository.CreateAsync(item);
-      await itemRepository.SaveChangesAsync();
+      await transactionManager.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
       itemDTO.StatusId = (int)item.Status;
@@ -68,7 +70,7 @@ namespace Services
 
       itemRepository.UpdatePartially(item, patches.ToDictionary(p => p.Name, p => p.Value));
 
-      await itemRepository.SaveChangesAsync();
+      await transactionManager.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id, int userId)
@@ -80,7 +82,7 @@ namespace Services
 
       itemRepository.Delete(item);
 
-      await itemRepository.SaveChangesAsync();
+      await transactionManager.SaveChangesAsync();
     }
 
     private void CorrectPatchDTOs(ICollection<PatchDTO> patches)
