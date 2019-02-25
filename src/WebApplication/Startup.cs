@@ -34,7 +34,7 @@ namespace WebApplication
         );
 
       services
-        .AddIdentity<User, IdentityRole<int>>()
+        .AddIdentity<User, Role>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
       services
