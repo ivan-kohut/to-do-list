@@ -11,13 +11,22 @@
 
     $inputField = $('#text_input');
 
-    if (getAuthToken() === null) {
+    var authToken = getAuthToken();
+
+    if (authToken === null) {
 
       $("#auth").show();
 
     } else {
 
       $("#items").show();
+
+      var userRoles = JSON.parse(atob(authToken.substring(authToken.indexOf(".") + 1, authToken.lastIndexOf("."))))
+      ["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+      if (userRoles.includes("admin")) {
+        $("#users").show();
+      }
 
       callAPI(itemsURL, "GET", null, function (data) {
         for (var i = 0; i < data.length; i++) {
@@ -133,7 +142,7 @@
 
   app.onItemSelect = function (id) {
 
-    var statusesSelectListSelector = "#statuses-select-list"; 
+    var statusesSelectListSelector = "#statuses-select-list";
 
     if (!isSelectedItem()) {
       changeColor("red", "blue");
@@ -217,7 +226,7 @@
 
   function callAPI(url, method, data, callback) {
     $.ajax({
-      beforeSend: function(request) {
+      beforeSend: function (request) {
         request.setRequestHeader("Authorization", `Bearer ${getAuthToken()}`);
       },
       url: url,

@@ -8,6 +8,7 @@ using Models;
 using Newtonsoft.Json;
 using Options;
 using Services;
+using Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,6 +28,7 @@ namespace Controllers
   {
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+    private readonly IUserService userService;
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
     private readonly IHttpClientFactory httpClientFactory;
@@ -36,7 +38,8 @@ namespace Controllers
     private readonly GithubOptions githubOptions;
     private readonly LinkedInOptions linkedInOptions;
 
-    public UsersController(IEmailService emailService,
+    public UsersController(IUserService userService,
+                           IEmailService emailService,
                            UserManager<User> userManager,
                            IHttpClientFactory httpClientFactory,
                            IOptions<JwtOptions> jwtOptions,
@@ -45,6 +48,7 @@ namespace Controllers
                            IOptions<GithubOptions> githubOptions,
                            IOptions<LinkedInOptions> linkedInOptions)
     {
+      this.userService = userService;
       this.emailService = emailService;
       this.userManager = userManager;
       this.httpClientFactory = httpClientFactory;
@@ -53,6 +57,31 @@ namespace Controllers
       this.googleOptions = googleOptions.Value;
       this.githubOptions = githubOptions.Value;
       this.linkedInOptions = linkedInOptions.Value;
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllAsync()
+    {
+      return new List<UserDTO>(await userService.GetAllAsync());
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+      IActionResult actionResult = Ok();
+
+      try
+      {
+        await userService.DeleteAsync(id);
+      }
+      catch (EntityNotFoundException)
+      {
+        actionResult = NotFound();
+      }
+
+      return actionResult;
     }
 
     [HttpPost("login")]
