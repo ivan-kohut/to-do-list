@@ -73,7 +73,7 @@ namespace Controllers
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<IEnumerable<ItemDTO>>> GetUserItemsAsync(int userId)
     {
-      return new List<ItemDTO>(await itemService.AllAsync(userId));
+      return new List<ItemDTO>(await itemService.GetAllAsync(userId));
     }
 
     [HttpDelete("{id}")]

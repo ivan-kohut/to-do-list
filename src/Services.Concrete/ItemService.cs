@@ -20,7 +20,7 @@ namespace Services
       this.transactionManager = transactionManager;
     }
 
-    public async Task<IEnumerable<ItemDTO>> AllAsync(int userId)
+    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int userId)
     {
       return await itemRepository
         .All(userId)

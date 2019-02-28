@@ -37,7 +37,7 @@ namespace Services.Tests
         .Returns(new List<Item>().AsQueryable().BuildMock().Object);
 
       // Act
-      Assert.Empty(itemService.AllAsync(userId).Result);
+      Assert.Empty(itemService.GetAllAsync(userId).Result);
 
       mockItemRepository.Verify(r => r.All(userId), Times.Once());
     }
@@ -59,7 +59,7 @@ namespace Services.Tests
       };
 
       // Act
-      IEnumerable<ItemDTO> actual = itemService.AllAsync(userId).Result;
+      IEnumerable<ItemDTO> actual = itemService.GetAllAsync(userId).Result;
 
       actual.ShouldBeEquivalentTo(expected);
 
