@@ -29,6 +29,7 @@ namespace Controllers
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     private readonly IUserService userService;
+    private readonly IItemService itemService;
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
     private readonly IHttpClientFactory httpClientFactory;
@@ -39,6 +40,7 @@ namespace Controllers
     private readonly LinkedInOptions linkedInOptions;
 
     public UsersController(IUserService userService,
+                           IItemService itemService,
                            IEmailService emailService,
                            UserManager<User> userManager,
                            IHttpClientFactory httpClientFactory,
@@ -49,6 +51,7 @@ namespace Controllers
                            IOptions<LinkedInOptions> linkedInOptions)
     {
       this.userService = userService;
+      this.itemService = itemService;
       this.emailService = emailService;
       this.userManager = userManager;
       this.httpClientFactory = httpClientFactory;
@@ -64,6 +67,13 @@ namespace Controllers
     public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllAsync()
     {
       return new List<UserDTO>(await userService.GetAllAsync());
+    }
+
+    [HttpGet("{userId}/items")]
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<IEnumerable<ItemDTO>>> GetUserItemsAsync(int userId)
+    {
+      return new List<ItemDTO>(await itemService.AllAsync(userId));
     }
 
     [HttpDelete("{id}")]
