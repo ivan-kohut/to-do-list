@@ -1,8 +1,8 @@
-﻿using Models;
-using Controllers.Tests.Extensions;
+﻿using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
+using Models;
 using Repositories;
 using Services;
 using System;
@@ -23,145 +23,173 @@ namespace Controllers.Tests
     {
     }
 
-    [Fact]
-    public void All_When_ItemsDoNotExist_Expect_EmptyList()
+    public class GetAllAsync : ItemsControllerTest
     {
-      // Act
-      HttpResponseMessage response = Get(url);
-
-      response.EnsureSuccessStatusCode();
-
-      Assert.Empty(DeserializeResponseBody<IEnumerable<ItemDTO>>(response));
-    }
-
-    [Fact]
-    public void All_When_ItemsExist_Expect_Returned()
-    {
-      IEnumerable<Item> items = new List<Item>
+      public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
-        new Item { UserId = UserId, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
-        new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
-      };
+      }
 
-      IEnumerable<ItemDTO> expected = items
-        .Select(i => SaveItem(i))
-        .OrderBy(i => i.Priority)
-        .ToList();
-
-      // Act
-      HttpResponseMessage response = Get(url);
-
-      response.EnsureSuccessStatusCode();
-
-      IEnumerable<ItemDTO> actual = DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
-
-      actual.ShouldBeEquivalentTo(expected);
-    }
-
-    [Fact]
-    public void Save_When_InputModelIsNotValid_Expect_BadRequest()
-    {
-      // Act
-      HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
-
-      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public void Save_When_InputModelIsValid_Expect_Saved()
-    {
-      ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
-
-      // Act
-      HttpResponseMessage response = Post(url, itemToSave);
-
-      response.EnsureSuccessStatusCode();
-
-      ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
-
-      Assert.NotEqual(0, itemSaved.Id);
-      Assert.Equal(itemToSave.Text, itemSaved.Text);
-      Assert.Equal(1, itemSaved.Priority);
-      Assert.Equal((int)ItemStatus.Todo, itemSaved.StatusId);
-    }
-
-    [Fact]
-    public void UpdatePartially_When_InputModelIsNotValid_Expect_BadRequest()
-    {
-      // Act
-      HttpResponseMessage response = Patch($"{url}/{1}", null);
-
-      Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public void UpdatePartially_When_ItemIsNotFound_Expect_NotFound()
-    {
-      // Act
-      HttpResponseMessage response = Patch($"{url}/{1}", Enumerable.Empty<PatchDTO>());
-
-      Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
-
-    [Fact]
-    public void UpdatePartially_When_InputModelIsValid_Expect_Updated()
-    {
-      ItemDTO itemToUpdate = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
-
-      PatchDTO textPatchDTO = new PatchDTO
+      [Fact]
+      public void When_ItemsDoNotExist_Expect_EmptyList()
       {
-        Name = "Text",
-        Value = "newItemText"
-      };
+        // Act
+        HttpResponseMessage response = Get(url);
 
-      PatchDTO priorityPatchDTO = new PatchDTO
+        response.EnsureSuccessStatusCode();
+
+        Assert.Empty(DeserializeResponseBody<IEnumerable<ItemDTO>>(response));
+      }
+
+      [Fact]
+      public void When_ItemsExist_Expect_Returned()
       {
-        Name = "Priority",
-        Value = 2
-      };
+        IEnumerable<Item> items = new List<Item>
+        {
+          new Item { UserId = UserId, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
+          new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
+        };
 
-      PatchDTO statusPatchDTO = new PatchDTO
-      {
-        Name = "StatusId",
-        Value = 2
-      };
+        IEnumerable<ItemDTO> expected = items
+          .Select(i => SaveItem(i))
+          .OrderBy(i => i.Priority)
+          .ToList();
 
-      // Act
-      HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
+        // Act
+        HttpResponseMessage response = Get(url);
 
-      response.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
-      Item itemUpdated = GetAllItems()
-        .Single(i => i.Id == itemToUpdate.Id);
+        IEnumerable<ItemDTO> actual = DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
 
-      Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
-      Assert.Equal(priorityPatchDTO.Value, itemUpdated.Priority);
-      Assert.Equal(statusPatchDTO.Value, (int)itemUpdated.Status);
+        actual.ShouldBeEquivalentTo(expected);
+      }
     }
 
-    [Fact]
-    public void Delete_When_ItemIsNotFound_Expect_NotFound()
+    public class SaveAsync : ItemsControllerTest
     {
-      // Act
-      HttpResponseMessage response = Delete($"{url}/{1}");
+      public SaveAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
 
-      Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+      [Fact]
+      public void When_InputModelIsNotValid_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public void When_InputModelIsValid_Expect_Saved()
+      {
+        ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
+
+        // Act
+        HttpResponseMessage response = Post(url, itemToSave);
+
+        response.EnsureSuccessStatusCode();
+
+        ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
+
+        Assert.NotEqual(0, itemSaved.Id);
+        Assert.Equal(itemToSave.Text, itemSaved.Text);
+        Assert.Equal(1, itemSaved.Priority);
+        Assert.Equal((int)ItemStatus.Todo, itemSaved.StatusId);
+      }
     }
 
-    [Fact]
-    public void Delete_When_ItemIsFound_Expect_Deleted()
+    public class PatchAsync : ItemsControllerTest
     {
-      ItemDTO itemSaved = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+      public PatchAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
 
-      // Act
-      HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
+      [Fact]
+      public void When_InputModelIsNotValid_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = Patch($"{url}/{1}", null);
 
-      response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
 
-      Item itemDeleted = GetAllItems()
-        .SingleOrDefault(i => i.Id == itemSaved.Id);
+      [Fact]
+      public void When_ItemIsNotFound_Expect_NotFound()
+      {
+        // Act
+        HttpResponseMessage response = Patch($"{url}/{1}", Enumerable.Empty<PatchDTO>());
 
-      Assert.Null(itemDeleted);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+      }
+
+      [Fact]
+      public void When_InputModelIsValid_Expect_Updated()
+      {
+        ItemDTO itemToUpdate = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+
+        PatchDTO textPatchDTO = new PatchDTO
+        {
+          Name = "Text",
+          Value = "newItemText"
+        };
+
+        PatchDTO priorityPatchDTO = new PatchDTO
+        {
+          Name = "Priority",
+          Value = 2
+        };
+
+        PatchDTO statusPatchDTO = new PatchDTO
+        {
+          Name = "StatusId",
+          Value = 2
+        };
+
+        // Act
+        HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
+
+        response.EnsureSuccessStatusCode();
+
+        Item itemUpdated = GetAllItems()
+          .Single(i => i.Id == itemToUpdate.Id);
+
+        Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
+        Assert.Equal(priorityPatchDTO.Value, itemUpdated.Priority);
+        Assert.Equal(statusPatchDTO.Value, (int)itemUpdated.Status);
+      }
+    }
+
+    public class DeleteAsync : ItemsControllerTest
+    {
+      public DeleteAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public void When_ItemIsNotFound_Expect_NotFound()
+      {
+        // Act
+        HttpResponseMessage response = Delete($"{url}/{1}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+      }
+
+      [Fact]
+      public void When_ItemIsFound_Expect_Deleted()
+      {
+        ItemDTO itemSaved = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+
+        // Act
+        HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
+
+        response.EnsureSuccessStatusCode();
+
+        Item itemDeleted = GetAllItems()
+          .SingleOrDefault(i => i.Id == itemSaved.Id);
+
+        Assert.Null(itemDeleted);
+      }
     }
 
     public void Dispose()

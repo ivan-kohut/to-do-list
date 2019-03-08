@@ -12,32 +12,35 @@ namespace Services.Tests
 
     public SelectListServiceTest()
     {
-      selectListService = new SelectListService();
+      this.selectListService = new SelectListService();
     }
 
-    [Fact]
-    public void BuildSelectList_When_InputStructIsNotEnum_Expect_ArgumentExeption()
+    public class BuildSelectList : SelectListServiceTest
     {
-      // Act
-      Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<int>());
-      Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<long>());
-      Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<double>());
-      Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<decimal>());
-    }
+      [Fact]
+      public void When_InputStructIsNotEnum_Expect_ArgumentExeption()
+      {
+        // Act
+        Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<int>());
+        Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<long>());
+        Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<double>());
+        Assert.Throws<ArgumentException>(() => selectListService.BuildSelectList<decimal>());
+      }
 
-    [Fact]
-    public void BuildSelectList_When_InputStructIsEnum_Expect_SelectListIsReturned()
-    {
-      IEnumerable<SelectListItemDTO> expected = new List<SelectListItemDTO>
+      [Fact]
+      public void When_InputStructIsEnum_Expect_SelectListIsReturned()
+      {
+        IEnumerable<SelectListItemDTO> expected = new List<SelectListItemDTO>
       {
         new SelectListItemDTO { Value = "1", Text = "Todo" },
         new SelectListItemDTO { Value = "2", Text = "Done" }
       };
 
-      // Act
-      IEnumerable<SelectListItemDTO> actual = selectListService.BuildSelectList<ItemStatus>();
+        // Act
+        IEnumerable<SelectListItemDTO> actual = selectListService.BuildSelectList<ItemStatus>();
 
-      actual.ShouldBeEquivalentTo(expected);
+        actual.ShouldBeEquivalentTo(expected);
+      }
     }
   }
 }

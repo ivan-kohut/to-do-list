@@ -23,7 +23,7 @@ namespace Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ItemDTO>>> AllAsync()
+    public async Task<ActionResult<IEnumerable<ItemDTO>>> GetAllAsync()
     {
       return new List<ItemDTO>(await itemService.GetAllAsync(GetUserId()));
     }

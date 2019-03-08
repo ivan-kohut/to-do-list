@@ -16,23 +16,30 @@ namespace Controllers.Tests
     {
     }
 
-    [Fact]
-    public void GetStatusesSelectList_Expect_Returned()
+    public class GetStatusesSelectList : SelectListsControllerTest
     {
-      IEnumerable<SelectListItemDTO> expected = new List<SelectListItemDTO>
+      public GetStatusesSelectList(TestServerFixture testServerFixture) : base(testServerFixture)
       {
-        new SelectListItemDTO { Value = "1", Text = "Todo" },
-        new SelectListItemDTO { Value = "2", Text = "Done" }
-      };
+      }
 
-      // Act
-      HttpResponseMessage response = Get($"{url}/item-statuses");
+      [Fact]
+      public void Expect_Returned()
+      {
+        IEnumerable<SelectListItemDTO> expected = new List<SelectListItemDTO>
+        {
+          new SelectListItemDTO { Value = "1", Text = "Todo" },
+          new SelectListItemDTO { Value = "2", Text = "Done" }
+        };
 
-      response.EnsureSuccessStatusCode();
+        // Act
+        HttpResponseMessage response = Get($"{url}/item-statuses");
 
-      IEnumerable<SelectListItemDTO> actual = DeserializeResponseBody<IEnumerable<SelectListItemDTO>>(response);
+        response.EnsureSuccessStatusCode();
 
-      actual.ShouldBeEquivalentTo(expected);
+        IEnumerable<SelectListItemDTO> actual = DeserializeResponseBody<IEnumerable<SelectListItemDTO>>(response);
+
+        actual.ShouldBeEquivalentTo(expected);
+      }
     }
   }
 }
