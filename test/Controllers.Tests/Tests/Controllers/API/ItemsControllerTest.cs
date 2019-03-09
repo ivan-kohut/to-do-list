@@ -2,6 +2,7 @@
 using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Repositories;
 using Services;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Controllers.Tests
@@ -30,10 +32,10 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void When_ItemsDoNotExist_Expect_EmptyList()
+      public async Task When_ItemsDoNotExist_Expect_EmptyList()
       {
         // Act
-        HttpResponseMessage response = Get(url);
+        HttpResponseMessage response = await GetAsync(url);
 
         response.EnsureSuccessStatusCode();
 
@@ -41,7 +43,7 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void When_ItemsExist_Expect_Returned()
+      public async Task When_ItemsExist_Expect_Returned()
       {
         IEnumerable<Item> items = new List<Item>
         {
@@ -49,13 +51,12 @@ namespace Controllers.Tests
           new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
         };
 
-        IEnumerable<ItemDTO> expected = items
-          .Select(i => SaveItem(i))
+        IEnumerable<ItemDTO> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
           .OrderBy(i => i.Priority)
           .ToList();
 
         // Act
-        HttpResponseMessage response = Get(url);
+        HttpResponseMessage response = await GetAsync(url);
 
         response.EnsureSuccessStatusCode();
 
@@ -72,21 +73,21 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void When_InputModelIsNotValid_Expect_BadRequest()
+      public async Task When_InputModelIsNotValid_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = Post(url, new ItemCreateApiModel { Text = "" });
+        HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
 
       [Fact]
-      public void When_InputModelIsValid_Expect_Saved()
+      public async Task When_InputModelIsValid_Expect_Saved()
       {
         ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
 
         // Act
-        HttpResponseMessage response = Post(url, itemToSave);
+        HttpResponseMessage response = await PostAsync(url, itemToSave);
 
         response.EnsureSuccessStatusCode();
 
@@ -106,27 +107,27 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void When_InputModelIsNotValid_Expect_BadRequest()
+      public async Task When_InputModelIsNotValid_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = Patch($"{url}/{1}", null);
+        HttpResponseMessage response = await PatchAsync($"{url}/{1}", null);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
 
       [Fact]
-      public void When_ItemIsNotFound_Expect_NotFound()
+      public async Task When_ItemIsNotFound_Expect_NotFound()
       {
         // Act
-        HttpResponseMessage response = Patch($"{url}/{1}", Enumerable.Empty<PatchDTO>());
+        HttpResponseMessage response = await PatchAsync($"{url}/{1}", Enumerable.Empty<PatchDTO>());
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
       }
 
       [Fact]
-      public void When_InputModelIsValid_Expect_Updated()
+      public async Task When_InputModelIsValid_Expect_Updated()
       {
-        ItemDTO itemToUpdate = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemDTO itemToUpdate = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
         PatchDTO textPatchDTO = new PatchDTO
         {
@@ -147,11 +148,11 @@ namespace Controllers.Tests
         };
 
         // Act
-        HttpResponseMessage response = Patch($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
+        HttpResponseMessage response = await PatchAsync($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
 
         response.EnsureSuccessStatusCode();
 
-        Item itemUpdated = GetAllItems()
+        Item itemUpdated = (await GetAllItemsAsync())
           .Single(i => i.Id == itemToUpdate.Id);
 
         Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
@@ -167,25 +168,25 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void When_ItemIsNotFound_Expect_NotFound()
+      public async Task When_ItemIsNotFound_Expect_NotFound()
       {
         // Act
-        HttpResponseMessage response = Delete($"{url}/{1}");
+        HttpResponseMessage response = await DeleteAsync($"{url}/{1}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
       }
 
       [Fact]
-      public void When_ItemIsFound_Expect_Deleted()
+      public async Task When_ItemIsFound_Expect_Deleted()
       {
-        ItemDTO itemSaved = SaveItem(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemDTO itemSaved = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
         // Act
-        HttpResponseMessage response = Delete($"{url}/{itemSaved.Id}");
+        HttpResponseMessage response = await DeleteAsync($"{url}/{itemSaved.Id}");
 
         response.EnsureSuccessStatusCode();
 
-        Item itemDeleted = GetAllItems()
+        Item itemDeleted = (await GetAllItemsAsync())
           .SingleOrDefault(i => i.Id == itemSaved.Id);
 
         Assert.Null(itemDeleted);
@@ -202,12 +203,13 @@ namespace Controllers.Tests
       }
     }
 
-    private ItemDTO SaveItem(Item itemToSave)
+    private async Task<ItemDTO> SaveItemAsync(Item itemToSave)
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
         appDbContext.Add(itemToSave);
-        appDbContext.SaveChanges();
+
+        await appDbContext.SaveChangesAsync();
 
         return new ItemDTO
         {
@@ -219,13 +221,13 @@ namespace Controllers.Tests
       }
     }
 
-    private IEnumerable<Item> GetAllItems()
+    private async Task<IEnumerable<Item>> GetAllItemsAsync()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
-        return appDbContext
+        return await appDbContext
           .Items
-          .ToList();
+          .ToListAsync();
       }
     }
   }

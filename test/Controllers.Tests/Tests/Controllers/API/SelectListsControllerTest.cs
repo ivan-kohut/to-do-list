@@ -3,6 +3,7 @@ using FluentAssertions;
 using Services;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Controllers.Tests
@@ -23,7 +24,7 @@ namespace Controllers.Tests
       }
 
       [Fact]
-      public void Expect_Returned()
+      public async Task Expect_Returned()
       {
         IEnumerable<SelectListItemDTO> expected = new List<SelectListItemDTO>
         {
@@ -32,7 +33,7 @@ namespace Controllers.Tests
         };
 
         // Act
-        HttpResponseMessage response = Get($"{url}/item-statuses");
+        HttpResponseMessage response = await GetAsync($"{url}/item-statuses");
 
         response.EnsureSuccessStatusCode();
 

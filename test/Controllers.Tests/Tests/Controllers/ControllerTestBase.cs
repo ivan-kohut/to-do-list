@@ -1,5 +1,6 @@
 ﻿using Controllers.Tests.Fixtures;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Controllers.Tests
 {
@@ -9,30 +10,30 @@ namespace Controllers.Tests
     {
     }
 
-    protected HttpResponseMessage Get(string url)
+    protected async Task<HttpResponseMessage> GetAsync(string url)
     {
-      return Client.GetAsync(url).Result;
+      return await Client.GetAsync(url);
     }
 
-    protected HttpResponseMessage Post(string url, object requestBody)
+    protected async Task<HttpResponseMessage> PostAsync(string url, object requestBody)
     {
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        return Client.PostAsync(url, httpContent).Result;
+        return await Client.PostAsync(url, httpContent);
       }
     }
 
-    protected HttpResponseMessage Patch(string url, object requestBody)
+    protected async Task<HttpResponseMessage> PatchAsync(string url, object requestBody)
     {
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        return Client.PatchAsync(url, httpContent).Result;
+        return await Client.PatchAsync(url, httpContent);
       }
     }
 
-    protected HttpResponseMessage Delete(string url)
+    protected async Task<HttpResponseMessage> DeleteAsync(string url)
     {
-      return Client.DeleteAsync(url).Result;
+      return await Client.DeleteAsync(url);
     }
 
     protected abstract HttpContent CreateHttpContent(object requestBody);
