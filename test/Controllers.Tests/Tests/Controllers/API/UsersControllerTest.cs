@@ -314,6 +314,237 @@ namespace Controllers.Tests
       }
     }
 
+    public class CreateUserAsync : UsersControllerTest
+    {
+      public CreateUserAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_InputModelIsNotValid_Expect_BadRequest()
+      {
+        object body = new
+        {
+          Email = string.Empty,
+          Name = string.Empty,
+          Password = string.Empty,
+          ConfirmPassword = string.Empty
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserAlreadyExistsWithSpecifiedEmail_Expect_BadRequest()
+      {
+        string userEmail = "user@user.user";
+        string userPassword = "user-password";
+
+        User user = new User
+        {
+          UserName = "userName",
+          Email = userEmail,
+          NormalizedEmail = userEmail.ToUpper()
+        };
+
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
+        }
+
+        UserDTO userDTO = await SaveUserAsync(user);
+
+        object body = new
+        {
+          user.Email,
+          Name = user.UserName,
+          Password = userPassword,
+          ConfirmPassword = userPassword
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserAlreadyExistsWithSpecifiedName_Expect_BadRequest()
+      {
+        string userName = "userName";
+        string userEmail = "user@user.user";
+        string userPassword = "user-password";
+
+        User user = new User
+        {
+          UserName = userName,
+          NormalizedUserName = userName.ToUpper(),
+          Email = userEmail,
+          NormalizedEmail = userEmail.ToUpper()
+        };
+
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
+        }
+
+        UserDTO userDTO = await SaveUserAsync(user);
+
+        object body = new
+        {
+          Email = "test-email.test@test",
+          Name = user.UserName,
+          Password = "abtRHh54rh.cAK",
+          ConfirmPassword = "abtRHh54rh.cAK"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserDoesNotExistInDataBase_Expect_Created()
+      {
+        var body = new
+        {
+          Email = "test-email.test@test",
+          Name = "userName",
+          Password = "abtRHh54rh.cAK",
+          ConfirmPassword = "abtRHh54rh.cAK"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        response.EnsureSuccessStatusCode();
+
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        {
+          User user = await dbContext
+            .Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(u => u.Role)
+            .SingleOrDefaultAsync(u => u.Email == body.Email);
+
+          Assert.NotNull(user);
+
+          Assert.Equal(body.Name, user.UserName);
+
+          Assert.Equal(1, user.UserRoles.Count);
+          Assert.Equal("user", user.UserRoles.First().Role.Name);
+        }
+      }
+
+      [Fact]
+      public async Task When_UserExistsWithoutPassword_Expect_BadRequestRelatedToUserName()
+      {
+        string userName = "userName";
+
+        await SaveUserAsync(new User
+        {
+          UserName = userName,
+          NormalizedUserName = userName.ToUpper()
+        });
+
+        string userEmail = "user@user.user";
+
+        User user = new User
+        {
+          UserName = userEmail,
+          NormalizedUserName = userEmail.ToUpper(),
+          Email = userEmail,
+          NormalizedEmail = userEmail.ToUpper()
+        };
+
+        await SaveUserAsync(user);
+
+        object body = new
+        {
+          Email = userEmail,
+          Name = userName,
+          Password = "abtRHh54rh.cAK",
+          ConfirmPassword = "abtRHh54rh.cAK"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserExistsWithoutPassword_Expect_BadRequestRelatedToUserPassword()
+      {
+        string userEmail = "user@user.user";
+
+        User user = new User
+        {
+          UserName = userEmail,
+          NormalizedUserName = userEmail.ToUpper(),
+          Email = userEmail,
+          NormalizedEmail = userEmail.ToUpper()
+        };
+
+        await SaveUserAsync(user);
+
+        object body = new
+        {
+          Email = userEmail,
+          Name = "userName",
+          Password = "abcABC",
+          ConfirmPassword = "abcABC"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserExistsWithoutPassword_Expect_UserNameAndPasswordIsUpdated()
+      {
+        string userEmail = "user@user.user";
+
+        User user = new User
+        {
+          UserName = userEmail,
+          NormalizedUserName = userEmail.ToUpper(),
+          Email = userEmail,
+          NormalizedEmail = userEmail.ToUpper()
+        };
+
+        await SaveUserAsync(user);
+
+        var body = new
+        {
+          Email = userEmail,
+          Name = "userName",
+          Password = "abtRHh54rh.cAK",
+          ConfirmPassword = "abtRHh54rh.cAK"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync(url, body);
+
+        response.EnsureSuccessStatusCode();
+
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        {
+          user = await dbContext
+            .Users
+            .SingleOrDefaultAsync(u => u.Email == body.Email);
+
+          Assert.Equal(body.Name, user.UserName);
+        }
+      }
+    }
+
     public void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
