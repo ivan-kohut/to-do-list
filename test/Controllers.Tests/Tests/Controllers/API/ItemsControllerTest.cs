@@ -203,24 +203,6 @@ namespace Controllers.Tests
       }
     }
 
-    private async Task<ItemDTO> SaveItemAsync(Item itemToSave)
-    {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
-      {
-        appDbContext.Add(itemToSave);
-
-        await appDbContext.SaveChangesAsync();
-
-        return new ItemDTO
-        {
-          Id = itemToSave.Id,
-          Text = itemToSave.Text,
-          StatusId = (int)itemToSave.Status,
-          Priority = itemToSave.Priority
-        };
-      }
-    }
-
     private async Task<IEnumerable<Item>> GetAllItemsAsync()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
