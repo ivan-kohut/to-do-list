@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Services.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace Services
 {
   public class UserService : IUserService
   {
+    private const int adminId = 1;
+
     private readonly IUserRepository userRepository;
     private readonly ITransactionManager transactionManager;
 
@@ -23,6 +26,7 @@ namespace Services
     {
       return await userRepository
         .GetAll()
+        .Where(u => u.Id != adminId)
         .Select(u => new UserDTO
         {
           Id = u.Id,
@@ -35,10 +39,17 @@ namespace Services
 
     public async Task DeleteAsync(int id)
     {
+      if (id == adminId)
+      {
+        throw new ArgumentException($"You can not delete user with id {id}");
+      }
+
       User user = await userRepository.GetByIdAsync(id);
 
       if (user == null)
+      {
         throw new EntityNotFoundException($"User with id {id} is not found");
+      }
 
       userRepository.Delete(user);
 

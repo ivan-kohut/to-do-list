@@ -19,7 +19,7 @@ namespace Services.Tests
     private readonly Mock<IItemRepository> mockItemRepository;
     private readonly Mock<ITransactionManager> mockTransactionManager;
 
-    private readonly ItemService itemService;
+    private readonly IItemService itemService;
 
     public ItemServiceTest()
     {
@@ -36,7 +36,7 @@ namespace Services.Tests
       {
         mockItemRepository
           .Setup(r => r.All(userId))
-          .Returns(new List<Item>().AsQueryable().BuildMock().Object);
+          .Returns(Enumerable.Empty<Item>().AsQueryable().BuildMock().Object);
 
         // Act
         Assert.Empty(await itemService.GetAllAsync(userId));

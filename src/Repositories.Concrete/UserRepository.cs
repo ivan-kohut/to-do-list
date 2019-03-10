@@ -18,7 +18,6 @@ namespace Repositories
     {
       return await dbContext
         .Users
-        .Where(u => u.Id != 1)
         .SingleOrDefaultAsync(u => u.Id == id);
     }
 
@@ -26,7 +25,6 @@ namespace Repositories
     {
       return dbContext
         .Users
-        .Where(u => u.Id != 1)
         .AsNoTracking();
     }
 
