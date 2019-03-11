@@ -545,6 +545,109 @@ namespace Controllers.Tests
       }
     }
 
+    public class ConfirmEmailAsync : UsersControllerTest
+    {
+      public ConfirmEmailAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_CodeIsNull_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/10/email-confirmation");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserIsNotFound_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/10/email-confirmation?code=some-code");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserEmailIsAlreadyConfirmed_Expect_BadRequest()
+      {
+        UserDTO user = await SaveUserAsync(new User { EmailConfirmed = true });
+
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email-confirmation?code=some-code");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_CodeIsNotValid_Expect_BadRequest()
+      {
+        UserDTO user = await SaveUserAsync(new User { EmailConfirmed = false });
+
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email-confirmation?code=not-valid-code");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_CodeIsValid_Expect_EmailIsConfirmed()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User user = new User { UserName = "test-user-name", Email = "test@test.test" };
+
+          await userManager.CreateAsync(user, "hrbEgerGER534.tf");
+
+          string code = Uri.EscapeDataString(await userManager.GenerateEmailConfirmationTokenAsync(user));
+
+          // Act
+          HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email-confirmation?code={code}");
+
+          response.EnsureSuccessStatusCode();
+
+          Assert.True((await dbContext.Users.SingleAsync(u => u.Id == user.Id)).EmailConfirmed);
+        }
+      }
+    }
+
+    public class RecoverPassword : UsersControllerTest
+    {
+      public RecoverPassword(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_UserIsNotFound_Expect_NotFound()
+      {
+        // Act
+        HttpResponseMessage response = await PostAsync($"{url}/password-recovery", new { Email = "test@test.test" });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_UserIsFound_NewPasswordIsGenerated()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User user = new User { UserName = "test-user-name", Email = "test@test.test" };
+
+          await userManager.CreateAsync(user, "hrbEgerGER534.tf");
+
+          // Act
+          HttpResponseMessage response = await PostAsync($"{url}/password-recovery", new { user.Email });
+
+          response.EnsureSuccessStatusCode();
+
+          Assert.NotEqual(user.PasswordHash, (await dbContext.Users.SingleAsync(u => u.Id == user.Id)).PasswordHash);
+        }
+      }
+    }
+
     public void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
