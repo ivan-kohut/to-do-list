@@ -648,6 +648,103 @@ namespace Controllers.Tests
       }
     }
 
+    public class ChangePassword : UsersControllerTest
+    {
+      public ChangePassword(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_InputModelIsNotValid_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = await PostAsync($"{url}/change-password", new { });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_NewPasswordAndConfirmationPasswordDoNotEqual_Expect_BadRequest()
+      {
+        object body = new
+        {
+          OldPassword = "abcABC123.",
+          NewPassword = "new-password",
+          ConfirmNewPassword = "some-wrong-password"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync($"{url}/change-password", body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_OldPasswordIsWrong_Expect_BadRequest()
+      {
+        object body = new
+        {
+          OldPassword = "wrong-password",
+          NewPassword = "abcABC123.",
+          ConfirmNewPassword = "abcABC123."
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync($"{url}/change-password", body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_NewPasswordIsNotValid_Expect_BadRequest()
+      {
+        object body = new
+        {
+          OldPassword = "abcABC123.",
+          NewPassword = "password-without-digits",
+          ConfirmNewPassword = "password-without-digits"
+        };
+
+        // Act
+        HttpResponseMessage response = await PostAsync($"{url}/change-password", body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task Expect_Changed()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          var body = new
+          {
+            OldPassword = "abcABC123.",
+            NewPassword = "abcABC123.123",
+            ConfirmNewPassword = "abcABC123.123"
+          };
+
+          User user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+
+          // Act
+          HttpResponseMessage response = await PostAsync($"{url}/change-password", body);
+
+          response.EnsureSuccessStatusCode();
+
+          Assert.NotEqual(user.PasswordHash, (await dbContext.Users.AsNoTracking().SingleAsync(u => u.Id == UserId)).PasswordHash);
+
+          body = new
+          {
+            OldPassword = "abcABC123.123",
+            NewPassword = "abcABC123.",
+            ConfirmNewPassword = "abcABC123."
+          };
+
+          await PostAsync($"{url}/change-password", body); // change password back
+        }
+      }
+    }
+
     public void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
