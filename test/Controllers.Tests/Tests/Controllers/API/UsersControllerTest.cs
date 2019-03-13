@@ -47,7 +47,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<UserDTO> actual = DeserializeResponseBody<IEnumerable<UserDTO>>(response);
+        IEnumerable<UserDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<UserDTO>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -79,7 +79,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemDTO> actual = DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
+        IEnumerable<ItemDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -232,7 +232,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Assert.True(!string.IsNullOrWhiteSpace(DeserializeResponseBody<string>(response)));
+        Assert.True(!string.IsNullOrWhiteSpace(await DeserializeResponseBodyAsync<string>(response)));
       }
 
       [Fact]

@@ -39,7 +39,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Assert.Empty(DeserializeResponseBody<IEnumerable<ItemDTO>>(response));
+        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response));
       }
 
       [Fact]
@@ -60,7 +60,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemDTO> actual = DeserializeResponseBody<IEnumerable<ItemDTO>>(response);
+        IEnumerable<ItemDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -91,7 +91,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        ItemDTO itemSaved = DeserializeResponseBody<ItemDTO>(response);
+        ItemDTO itemSaved = await DeserializeResponseBodyAsync<ItemDTO>(response);
 
         Assert.NotEqual(0, itemSaved.Id);
         Assert.Equal(itemToSave.Text, itemSaved.Text);

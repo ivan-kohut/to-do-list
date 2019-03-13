@@ -37,7 +37,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<SelectListItemDTO> actual = DeserializeResponseBody<IEnumerable<SelectListItemDTO>>(response);
+        IEnumerable<SelectListItemDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<SelectListItemDTO>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }

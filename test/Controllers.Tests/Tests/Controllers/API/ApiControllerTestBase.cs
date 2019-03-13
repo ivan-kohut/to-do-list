@@ -24,9 +24,9 @@ namespace Controllers.Tests
       return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
     }
 
-    protected T DeserializeResponseBody<T>(HttpResponseMessage response)
+    protected async Task<T> DeserializeResponseBodyAsync<T>(HttpResponseMessage response)
     {
-      return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
+      return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
     }
 
     protected async Task<ItemDTO> SaveItemAsync(Item itemToSave)
