@@ -403,23 +403,15 @@ namespace Controllers
       User user = await userManager.GetUserAsync(User);
 
       string authenticatorKey = await userManager.GetAuthenticatorKeyAsync(user);
-      string authenticatorUri = null;
 
-      if (!string.IsNullOrWhiteSpace(authenticatorKey))
+      if (string.IsNullOrWhiteSpace(authenticatorKey))
       {
-        return $"otpauth://totp/ToDoList:{user.UserName}?secret={authenticatorKey}&issuer=ToDoList&digits=6";
+        await userManager.ResetAuthenticatorKeyAsync(user);
+
+        authenticatorKey = await userManager.GetAuthenticatorKeyAsync(user);
       }
 
-      return authenticatorUri;
-    }
-
-    [Authorize(Roles = "user")]
-    [HttpPut("authenticator-key")]
-    public async Task<IActionResult> ResetAuthenticatorKey()
-    {
-      await userManager.ResetAuthenticatorKeyAsync(await userManager.GetUserAsync(User));
-
-      return Ok();
+      return $"otpauth://totp/ToDoList:{user.UserName}?secret={authenticatorKey}&issuer=ToDoList&digits=6";
     }
 
     [Authorize(Roles = "user")]

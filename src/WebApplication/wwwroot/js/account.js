@@ -21,16 +21,7 @@
     $("#authentication-code").show();
 
     callAPI(`${usersURL}/authenticator-uri`, "GET", null, function (authenticatorUri) {
-
-      if (authenticatorUri === undefined) {
-        callAPI(`${usersURL}/authenticator-key`, "PUT", null, function () {
-          callAPI(`${usersURL}/authenticator-uri`, "GET", null, function (authenticatorUri) {
-            generateQrCode(authenticatorUri);
-          });
-        });
-      } else {
-        generateQrCode(authenticatorUri);
-      }
+      generateQrCode(authenticatorUri);
     });
   };
 

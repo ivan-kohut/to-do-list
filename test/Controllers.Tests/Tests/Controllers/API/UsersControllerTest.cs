@@ -745,6 +745,78 @@ namespace Controllers.Tests
       }
     }
 
+    public class GetAuthenticatorUri : UsersControllerTest
+    {
+      public GetAuthenticatorUri(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_AuthenticatorKeyIsNull_Expect_AuthenticatorKeyIsGeneratedAndAuthenticatorUriIsReturned()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          UserToken authenticatorKey = await dbContext
+            .UserTokens
+            .SingleOrDefaultAsync(t => t.UserId == UserId && t.LoginProvider == "[AspNetUserStore]" && t.Name == "AuthenticatorKey");
+
+          Assert.Null(authenticatorKey);
+
+          // Act
+          HttpResponseMessage response = await GetAsync($"{url}/authenticator-uri");
+
+          response.EnsureSuccessStatusCode();
+
+          authenticatorKey = await dbContext
+            .UserTokens
+            .AsNoTracking()
+            .SingleOrDefaultAsync(t => t.UserId == UserId && t.LoginProvider == "[AspNetUserStore]" && t.Name == "AuthenticatorKey");
+
+          Assert.NotNull(authenticatorKey);
+
+          string expected = $"otpauth://totp/ToDoList:admin?secret={authenticatorKey.Value}&issuer=ToDoList&digits=6";
+          string actual = await response.Content.ReadAsStringAsync();
+
+          Assert.Equal(expected, actual);
+
+          dbContext.Rollback<UserToken>();
+          dbContext.SaveChanges();
+        }
+      }
+
+      [Fact]
+      public async Task When_AuthenticatorKeyIsNotNull_Expect_AuthenticatorUriIsReturned()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User admin = await userManager.FindByIdAsync(UserId.ToString());
+
+          await userManager.ResetAuthenticatorKeyAsync(admin);
+
+          UserToken authenticatorKey = await dbContext
+            .UserTokens
+            .SingleOrDefaultAsync(t => t.UserId == UserId && t.LoginProvider == "[AspNetUserStore]" && t.Name == "AuthenticatorKey");
+
+          Assert.NotNull(authenticatorKey);
+
+          // Act
+          HttpResponseMessage response = await GetAsync($"{url}/authenticator-uri");
+
+          response.EnsureSuccessStatusCode();
+
+          string expected = $"otpauth://totp/ToDoList:admin?secret={authenticatorKey.Value}&issuer=ToDoList&digits=6";
+          string actual = await response.Content.ReadAsStringAsync();
+
+          Assert.Equal(expected, actual);
+
+          dbContext.Rollback<UserToken>();
+          dbContext.SaveChanges();
+        }
+      }
+    }
+
     public void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
