@@ -863,7 +863,111 @@ namespace Controllers.Tests
           dbContext.Rollback<UserToken>();
           dbContext.SaveChanges();
         }
-        
+      }
+    }
+
+    public class DisableTwoFactorAuthentication : UsersControllerTest
+    {
+      public DisableTwoFactorAuthentication(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_TwoFactorIsNotEnabled_Expect_BadRequest()
+      {
+        // Act
+        HttpResponseMessage response = await PutAsync($"{url}/disable-two-factor-authentication", null);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_TwoFactorIsEnabled_Expect_TwoFactorIsDisabledAndAuthenticatorKeyIsChanged()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User admin = await userManager.FindByIdAsync(UserId.ToString());
+
+          admin.TwoFactorEnabled = true;
+
+          await userManager.UpdateAsync(admin);
+          await userManager.ResetAuthenticatorKeyAsync(admin);
+
+          UserToken authenticatorKey = await dbContext
+            .UserTokens
+            .SingleOrDefaultAsync(t => t.UserId == UserId && t.LoginProvider == "[AspNetUserStore]" && t.Name == "AuthenticatorKey");
+
+          Assert.True(admin.TwoFactorEnabled);
+
+          // Act
+          HttpResponseMessage response = await PutAsync($"{url}/disable-two-factor-authentication", null);
+
+          response.EnsureSuccessStatusCode();
+
+          User adminAfterDisabling = await dbContext
+            .Users
+            .AsNoTracking()
+            .SingleAsync(u => u.Id == UserId);
+
+          Assert.False(adminAfterDisabling.TwoFactorEnabled);
+
+          UserToken authenticatorKeyAfterDisabling = await dbContext
+            .UserTokens
+            .AsNoTracking()
+            .SingleOrDefaultAsync(t => t.UserId == UserId && t.LoginProvider == "[AspNetUserStore]" && t.Name == "AuthenticatorKey");
+
+          Assert.NotEqual(authenticatorKey.Value, authenticatorKeyAfterDisabling.Value);
+
+          dbContext.Rollback<UserToken>();
+          dbContext.SaveChanges();
+
+          admin.TwoFactorEnabled = false;
+
+          await userManager.UpdateAsync(admin);
+        }
+      }
+    }
+
+    public class IsTwoFactorAuthenticationEnabled : UsersControllerTest
+    {
+      public IsTwoFactorAuthenticationEnabled(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_TwoFactorIsNotEnabled_Expect_False()
+      {
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication-enabled");
+
+        response.EnsureSuccessStatusCode();
+
+        Assert.False(await DeserializeResponseBodyAsync<bool>(response));
+      }
+
+      [Fact]
+      public async Task When_TwoFactorIsEnabled_Expect_True()
+      {
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User admin = await userManager.FindByIdAsync(UserId.ToString());
+
+          admin.TwoFactorEnabled = true;
+
+          await userManager.UpdateAsync(admin);
+
+          // Act
+          HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication-enabled");
+
+          response.EnsureSuccessStatusCode();
+
+          Assert.True(await DeserializeResponseBodyAsync<bool>(response));
+
+          admin.TwoFactorEnabled = false;
+
+          await userManager.UpdateAsync(admin);
+        }
       }
     }
 
