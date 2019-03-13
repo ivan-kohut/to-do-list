@@ -23,6 +23,14 @@ namespace Controllers.Tests
       }
     }
 
+    protected async Task<HttpResponseMessage> PutAsync(string url, object requestBody)
+    {
+      using (HttpContent httpContent = CreateHttpContent(requestBody))
+      {
+        return await Client.PutAsync(url, httpContent);
+      }
+    }
+
     protected async Task<HttpResponseMessage> PatchAsync(string url, object requestBody)
     {
       using (HttpContent httpContent = CreateHttpContent(requestBody))

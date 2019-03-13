@@ -817,6 +817,56 @@ namespace Controllers.Tests
       }
     }
 
+    public class EnableAuthenticator : UsersControllerTest
+    {
+      public EnableAuthenticator(TestServerFixture testServerFixture) : base(testServerFixture)
+      {
+      }
+
+      [Fact]
+      public async Task When_TwoFactorIsEnabledAlready_Expect_BadRequest()
+      {
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User admin = await userManager.FindByIdAsync(UserId.ToString());
+
+          admin.TwoFactorEnabled = true;
+
+          await userManager.UpdateAsync(admin);
+
+          // Act
+          HttpResponseMessage response = await PutAsync($"{url}/enable-authenticator", new { Code = 111111 });
+
+          Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+          admin.TwoFactorEnabled = false;
+
+          await userManager.UpdateAsync(admin);
+        }
+      }
+
+      [Fact]
+      public async Task When_CodeIsNotValid_Expect_BadRequest()
+      {
+        using (AppDbContext dbContext = Server.GetService<AppDbContext>())
+        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
+        {
+          User admin = await userManager.FindByIdAsync(UserId.ToString());
+
+          await userManager.ResetAuthenticatorKeyAsync(admin);
+
+          // Act
+          HttpResponseMessage response = await PutAsync($"{url}/enable-authenticator", new { Code = 111111 });
+
+          Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+          dbContext.Rollback<UserToken>();
+          dbContext.SaveChanges();
+        }
+        
+      }
+    }
+
     public void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
