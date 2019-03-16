@@ -46,7 +46,7 @@ namespace Controllers.Tests.Fixtures
       using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"))
       {
         string userToken = JsonConvert.DeserializeObject<string>(
-          Client.PostAsync("/api/v1/users/login", httpContent).Result.Content.ReadAsStringAsync().Result
+          Client.PostAsync("/api/v1/users/account/login", httpContent).Result.Content.ReadAsStringAsync().Result
         );
 
         UserId = int.Parse(

@@ -9,7 +9,7 @@
       redirectUri: "https://localhost:44388/facebookcallback"
     };
 
-    callAPI(`${usersURL}/facebook-login`, "POST", data, function (authToken) {
+    callAPI(`${usersURL}/account/login-by-facebook`, "POST", data, function (authToken) {
 
       localStorage.setItem("auth-token", authToken);
       window.location.href = "/";

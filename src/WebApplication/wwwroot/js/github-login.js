@@ -8,7 +8,7 @@
       code: getParameterByName("code")
     };
 
-    callAPI(`${usersURL}/github-login`, "POST", data, function (authToken) {
+    callAPI(`${usersURL}/account/login-by-github`, "POST", data, function (authToken) {
 
       localStorage.setItem("auth-token", authToken);
       window.location.href = "/";

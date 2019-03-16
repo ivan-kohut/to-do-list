@@ -10,7 +10,7 @@
       twoFactorToken: $("#authentication-code").val()
     };
 
-    callAPI(`${usersURL}/login`, "POST", data, function (authToken) {
+    callAPI(`${usersURL}//account/login`, "POST", data, function (authToken) {
 
       localStorage.setItem("auth-token", authToken);
       window.location.href = "/";

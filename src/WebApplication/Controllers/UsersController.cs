@@ -94,7 +94,7 @@ namespace Controllers
       return actionResult;
     }
 
-    [HttpPost("login")]
+    [HttpPost("account/login")]
     public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
     {
       IActionResult actionResult;
@@ -151,7 +151,7 @@ namespace Controllers
       return actionResult;
     }
 
-    [HttpPost("facebook-login")]
+    [HttpPost("account/login-by-facebook")]
     public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -172,7 +172,7 @@ namespace Controllers
       return Json(await GenerateTokenAsync("Facebook", userInfoResponse));
     }
 
-    [HttpPost("google-login")]
+    [HttpPost("account/login-by-google")]
     public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -204,7 +204,7 @@ namespace Controllers
       }
     }
 
-    [HttpPost("github-login")]
+    [HttpPost("account/login-by-github")]
     public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -240,7 +240,7 @@ namespace Controllers
       }
     }
 
-    [HttpPost("linkedin-login")]
+    [HttpPost("account/login-by-linkedin")]
     public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -332,7 +332,7 @@ namespace Controllers
       return Ok();
     }
 
-    [HttpGet("{id}/email-confirmation")]
+    [HttpGet("{id}/account/confirm-email")]
     public async Task<IActionResult> ConfirmEmailAsync(int id, string code)
     {
       if (string.IsNullOrWhiteSpace(code))
@@ -356,7 +356,7 @@ namespace Controllers
       }
     }
 
-    [HttpPost("password-recovery")]
+    [HttpPost("account/recover-password")]
     public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
     {
       User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);
@@ -377,7 +377,7 @@ namespace Controllers
     }
 
     [Authorize(Roles = "user")]
-    [HttpPost("change-password")]
+    [HttpPost("account/change-password")]
     public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
     {
       User user = await userManager.GetUserAsync(User);
@@ -397,7 +397,7 @@ namespace Controllers
     }
 
     [Authorize(Roles = "user")]
-    [HttpGet("authenticator-uri")]
+    [HttpGet("account/authenticator-uri")]
     public async Task<ActionResult<string>> GetAuthenticatorUri()
     {
       User user = await userManager.GetUserAsync(User);
@@ -415,7 +415,7 @@ namespace Controllers
     }
 
     [Authorize(Roles = "user")]
-    [HttpPut("enable-authenticator")]
+    [HttpPut("account/enable-two-factor-authentication")]
     public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
     {
       User user = await userManager.GetUserAsync(User);
@@ -444,7 +444,7 @@ namespace Controllers
     }
 
     [Authorize(Roles = "user")]
-    [HttpPut("disable-two-factor-authentication")]
+    [HttpPut("account/disable-two-factor-authentication")]
     public async Task<IActionResult> DisableTwoFactorAuthentication()
     {
       User user = await userManager.GetUserAsync(User);
@@ -461,7 +461,7 @@ namespace Controllers
     }
 
     [Authorize(Roles = "user")]
-    [HttpGet("two-factor-authentication-enabled")]
+    [HttpGet("account/two-factor-authentication-enabled")]
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
     {
       return (await userManager.GetUserAsync(User)).TwoFactorEnabled;

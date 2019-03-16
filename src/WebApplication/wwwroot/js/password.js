@@ -8,7 +8,7 @@
       email: $("#email").val()
     };
 
-    callAPI(`${usersURL}/password-recovery`, "POST", data, function () {
+    callAPI(`${usersURL}/account/recover-password`, "POST", data, function () {
 
       $("#email-block").hide();
       $("#login-block").show();

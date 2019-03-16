@@ -4,7 +4,7 @@
 
   app.initTwoFactorAuthenticationLogic = function () {
 
-    callAPI(`${usersURL}/two-factor-authentication-enabled`, "GET", null, function (isTwoFactorAuthenticationEnabled) {
+    callAPI(`${usersURL}/account/two-factor-authentication-enabled`, "GET", null, function (isTwoFactorAuthenticationEnabled) {
 
       if (isTwoFactorAuthenticationEnabled === true) {
         $("#enable").hide();
@@ -20,7 +20,7 @@
     $("#enable-link").hide();
     $("#authentication-code").show();
 
-    callAPI(`${usersURL}/authenticator-uri`, "GET", null, function (authenticatorUri) {
+    callAPI(`${usersURL}/account/authenticator-uri`, "GET", null, function (authenticatorUri) {
       generateQrCode(authenticatorUri);
     });
   };
@@ -31,7 +31,7 @@
       code: $("#two-factor-token").val()
     };
 
-    callAPI(`${usersURL}/enable-authenticator`, "PUT", data, function () {
+    callAPI(`${usersURL}/account/enable-two-factor-authentication`, "PUT", data, function () {
 
       window.location.href = "/";
 
@@ -49,7 +49,7 @@
   };
 
   app.disableTwoFactorAuthentication = function () {
-    callAPI(`${usersURL}/disable-two-factor-authentication`, "PUT", null, function () {
+    callAPI(`${usersURL}/account/disable-two-factor-authentication`, "PUT", null, function () {
       window.location.href = "/";
     });
   };
@@ -62,7 +62,7 @@
       confirmNewPassword: $("#confirm-new-password").val()
     };
 
-    callAPI(`${usersURL}/change-password`, "POST", data, function () {
+    callAPI(`${usersURL}/account/change-password`, "POST", data, function () {
 
       window.location.href = "/";
 
