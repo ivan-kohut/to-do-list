@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Services.Exceptions;
+using System;
 using System.Threading.Tasks;
 
 namespace Services
@@ -29,7 +30,7 @@ namespace Services
 
       if (userLogin != null)
       {
-        throw new EntityNotFoundException($"User login exists with provider {loginProvider} and provider key {providerKey} already");
+        throw new ArgumentException($"User login exists with provider {loginProvider} and provider key {providerKey} already");
       }
 
       await userLoginRepository.CreateAsync(new UserLogin

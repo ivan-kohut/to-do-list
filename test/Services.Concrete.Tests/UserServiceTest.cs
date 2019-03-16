@@ -27,6 +27,58 @@ namespace Services.Tests
       this.userService = new UserService(mockUserRepository.Object, mockTransactionManager.Object);
     }
 
+    public class GetByIdAsync : UserServiceTest
+    {
+      [Fact]
+      public async Task When_UserDoesNotExist_Expect_EntityNotFoundException()
+      {
+        int userId = 10;
+        User user = null;
+
+        mockUserRepository
+          .Setup(r => r.GetByIdAsync(userId))
+          .ReturnsAsync(user);
+
+        // Act
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => userService.GetByIdAsync(userId));
+
+        mockUserRepository.Verify(r => r.GetByIdAsync(userId), Times.Once());
+      }
+
+      [Fact]
+      public async Task When_UserExists_Expect_Returned()
+      {
+        int userId = 10;
+
+        User user = new User
+        {
+          Id = userId,
+          UserName = "testUserName",
+          Email = "testUserEmail",
+          EmailConfirmed = true
+        };
+
+        mockUserRepository
+          .Setup(r => r.GetByIdAsync(userId))
+          .ReturnsAsync(user);
+
+        UserDTO expected = new UserDTO
+        {
+          Id = userId,
+          Name = user.UserName,
+          Email = user.Email,
+          IsEmailConfirmed = user.EmailConfirmed
+        };
+
+        // Act
+        UserDTO actual = await userService.GetByIdAsync(userId);
+
+        actual.ShouldBeEquivalentTo(expected);
+
+        mockUserRepository.Verify(r => r.GetByIdAsync(userId), Times.Once());
+      }
+    }
+
     public class GetAllAsync : UserServiceTest
     {
       [Fact]
