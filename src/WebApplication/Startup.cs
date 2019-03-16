@@ -72,10 +72,15 @@ namespace WebApplication
 
       services.AddScoped<IItemRepository, ItemRepository>();
       services.AddScoped<IUserRepository, UserRepository>();
+      services.AddScoped<IRoleRepository, RoleRepository>();
+      services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+      services.AddScoped<IUserLoginRepository, UserLoginRepository>();
       services.AddScoped<ITransactionManager, TransactionManager>();
 
       services.AddScoped<IItemService, ItemService>();
       services.AddScoped<IUserService, UserService>();
+      services.AddScoped<IUserRoleService, UserRoleService>();
+      services.AddScoped<IUserLoginService, UserLoginService>();
       services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
       services.AddSingleton<ISelectListService, SelectListService>();
     }

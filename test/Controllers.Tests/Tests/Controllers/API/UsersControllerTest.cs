@@ -740,7 +740,7 @@ namespace Controllers.Tests
             ConfirmNewPassword = "abcABC123."
           };
 
-          await PostAsync($"{url}/change-password", body); // change password back
+          await PostAsync($"{url}/account/change-password", body); // change password back
         }
       }
     }

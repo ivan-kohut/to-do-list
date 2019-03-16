@@ -29,6 +29,8 @@ namespace Controllers
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     private readonly IUserService userService;
+    private readonly IUserRoleService userRoleService;
+    private readonly IUserLoginService userLoginService;
     private readonly IItemService itemService;
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
@@ -40,6 +42,8 @@ namespace Controllers
     private readonly LinkedInOptions linkedInOptions;
 
     public UsersController(IUserService userService,
+                           IUserRoleService userRoleService,
+                           IUserLoginService userLoginService,
                            IItemService itemService,
                            IEmailService emailService,
                            UserManager<User> userManager,
@@ -51,6 +55,8 @@ namespace Controllers
                            IOptions<LinkedInOptions> linkedInOptions)
     {
       this.userService = userService;
+      this.userRoleService = userRoleService;
+      this.userLoginService = userLoginService;
       this.itemService = itemService;
       this.emailService = emailService;
       this.userManager = userManager;
@@ -296,7 +302,7 @@ namespace Controllers
 
         if (identityCreateResult.Succeeded)
         {
-          await userManager.AddToRoleAsync(user, "user");
+          await userRoleService.CreateAsync(user.Id, "user");
         }
         else
         {
@@ -483,12 +489,12 @@ namespace Controllers
         user = new User { UserName = email, Email = email };
 
         await userManager.CreateAsync(user);
-        await userManager.AddToRoleAsync(user, "user");
-        await AddLoginAsync(user, loginProvider, id);
+        await userRoleService.CreateAsync(user.Id, "user");
+        await userLoginService.CreateAsync(user.Id, loginProvider, id);
       }
-      else if (!(await userManager.GetLoginsAsync(user)).Any(l => l.LoginProvider == loginProvider))
+      else if (!await userLoginService.ExistsWithUserIdAndLoginProviderAsync(user.Id, loginProvider))
       {
-        await AddLoginAsync(user, loginProvider, id);
+        await userLoginService.CreateAsync(user.Id, loginProvider, id);
       }
 
       return await GenerateTokenAsync(user);
@@ -544,11 +550,6 @@ namespace Controllers
         .Errors
         .Select(e => e.Description)
         .ToList();
-    }
-
-    private async Task AddLoginAsync(User user, string loginProvider, string providerKey)
-    {
-      await userManager.AddLoginAsync(user, new UserLoginInfo(loginProvider, providerKey, loginProvider));
     }
   }
 }

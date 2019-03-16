@@ -22,6 +22,24 @@ namespace Services
       this.transactionManager = transactionManager;
     }
 
+    public async Task<UserDTO> GetByIdAsync(int id)
+    {
+      User user = await userRepository.GetByIdAsync(id);
+
+      if (user == null)
+      {
+        throw new EntityNotFoundException($"User with id {id} is not found");
+      }
+
+      return new UserDTO
+      {
+        Id = user.Id,
+        Name = user.UserName,
+        Email = user.Email,
+        IsEmailConfirmed = user.EmailConfirmed
+      };
+    }
+
     public async Task<IEnumerable<UserDTO>> GetAllAsync()
     {
       return await userRepository
