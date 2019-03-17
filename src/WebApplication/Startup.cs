@@ -12,6 +12,10 @@ using Options;
 using Repositories;
 using Services;
 using StackExchange.Profiling;
+using Swagger;
+using Swashbuckle.AspNetCore.Swagger;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace WebApplication
@@ -63,6 +67,28 @@ namespace WebApplication
           };
         });
 
+      services.AddSwaggerGen(c =>
+      {
+        c.SwaggerDoc("v1", new Info
+        {
+          Version = "v1",
+          Title = "Todo List",
+          Description = "Simple Todo List application developed using C#, ASP.NET Core 2.2 and EF Core 2.2"
+        });
+
+        c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+        {
+          Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+          Name = "Authorization",
+          In = "Header",
+          Type = "apiKey"
+        });
+
+        c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> { { "Bearer", Enumerable.Empty<string>() } });
+
+        c.DocumentFilter<LowercaseDocumentFilter>();
+      });
+
       services.AddMvc();
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
@@ -90,6 +116,8 @@ namespace WebApplication
     {
       app.UseMiniProfiler();
       app.UseStaticFiles();
+      app.UseSwagger();
+      app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo List v1"));
       app.UseHttpsRedirection();
       app.UseAppExceptionHandler();
       app.UseAuthentication();
