@@ -8,7 +8,6 @@ using Models;
 using Newtonsoft.Json;
 using Options;
 using Services;
-using Services.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -102,18 +101,9 @@ namespace Controllers
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-      IActionResult actionResult = Ok();
+      await userService.DeleteAsync(id);
 
-      try
-      {
-        await userService.DeleteAsync(id);
-      }
-      catch (EntityNotFoundException)
-      {
-        actionResult = NotFound();
-      }
-
-      return actionResult;
+      return Ok();
     }
 
     [HttpPost("account/login")]
@@ -347,9 +337,7 @@ namespace Controllers
         }
       }
 
-      string emailConfirmationMessage = await GenerateEmailConfirmationMessageAsync(user);
-
-      await emailService.SendEmailAsync(user.Email, "Confirm your email", emailConfirmationMessage);
+      await emailService.SendEmailAsync(user.Email, "Confirm your email", await GenerateEmailConfirmationMessageAsync(user));
 
       return Ok();
     }

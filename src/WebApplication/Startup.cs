@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -87,10 +88,10 @@ namespace WebApplication
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
-      app.UseDeveloperExceptionPage();
       app.UseMiniProfiler();
       app.UseStaticFiles();
       app.UseHttpsRedirection();
+      app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseMvc();
     }

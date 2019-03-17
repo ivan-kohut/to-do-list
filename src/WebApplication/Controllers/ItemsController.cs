@@ -54,39 +54,17 @@ namespace Controllers
     [HttpPatch("{id}")]
     public async Task<IActionResult> PatchAsync(int id, [FromBody]ICollection<PatchDTO> patches)
     {
-      IActionResult actionResult = Ok();
+      await itemService.UpdatePartiallyAsync(id, GetUserId(), patches);
 
-      try
-      {
-        await itemService.UpdatePartiallyAsync(id, GetUserId(), patches);
-      }
-      catch (EntityNotFoundException)
-      {
-        actionResult = NotFound();
-      }
-      catch (ArgumentException)
-      {
-        actionResult = BadRequest();
-      }
-
-      return actionResult;
+      return Ok();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-      IActionResult actionResult = Ok();
+      await itemService.DeleteAsync(id, GetUserId());
 
-      try
-      {
-        await itemService.DeleteAsync(id, GetUserId());
-      }
-      catch (EntityNotFoundException)
-      {
-        actionResult = NotFound();
-      }
-
-      return actionResult;
+      return Ok();
     }
 
     private int GetUserId()
