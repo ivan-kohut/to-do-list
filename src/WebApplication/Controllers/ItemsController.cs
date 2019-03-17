@@ -5,6 +5,7 @@ using Services;
 using Services.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -23,15 +24,31 @@ namespace Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ItemDTO>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetAllAsync()
     {
-      return new List<ItemDTO>(await itemService.GetAllAsync(GetUserId()));
+      return (await itemService.GetAllAsync(GetUserId()))
+        .Select(i => new ItemListApiModel
+        {
+          Id = i.Id,
+          StatusId = i.StatusId,
+          Text = i.Text,
+          Priority = i.Priority
+        })
+        .ToList();
     }
 
     [HttpPost]
-    public async Task<ActionResult<ItemDTO>> SaveAsync(ItemCreateApiModel item)
+    public async Task<ActionResult<ItemListApiModel>> SaveAsync(ItemCreateApiModel item)
     {
-      return await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
+      ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
+
+      return new ItemListApiModel
+      {
+        Id = result.Id,
+        StatusId = result.StatusId,
+        Text = result.Text,
+        Priority = result.Priority
+      };
     }
 
     [HttpPatch("{id}")]

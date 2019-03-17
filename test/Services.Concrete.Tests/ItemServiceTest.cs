@@ -47,8 +47,23 @@ namespace Services.Tests
       [Fact]
       public async Task When_ItemsExist_Expect_Returned()
       {
-        Item firstItem = new Item { Id = 1, Text = "firstText", Priority = 1, Status = ItemStatus.Todo };
-        Item secondItem = new Item { Id = 2, Text = "secondText", Priority = 2, Status = ItemStatus.Done };
+        Item firstItem = new Item
+        {
+          Id = 1,
+          UserId = userId,
+          Text = "firstText",
+          Priority = 1,
+          Status = ItemStatus.Todo
+        };
+
+        Item secondItem = new Item
+        {
+          Id = 2,
+          UserId = userId,
+          Text = "secondText",
+          Priority = 2,
+          Status = ItemStatus.Done
+        };
 
         mockItemRepository
           .Setup(r => r.All(userId))
@@ -56,8 +71,21 @@ namespace Services.Tests
 
         IEnumerable<ItemDTO> expected = new List<ItemDTO>
         {
-          new ItemDTO { Id = firstItem.Id, Text = firstItem.Text, Priority = firstItem.Priority, StatusId = (int)firstItem.Status },
-          new ItemDTO { Id = secondItem.Id, Text = secondItem.Text, Priority = secondItem.Priority, StatusId = (int)secondItem.Status }
+          new ItemDTO {
+            Id = firstItem.Id,
+            UserId = firstItem.UserId,
+            Text = firstItem.Text,
+            Priority = firstItem.Priority,
+            StatusId = (int)firstItem.Status
+          },
+
+          new ItemDTO {
+            Id = secondItem.Id,
+            UserId = secondItem.UserId,
+            Text = secondItem.Text,
+            Priority = secondItem.Priority,
+            StatusId = (int)secondItem.Status
+          }
         };
 
         // Act

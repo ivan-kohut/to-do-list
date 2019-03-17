@@ -27,6 +27,7 @@ namespace Services
         .Select(i => new ItemDTO
         {
           Id = i.Id,
+          UserId = i.UserId,
           StatusId = (int)i.Status,
           Text = i.Text,
           Priority = i.Priority

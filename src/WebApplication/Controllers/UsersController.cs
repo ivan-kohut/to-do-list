@@ -70,16 +70,32 @@ namespace Controllers
 
     [HttpGet]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync()
     {
-      return new List<UserDTO>(await userService.GetAllAsync());
+      return (await userService.GetAllAsync())
+        .Select(u => new UserListApiModel
+        {
+          Id = u.Id,
+          Name = u.Name,
+          Email = u.Email,
+          IsEmailConfirmed = u.IsEmailConfirmed
+        })
+        .ToList();
     }
 
     [HttpGet("{userId}/items")]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<ItemDTO>>> GetUserItemsAsync(int userId)
+    public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetUserItemsAsync(int userId)
     {
-      return new List<ItemDTO>(await itemService.GetAllAsync(userId));
+      return (await itemService.GetAllAsync(userId))
+        .Select(i => new ItemListApiModel
+        {
+          Id = i.Id,
+          StatusId = i.StatusId,
+          Text = i.Text,
+          Priority = i.Priority
+        })
+        .ToList();
     }
 
     [HttpDelete("{id}")]

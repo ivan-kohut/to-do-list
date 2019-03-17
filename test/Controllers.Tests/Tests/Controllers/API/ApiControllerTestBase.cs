@@ -1,9 +1,9 @@
 ﻿using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
+using Models;
 using Newtonsoft.Json;
 using Repositories;
-using Services;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace Controllers.Tests
       return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
     }
 
-    protected async Task<ItemDTO> SaveItemAsync(Item itemToSave)
+    protected async Task<ItemListApiModel> SaveItemAsync(Item itemToSave)
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
@@ -37,7 +37,7 @@ namespace Controllers.Tests
 
         await appDbContext.SaveChangesAsync();
 
-        return new ItemDTO
+        return new ItemListApiModel
         {
           Id = itemToSave.Id,
           Text = itemToSave.Text,
@@ -47,7 +47,7 @@ namespace Controllers.Tests
       }
     }
 
-    protected async Task<UserDTO> SaveUserAsync(User userToSave)
+    protected async Task<UserListApiModel> SaveUserAsync(User userToSave)
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
@@ -55,7 +55,7 @@ namespace Controllers.Tests
 
         await appDbContext.SaveChangesAsync();
 
-        return new UserDTO
+        return new UserListApiModel
         {
           Id = userToSave.Id,
           Name = userToSave.UserName,

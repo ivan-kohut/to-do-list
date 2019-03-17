@@ -39,7 +39,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response));
+        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response));
       }
 
       [Fact]
@@ -51,7 +51,7 @@ namespace Controllers.Tests
           new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
         };
 
-        IEnumerable<ItemDTO> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+        IEnumerable<ItemListApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
           .OrderBy(i => i.Priority)
           .ToList();
 
@@ -60,7 +60,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response);
+        IEnumerable<ItemListApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -91,7 +91,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        ItemDTO itemSaved = await DeserializeResponseBodyAsync<ItemDTO>(response);
+        ItemListApiModel itemSaved = await DeserializeResponseBodyAsync<ItemListApiModel>(response);
 
         Assert.NotEqual(0, itemSaved.Id);
         Assert.Equal(itemToSave.Text, itemSaved.Text);
@@ -127,7 +127,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_InputModelIsValid_Expect_Updated()
       {
-        ItemDTO itemToUpdate = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemListApiModel itemToUpdate = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
         PatchDTO textPatchDTO = new PatchDTO
         {
@@ -179,7 +179,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_ItemIsFound_Expect_Deleted()
       {
-        ItemDTO itemSaved = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemListApiModel itemSaved = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
         // Act
         HttpResponseMessage response = await DeleteAsync($"{url}/{itemSaved.Id}");

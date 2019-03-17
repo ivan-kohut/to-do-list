@@ -4,8 +4,8 @@ using Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using Repositories;
-using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,14 +40,14 @@ namespace Controllers.Tests
           new User { UserName = "secondUserName", Email = "secondEmail", EmailConfirmed = false }
         };
 
-        IEnumerable<UserDTO> expected = await Task.WhenAll(users.Select(u => SaveUserAsync(u)));
+        IEnumerable<UserListApiModel> expected = await Task.WhenAll(users.Select(u => SaveUserAsync(u)));
 
         // Act
         HttpResponseMessage response = await GetAsync(url);
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<UserDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<UserDTO>>(response);
+        IEnumerable<UserListApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<UserListApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -62,24 +62,24 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_UserItemsExist_Expect_Returned()
       {
-        UserDTO userDTO = await SaveUserAsync(new User { UserName = "userName", Email = "email", EmailConfirmed = true });
+        UserListApiModel user = await SaveUserAsync(new User { UserName = "userName", Email = "email", EmailConfirmed = true });
 
         IEnumerable<Item> items = new List<Item>
         {
-          new Item { UserId = userDTO.Id, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
-          new Item { UserId = userDTO.Id, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
+          new Item { UserId = user.Id, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
+          new Item { UserId = user.Id, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
         };
 
-        IEnumerable<ItemDTO> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+        IEnumerable<ItemListApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
           .OrderBy(i => i.Priority)
           .ToList();
 
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/{userDTO.Id}/items");
+        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/items");
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemDTO> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemDTO>>(response);
+        IEnumerable<ItemListApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -103,10 +103,10 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_UserExists_Expect_Deleted()
       {
-        UserDTO userDTO = await SaveUserAsync(new User { UserName = "userName", Email = "email", EmailConfirmed = true });
+        UserListApiModel userApiModel = await SaveUserAsync(new User { UserName = "userName", Email = "email", EmailConfirmed = true });
 
         // Act
-        HttpResponseMessage response = await DeleteAsync($"{url}/{userDTO.Id}");
+        HttpResponseMessage response = await DeleteAsync($"{url}/{userApiModel.Id}");
 
         response.EnsureSuccessStatusCode();
 
@@ -114,7 +114,7 @@ namespace Controllers.Tests
         {
           User user = await appDbContext
             .Users
-            .SingleOrDefaultAsync(i => i.Id == userDTO.Id);
+            .SingleOrDefaultAsync(i => i.Id == userApiModel.Id);
 
           Assert.Null(user);
         }
@@ -165,11 +165,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, "user-password");
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Password = "wrong-user-password"
         };
 
@@ -192,11 +192,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Password = userPassword
         };
 
@@ -219,11 +219,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Password = userPassword
         };
 
@@ -255,11 +255,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Password = userPassword
         };
 
@@ -298,11 +298,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Password = userPassword,
           TwoFactorToken = "555555"
         };
@@ -355,11 +355,11 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
-          user.Email,
+          userApiModel.Email,
           Name = user.UserName,
           Password = userPassword,
           ConfirmPassword = userPassword
@@ -391,7 +391,7 @@ namespace Controllers.Tests
           user.PasswordHash = userManager.PasswordHasher.HashPassword(user, userPassword);
         }
 
-        UserDTO userDTO = await SaveUserAsync(user);
+        UserListApiModel userApiModel = await SaveUserAsync(user);
 
         object body = new
         {
@@ -572,7 +572,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_UserEmailIsAlreadyConfirmed_Expect_BadRequest()
       {
-        UserDTO user = await SaveUserAsync(new User { EmailConfirmed = true });
+        UserListApiModel user = await SaveUserAsync(new User { EmailConfirmed = true });
 
         // Act
         HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/account/confirm-email?code=some-code");
@@ -583,7 +583,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_CodeIsNotValid_Expect_BadRequest()
       {
-        UserDTO user = await SaveUserAsync(new User { EmailConfirmed = false });
+        UserListApiModel user = await SaveUserAsync(new User { EmailConfirmed = false });
 
         // Act
         HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/account/confirm-email?code=not-valid-code");
