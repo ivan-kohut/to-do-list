@@ -15,6 +15,7 @@ using StackExchange.Profiling;
 using Swagger;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -43,7 +44,11 @@ namespace WebApplication
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
       services
-        .AddMiniProfiler(options => options.PopupRenderPosition = RenderPosition.Right)
+        .AddMiniProfiler(options =>
+        {
+          options.PopupRenderPosition = RenderPosition.Right;
+          options.RouteBasePath = "/profiler";
+        })
         .AddEntityFramework();
 
       services
@@ -116,8 +121,14 @@ namespace WebApplication
     {
       app.UseMiniProfiler();
       app.UseStaticFiles();
-      app.UseSwagger();
-      app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo List v1"));
+      app.UseSwagger(c => c.RouteTemplate = "api-docs/{documentName}/swagger.json");
+
+      app.UseSwaggerUI(c =>
+      {
+        c.SwaggerEndpoint("/api-docs/v1/swagger.json", "Todo List v1");
+        c.IndexStream = () => File.OpenRead("Swagger/index.html");
+      });
+
       app.UseHttpsRedirection();
       app.UseAppExceptionHandler();
       app.UseAuthentication();
