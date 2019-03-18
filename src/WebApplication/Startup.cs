@@ -14,9 +14,11 @@ using Services;
 using StackExchange.Profiling;
 using Swagger;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace WebApplication
@@ -92,6 +94,8 @@ namespace WebApplication
         c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> { { "Bearer", Enumerable.Empty<string>() } });
 
         c.DocumentFilter<LowercaseDocumentFilter>();
+
+        c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
       });
 
       services.AddMvc();

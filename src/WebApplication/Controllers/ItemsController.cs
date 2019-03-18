@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
-using Services.Exceptions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -13,6 +11,7 @@ namespace Controllers
 {
   [ApiController]
   [Authorize(Roles = "user")]
+  [Produces("application/json")]
   [Route("/api/v1/[controller]")]
   public class ItemsController : Controller
   {
@@ -23,6 +22,7 @@ namespace Controllers
       this.itemService = itemService;
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetAllAsync()
     {
@@ -37,7 +37,10 @@ namespace Controllers
         .ToList();
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
     [HttpPost]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<ActionResult<ItemListApiModel>> SaveAsync(ItemCreateApiModel item)
     {
       ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
@@ -51,7 +54,11 @@ namespace Controllers
       };
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="404">If item is not found by id</response> 
     [HttpPatch("{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> PatchAsync(int id, [FromBody]ICollection<PatchDTO> patches)
     {
       await itemService.UpdatePartiallyAsync(id, GetUserId(), patches);
@@ -59,6 +66,8 @@ namespace Controllers
       return Ok();
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="404">If item is not found by id</response> 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {

@@ -8,6 +8,7 @@ namespace Controllers
 {
   [ApiController]
   [Authorize(Roles = "user")]
+  [Produces("application/json")]
   [Route("/api/v1/select-lists")]
   public class SelectListsController : Controller
   {
@@ -18,6 +19,7 @@ namespace Controllers
       this.selectListService = selectListService;
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
     [HttpGet("item-statuses")]
     public ActionResult<IEnumerable<SelectListItemDTO>> GetStatusesSelectList()
     {
