@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 namespace Controllers
 {
   [ApiController]
+  [Produces("application/json")]
   [Route("/api/v1/[controller]")]
   public class UsersController : Controller
   {
@@ -67,6 +68,7 @@ namespace Controllers
       this.linkedInOptions = linkedInOptions.Value;
     }
 
+    /// <response code="401">If user does not have role "admin"</response>
     [HttpGet]
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync()
@@ -82,6 +84,7 @@ namespace Controllers
         .ToList();
     }
 
+    /// <response code="401">If user does not have role "admin"</response>
     [HttpGet("{userId}/items")]
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetUserItemsAsync(int userId)
@@ -97,6 +100,8 @@ namespace Controllers
         .ToList();
     }
 
+    /// <response code="401">If user does not have role "admin"</response> 
+    /// <response code="404">If user is not found by id</response> 
     [HttpDelete("{id}")]
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> DeleteAsync(int id)
@@ -106,6 +111,9 @@ namespace Controllers
       return Ok();
     }
 
+    /// <response code="400">Email is not confirmed or two-factor code is invalid or password is not valid</response> 
+    /// <response code="427">If two-factor code is missing</response> 
+    /// <response code="404">If user is not found by email</response> 
     [HttpPost("account/login")]
     public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
     {
@@ -163,6 +171,8 @@ namespace Controllers
       return actionResult;
     }
 
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpPost("account/login-by-facebook")]
     public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
     {
@@ -184,6 +194,8 @@ namespace Controllers
       return Json(await GenerateTokenAsync("Facebook", userInfoResponse));
     }
 
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpPost("account/login-by-google")]
     public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
     {
@@ -216,6 +228,8 @@ namespace Controllers
       }
     }
 
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpPost("account/login-by-github")]
     public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
     {
@@ -252,6 +266,8 @@ namespace Controllers
       }
     }
 
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpPost("account/login-by-linkedin")]
     public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
     {
@@ -292,6 +308,8 @@ namespace Controllers
     }
 
     [HttpPost]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
       User user = await userManager.FindByEmailAsync(userCreateModel.Email);
@@ -342,6 +360,8 @@ namespace Controllers
       return Ok();
     }
 
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpGet("{id}/account/confirm-email")]
     public async Task<IActionResult> ConfirmEmailAsync(int id, string code)
     {
@@ -366,6 +386,7 @@ namespace Controllers
       }
     }
 
+    /// <response code="404">If user is not found by email</response> 
     [HttpPost("account/recover-password")]
     public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
     {
@@ -386,7 +407,10 @@ namespace Controllers
       return Ok();
     }
 
+    /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [HttpPost("account/change-password")]
     public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
     {
@@ -406,6 +430,7 @@ namespace Controllers
       }
     }
 
+    ///// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
     [HttpGet("account/authenticator-uri")]
     public async Task<ActionResult<string>> GetAuthenticatorUri()
@@ -424,6 +449,8 @@ namespace Controllers
       return $"otpauth://totp/ToDoList:{user.UserName}?secret={authenticatorKey}&issuer=ToDoList&digits=6";
     }
 
+    /// <response code="400">Two factor is already enabled or verification code is invalid</response>
+    /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
     [HttpPut("account/enable-two-factor-authentication")]
     public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
@@ -453,6 +480,8 @@ namespace Controllers
       }
     }
 
+    /// <response code="400">Two factor is disabled already</response>
+    /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
     [HttpPut("account/disable-two-factor-authentication")]
     public async Task<IActionResult> DisableTwoFactorAuthentication()
@@ -470,6 +499,7 @@ namespace Controllers
       return Ok();
     }
 
+    /// <response code="401">If user does not have role "user"</response>
     [Authorize(Roles = "user")]
     [HttpGet("account/two-factor-authentication-enabled")]
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()

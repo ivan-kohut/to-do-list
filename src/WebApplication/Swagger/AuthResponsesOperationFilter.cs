@@ -10,21 +10,20 @@ namespace Swagger
   {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-      IEnumerable<AuthorizeAttribute> authAttributes = context.MethodInfo.DeclaringType
-        .GetCustomAttributes(true)
+      object[] customAttributes = context.MethodInfo.DeclaringType
+        .GetCustomAttributes(true);
+
+      IEnumerable<AuthorizeAttribute> authAttributes = customAttributes
         .Union(context.MethodInfo.GetCustomAttributes(true))
         .OfType<AuthorizeAttribute>();
 
-      IEnumerable<AllowAnonymousAttribute> anonymousScopes = context.MethodInfo.DeclaringType
-        .GetCustomAttributes(true)
+      IEnumerable<AllowAnonymousAttribute> anonymousScopes = customAttributes
         .Union(context.MethodInfo.GetCustomAttributes(true))
         .OfType<AllowAnonymousAttribute>()
         .Distinct();
 
       if (authAttributes.Any() && !anonymousScopes.Any())
       {
-        operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
-
         operation.Security.Add(new OpenApiSecurityRequirement
         {
           {
@@ -35,17 +34,6 @@ namespace Swagger
             new List<string>()
           }
         });
-      }
-
-      IEnumerable<string> requiredScopes = context.MethodInfo
-        .GetCustomAttributes(true)
-        .OfType<AuthorizeAttribute>()
-        .Select(attr => attr.Policy)
-        .Distinct();
-
-      if (requiredScopes.Any() && !anonymousScopes.Any())
-      {
-        operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
       }
     }
   }

@@ -776,7 +776,7 @@ namespace Controllers.Tests
           Assert.NotNull(authenticatorKey);
 
           string expected = $"otpauth://totp/ToDoList:admin?secret={authenticatorKey.Value}&issuer=ToDoList&digits=6";
-          string actual = await response.Content.ReadAsStringAsync();
+          string actual = await DeserializeResponseBodyAsync<string>(response);
 
           Assert.Equal(expected, actual);
 
@@ -807,7 +807,7 @@ namespace Controllers.Tests
           response.EnsureSuccessStatusCode();
 
           string expected = $"otpauth://totp/ToDoList:admin?secret={authenticatorKey.Value}&issuer=ToDoList&digits=6";
-          string actual = await response.Content.ReadAsStringAsync();
+          string actual = await DeserializeResponseBodyAsync<string>(response);
 
           Assert.Equal(expected, actual);
 
