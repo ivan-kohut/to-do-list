@@ -123,7 +123,7 @@ namespace Controllers.Tests
 
     public class LoginAsync : UsersControllerTest
     {
-      private const string loginAPI = url + "/account/login";
+      private const string loginAPI = url + "/login";
 
       public LoginAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
@@ -555,7 +555,7 @@ namespace Controllers.Tests
       public async Task When_CodeIsNull_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/10/account/confirm-email");
+        HttpResponseMessage response = await GetAsync($"{url}/10/email/confirm");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -564,7 +564,7 @@ namespace Controllers.Tests
       public async Task When_UserIsNotFound_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/10/account/confirm-email?code=some-code");
+        HttpResponseMessage response = await GetAsync($"{url}/10/email/confirm?code=some-code");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -575,7 +575,7 @@ namespace Controllers.Tests
         UserListApiModel user = await SaveUserAsync(new User { EmailConfirmed = true });
 
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/account/confirm-email?code=some-code");
+        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email/confirm?code=some-code");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -586,7 +586,7 @@ namespace Controllers.Tests
         UserListApiModel user = await SaveUserAsync(new User { EmailConfirmed = false });
 
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/account/confirm-email?code=not-valid-code");
+        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email/confirm?code=not-valid-code");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -604,7 +604,7 @@ namespace Controllers.Tests
           string code = Uri.EscapeDataString(await userManager.GenerateEmailConfirmationTokenAsync(user));
 
           // Act
-          HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/account/confirm-email?code={code}");
+          HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/email/confirm?code={code}");
 
           response.EnsureSuccessStatusCode();
 
@@ -623,7 +623,7 @@ namespace Controllers.Tests
       public async Task When_UserIsNotFound_Expect_NotFound()
       {
         // Act
-        HttpResponseMessage response = await PostAsync($"{url}/account/recover-password", new { Email = "test@test.test" });
+        HttpResponseMessage response = await PostAsync($"{url}/password", new { Email = "test@test.test" });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
       }
@@ -639,7 +639,7 @@ namespace Controllers.Tests
           await userManager.CreateAsync(user, "hrbEgerGER534.tf");
 
           // Act
-          HttpResponseMessage response = await PostAsync($"{url}/account/recover-password", new { user.Email });
+          HttpResponseMessage response = await PostAsync($"{url}/password", new { user.Email });
 
           response.EnsureSuccessStatusCode();
 
@@ -658,7 +658,7 @@ namespace Controllers.Tests
       public async Task When_InputModelIsNotValid_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = await PostAsync($"{url}/account/change-password", new { });
+        HttpResponseMessage response = await PutAsync($"{url}/password", new { });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -674,7 +674,7 @@ namespace Controllers.Tests
         };
 
         // Act
-        HttpResponseMessage response = await PostAsync($"{url}/account/change-password", body);
+        HttpResponseMessage response = await PutAsync($"{url}/password", body);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -690,7 +690,7 @@ namespace Controllers.Tests
         };
 
         // Act
-        HttpResponseMessage response = await PostAsync($"{url}/account/change-password", body);
+        HttpResponseMessage response = await PutAsync($"{url}/password", body);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -706,7 +706,7 @@ namespace Controllers.Tests
         };
 
         // Act
-        HttpResponseMessage response = await PostAsync($"{url}/account/change-password", body);
+        HttpResponseMessage response = await PutAsync($"{url}/password", body);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -727,7 +727,7 @@ namespace Controllers.Tests
           User user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
 
           // Act
-          HttpResponseMessage response = await PostAsync($"{url}/account/change-password", body);
+          HttpResponseMessage response = await PutAsync($"{url}/password", body);
 
           response.EnsureSuccessStatusCode();
 
@@ -740,7 +740,7 @@ namespace Controllers.Tests
             ConfirmNewPassword = "abcABC123."
           };
 
-          await PostAsync($"{url}/account/change-password", body); // change password back
+          await PutAsync($"{url}/password", body); // change password back
         }
       }
     }
@@ -764,7 +764,7 @@ namespace Controllers.Tests
           Assert.Null(authenticatorKey);
 
           // Act
-          HttpResponseMessage response = await GetAsync($"{url}/account/authenticator-uri");
+          HttpResponseMessage response = await GetAsync($"{url}/authenticator-uri");
 
           response.EnsureSuccessStatusCode();
 
@@ -802,7 +802,7 @@ namespace Controllers.Tests
           Assert.NotNull(authenticatorKey);
 
           // Act
-          HttpResponseMessage response = await GetAsync($"{url}/account/authenticator-uri");
+          HttpResponseMessage response = await GetAsync($"{url}/authenticator-uri");
 
           response.EnsureSuccessStatusCode();
 
@@ -835,7 +835,7 @@ namespace Controllers.Tests
           await userManager.UpdateAsync(admin);
 
           // Act
-          HttpResponseMessage response = await PutAsync($"{url}/account/enable-two-factor-authentication", new { Code = 111111 });
+          HttpResponseMessage response = await PutAsync($"{url}/two-factor-authentication/enable", new { Code = 111111 });
 
           Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -856,7 +856,7 @@ namespace Controllers.Tests
           await userManager.ResetAuthenticatorKeyAsync(admin);
 
           // Act
-          HttpResponseMessage response = await PutAsync($"{url}/account/enable-two-factor-authentication", new { Code = 111111 });
+          HttpResponseMessage response = await PutAsync($"{url}/two-factor-authentication/enable", new { Code = 111111 });
 
           Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -876,7 +876,7 @@ namespace Controllers.Tests
       public async Task When_TwoFactorIsNotEnabled_Expect_BadRequest()
       {
         // Act
-        HttpResponseMessage response = await PutAsync($"{url}/account/disable-two-factor-authentication", null);
+        HttpResponseMessage response = await PutAsync($"{url}/two-factor-authentication/disable", null);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -901,7 +901,7 @@ namespace Controllers.Tests
           Assert.True(admin.TwoFactorEnabled);
 
           // Act
-          HttpResponseMessage response = await PutAsync($"{url}/account/disable-two-factor-authentication", null);
+          HttpResponseMessage response = await PutAsync($"{url}/two-factor-authentication/disable", null);
 
           response.EnsureSuccessStatusCode();
 
@@ -939,7 +939,7 @@ namespace Controllers.Tests
       public async Task When_TwoFactorIsNotEnabled_Expect_False()
       {
         // Act
-        HttpResponseMessage response = await GetAsync($"{url}/account/two-factor-authentication-enabled");
+        HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication/is-enabled");
 
         response.EnsureSuccessStatusCode();
 
@@ -958,7 +958,7 @@ namespace Controllers.Tests
           await userManager.UpdateAsync(admin);
 
           // Act
-          HttpResponseMessage response = await GetAsync($"{url}/account/two-factor-authentication-enabled");
+          HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication/is-enabled");
 
           response.EnsureSuccessStatusCode();
 

@@ -114,7 +114,7 @@ namespace Controllers
     /// <response code="400">Email is not confirmed or two-factor code is invalid or password is not valid</response> 
     /// <response code="427">If two-factor code is missing</response> 
     /// <response code="404">If user is not found by email</response> 
-    [HttpPost("account/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
     {
       IActionResult actionResult;
@@ -173,7 +173,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("account/login-by-facebook")]
+    [HttpPost("login-by-facebook")]
     public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -196,7 +196,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("account/login-by-google")]
+    [HttpPost("login-by-google")]
     public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -230,7 +230,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("account/login-by-github")]
+    [HttpPost("login-by-github")]
     public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -268,7 +268,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("account/login-by-linkedin")]
+    [HttpPost("login-by-linkedin")]
     public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
@@ -362,7 +362,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpGet("{id}/account/confirm-email")]
+    [HttpGet("{id}/email/confirm")]
     public async Task<IActionResult> ConfirmEmailAsync(int id, string code)
     {
       if (string.IsNullOrWhiteSpace(code))
@@ -387,7 +387,7 @@ namespace Controllers
     }
 
     /// <response code="404">If user is not found by email</response> 
-    [HttpPost("account/recover-password")]
+    [HttpPost("password")]
     public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
     {
       User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);
@@ -411,7 +411,7 @@ namespace Controllers
     [Authorize(Roles = "user")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("account/change-password")]
+    [HttpPut("password")]
     public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
     {
       User user = await userManager.GetUserAsync(User);
@@ -432,7 +432,7 @@ namespace Controllers
 
     ///// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpGet("account/authenticator-uri")]
+    [HttpGet("authenticator-uri")]
     public async Task<ActionResult<string>> GetAuthenticatorUri()
     {
       User user = await userManager.GetUserAsync(User);
@@ -452,7 +452,7 @@ namespace Controllers
     /// <response code="400">Two factor is already enabled or verification code is invalid</response>
     /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpPut("account/enable-two-factor-authentication")]
+    [HttpPut("two-factor-authentication/enable")]
     public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
     {
       User user = await userManager.GetUserAsync(User);
@@ -483,7 +483,7 @@ namespace Controllers
     /// <response code="400">Two factor is disabled already</response>
     /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpPut("account/disable-two-factor-authentication")]
+    [HttpPut("two-factor-authentication/disable")]
     public async Task<IActionResult> DisableTwoFactorAuthentication()
     {
       User user = await userManager.GetUserAsync(User);
@@ -501,7 +501,7 @@ namespace Controllers
 
     /// <response code="401">If user does not have role "user"</response>
     [Authorize(Roles = "user")]
-    [HttpGet("account/two-factor-authentication-enabled")]
+    [HttpGet("two-factor-authentication/is-enabled")]
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
     {
       return (await userManager.GetUserAsync(User)).TwoFactorEnabled;

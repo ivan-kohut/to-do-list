@@ -9,7 +9,7 @@
       redirectUri: "https://localhost:44388/googlecallback"
     };
 
-    callAPI(`${usersURL}/account/login-by-google`, "POST", data, function (authToken) {
+    callAPI(`${usersURL}/login-by-google`, "POST", data, function (authToken) {
 
       localStorage.setItem("auth-token", authToken);
       window.location.href = "/";
