@@ -1,4 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,9 @@ namespace Swagger
 {
   public class LowercaseDocumentFilter : IDocumentFilter
   {
-    public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+    public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
-      IDictionary<string, PathItem> newPaths = new Dictionary<string, PathItem>();
+      IDictionary<string, OpenApiPathItem> newPaths = new Dictionary<string, OpenApiPathItem>();
       IList<string> removeKeys = new List<string>();
 
       foreach (var path in swaggerDoc.Paths)

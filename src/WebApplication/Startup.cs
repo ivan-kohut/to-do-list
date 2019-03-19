@@ -8,16 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Options;
 using Repositories;
 using Services;
 using StackExchange.Profiling;
 using Swagger;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -76,22 +74,22 @@ namespace WebApplication
 
       services.AddSwaggerGen(c =>
       {
-        c.SwaggerDoc("v1", new Info
+        c.SwaggerDoc("v1", new OpenApiInfo
         {
           Version = "v1",
           Title = "Todo List",
           Description = "Simple Todo List application developed using C#, ASP.NET Core 2.2 and EF Core 2.2"
         });
 
-        c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
           Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
           Name = "Authorization",
-          In = "Header",
-          Type = "apiKey"
+          In = ParameterLocation.Header,
+          Type = SecuritySchemeType.ApiKey
         });
 
-        c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> { { "Bearer", Enumerable.Empty<string>() } });
+        c.OperationFilter<AuthResponsesOperationFilter>();
 
         c.DocumentFilter<LowercaseDocumentFilter>();
 
