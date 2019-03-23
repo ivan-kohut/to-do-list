@@ -40,7 +40,8 @@ namespace WebApplication
       services
         .AddIdentity<User, Role>()
         .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders();
+
       services
         .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
         .AddEntityFramework();
@@ -90,6 +91,7 @@ namespace WebApplication
         c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
       });
 
+      services.AddCors();
       services.AddMvc();
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
@@ -125,6 +127,7 @@ namespace WebApplication
         c.IndexStream = () => File.OpenRead("Swagger/index.html");
       });
 
+      app.UseCors(b => b.WithOrigins("https://localhost:44374").AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseMvc();
