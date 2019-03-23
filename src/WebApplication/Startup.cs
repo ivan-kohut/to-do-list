@@ -35,20 +35,14 @@ namespace WebApplication
     public void ConfigureServices(IServiceCollection services)
     {
       services
-        .AddDbContext<AppDbContext>(
-          options => options.UseSqlServer(configuration.GetConnectionString(ConnectionStringName))
-        );
+        .AddDbContext<AppDbContext>(o => o.UseSqlServer(configuration.GetConnectionString(ConnectionStringName)));
 
       services
         .AddIdentity<User, Role>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
       services
-        .AddMiniProfiler(options =>
-        {
-          options.PopupRenderPosition = RenderPosition.Right;
-          options.RouteBasePath = "/profiler";
-        })
+        .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
         .AddEntityFramework();
 
       services
@@ -78,7 +72,7 @@ namespace WebApplication
         {
           Version = "v1",
           Title = "Todo List",
-          Description = "Simple Todo List application developed using C#, ASP.NET Core 2.2 and EF Core 2.2"
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 2.2 and EF Core 2.2"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -121,8 +115,8 @@ namespace WebApplication
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
+      app.UseHttpsRedirection();
       app.UseMiniProfiler();
-      app.UseStaticFiles();
       app.UseSwagger(c => c.RouteTemplate = "api-docs/{documentName}/swagger.json");
 
       app.UseSwaggerUI(c =>
@@ -131,7 +125,6 @@ namespace WebApplication
         c.IndexStream = () => File.OpenRead("Swagger/index.html");
       });
 
-      app.UseHttpsRedirection();
       app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseMvc();
