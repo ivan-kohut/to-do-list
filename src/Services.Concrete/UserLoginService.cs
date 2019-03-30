@@ -1,7 +1,6 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
-using Services.Exceptions;
 using System;
 using System.Threading.Tasks;
 

@@ -30,7 +30,5 @@ namespace Repositories
     {
       await dbContext.AddAsync(userLogin);
     }
-
-    
   }
 }
