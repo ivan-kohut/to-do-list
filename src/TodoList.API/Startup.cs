@@ -127,7 +127,7 @@ namespace WebApplication
         c.IndexStream = () => File.OpenRead("Swagger/index.html");
       });
 
-      app.UseCors(b => b.WithOrigins("http://localhost:5000").AllowAnyHeader().AllowAnyMethod());
+      app.UseCors(b => b.WithOrigins("http://localhost:5000", "http://localhost:56221").AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseMvc();
