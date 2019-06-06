@@ -27,7 +27,7 @@ namespace Controllers.Tests.Fixtures
     {
       string projectRootPath = Path.Combine(
         Directory.GetCurrentDirectory(),
-        "..", "..", "..", "..", "..", "src", "WebApplication"
+        "..", "..", "..", "..", "..", "src", "TodoList.API"
       );
 
       IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
