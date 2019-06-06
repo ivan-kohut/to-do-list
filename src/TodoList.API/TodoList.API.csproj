@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\API.Models\API.Models.csproj" />
     <ProjectReference Include="..\Services.Concrete\Services.Concrete.csproj" />
     <ProjectReference Include="..\Repositories.Concrete\Repositories.Concrete.csproj" />
   </ItemGroup>

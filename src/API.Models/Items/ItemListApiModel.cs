@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace API.Models
 {
   public class ItemListApiModel
   {

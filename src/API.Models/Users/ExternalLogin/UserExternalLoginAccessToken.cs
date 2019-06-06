@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Models
+namespace API.Models
 {
   public class UserExternalLoginAccessToken
   {

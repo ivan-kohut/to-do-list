@@ -4,7 +4,7 @@ using Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using API.Models;
 using Repositories;
 using System;
 using System.Collections.Generic;

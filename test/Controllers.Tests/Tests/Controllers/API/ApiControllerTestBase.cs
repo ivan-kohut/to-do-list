@@ -1,7 +1,7 @@
 ﻿using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
-using Models;
+using API.Models;
 using Newtonsoft.Json;
 using Repositories;
 using System.Net.Http;

@@ -3,7 +3,7 @@ using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using API.Models;
 using Repositories;
 using Services;
 using System;
