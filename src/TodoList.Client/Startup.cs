@@ -7,7 +7,8 @@ namespace TodoList.Client
   {
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddScoped<AppState>();
+      services.AddScoped<IAppState, AppState>();
+      services.AddScoped<IAppHttpClient, AppHttpClient >();
     }
 
     public void Configure(IComponentsApplicationBuilder app)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using API.Models;
+using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -10,28 +11,22 @@ namespace TodoList.Client.Components
   public class LoginComponent : ComponentBase
   {
     [Inject]
-    private HttpClient HttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; }
 
-    protected string Email { get; set; }
-    protected string Password { get; set; }
-    protected string TwoFactorToken { get; set; }
-
+    protected UserLoginModel UserLoginModel { get; set; }
     protected bool IsTwoFactorTokenFieldDisplayed { get; set; }
+
+    protected override void OnInit()
+    {
+      UserLoginModel = new UserLoginModel();
+    }
 
     protected async Task OnLoginAsync()
     {
-      using (HttpContent httpContent = CreateHttpContent(new { Email, Password, TwoFactorToken }))
-      {
-        HttpResponseMessage some  = await HttpClient.PostAsync("https://localhost:44388/api/v1/users/login", httpContent);
+      HttpResponseMessage some = await AppHttpClient.PostAsync("https://localhost:44388/api/v1/users/login", UserLoginModel);
 
-        Console.WriteLine(some.IsSuccessStatusCode);
-        Console.WriteLine($"Email -> {Email}; Password -> {Password}");
-      }
-    }
-
-    private HttpContent CreateHttpContent(object requestBody)
-    {
-      return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+      Console.WriteLine(some.IsSuccessStatusCode);
+      Console.WriteLine($"Email -> {UserLoginModel.Email}; Password -> {UserLoginModel.Password}");
     }
   }
 }

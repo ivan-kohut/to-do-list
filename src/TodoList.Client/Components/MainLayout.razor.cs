@@ -8,7 +8,7 @@ namespace TodoList.Client.Components
   public class MainLayoutComponent : LayoutComponentBase
   {
     [Inject]
-    private AppState AppState { get; set; }
+    private IAppState AppState { get; set; }
 
     [Inject]
     private IUriHelper UriHelper { get; set; }

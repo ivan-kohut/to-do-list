@@ -3,16 +3,16 @@
 @inherits LoginComponent
 
 <label for="email">Електронна пошта</label>
-<input bind="@Email" id="email" type="text" /> <br />
+<input bind="@UserLoginModel.Email" id="email" type="text" /> <br />
 
 <label for="password">Пароль</label>
-<input bind="@Password" id="password" type="password" /> <br />
+<input bind="@UserLoginModel.Password" id="password" type="password" /> <br />
 
 @if (IsTwoFactorTokenFieldDisplayed)
 {
   <div id="two-factor-authentication-block">
     <label for="authentication-code">Код аутентифікації</label>
-    <input bind="@TwoFactorToken" id="authentication-code" type="text" /> <br />
+    <input bind="@UserLoginModel.TwoFactorToken" id="authentication-code" type="text" /> <br />
   </div>
 }
 

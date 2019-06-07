@@ -1,7 +1,7 @@
 ﻿namespace TodoList.Client
 {
-  public class AppState
+  public class AppState : IAppState
   {
-    public bool IsUserLoggedIn { get; private set; }
+    public bool IsUserLoggedIn { get; set; }
   }
 }
