@@ -1,6 +1,6 @@
 @inherits LayoutComponentBase
 
-@inject IAppState AppState
+@inject AppState AppState
 @inject IUriHelper UriHelper
 
 @if (AppState.IsUserLoggedIn || UriHelper.GetAbsoluteUri().Substring(UriHelper.GetBaseUri().Length) == "login")

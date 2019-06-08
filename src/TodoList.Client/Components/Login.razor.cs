@@ -1,9 +1,7 @@
 ﻿using API.Models;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
-using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Text;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
@@ -13,8 +11,15 @@ namespace TodoList.Client.Components
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
 
+    [Inject]
+    private ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    private IUriHelper UriHelper { get; set; }
+
     protected UserLoginModel UserLoginModel { get; set; }
     protected bool IsTwoFactorTokenFieldDisplayed { get; set; }
+    protected IEnumerable<string> Errors { get; set; }
 
     protected override void OnInit()
     {
@@ -23,10 +28,21 @@ namespace TodoList.Client.Components
 
     protected async Task OnLoginAsync()
     {
-      HttpResponseMessage some = await AppHttpClient.PostAsync("https://localhost:44388/api/v1/users/login", UserLoginModel);
+      ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(
+        "https://localhost:44388/api/v1/users/login",
+        UserLoginModel
+      );
 
-      Console.WriteLine(some.IsSuccessStatusCode);
-      Console.WriteLine($"Email -> {UserLoginModel.Email}; Password -> {UserLoginModel.Password}");
+      if (loginCallResult.IsSuccess)
+      {
+        await LocalStorageService.SetItemAsync(AppState.AuthTokenKey, loginCallResult.Value);
+
+        UriHelper.NavigateTo(string.Empty);
+      }
+      else
+      {
+        Errors = loginCallResult.Errors;
+      }
     }
   }
 }

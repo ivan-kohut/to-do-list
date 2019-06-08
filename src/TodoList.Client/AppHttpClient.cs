@@ -19,11 +19,29 @@ namespace TodoList.Client
       return await httpClient.GetAsync(url);
     }
 
-    public async Task<HttpResponseMessage> PostAsync(string url, object requestBody)
+    public async Task<ApiCallResult<T>> PostAsync<T>(string url, object requestBody)
     {
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        return await httpClient.PostAsync(url, httpContent);
+        HttpResponseMessage httpResponse = await httpClient.PostAsync(url, httpContent);
+
+        ApiCallResult<T> apiCallResult = new ApiCallResult<T>
+        {
+          IsSuccess = httpResponse.IsSuccessStatusCode
+        };
+
+        string httpResponseContent = await httpResponse.Content.ReadAsStringAsync();
+
+        if (apiCallResult.IsSuccess)
+        {
+          apiCallResult.Value = JsonConvert.DeserializeObject<T>(httpResponseContent);
+        }
+        else
+        {
+          apiCallResult.Errors = JsonConvert.DeserializeObject<ApiCallResult<T>>(httpResponseContent).Errors;
+        }
+
+        return apiCallResult;
       }
     }
 

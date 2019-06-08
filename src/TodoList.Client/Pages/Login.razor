@@ -23,4 +23,12 @@
 
 <p onclick="@OnLoginAsync">Увійти</p>
 
-<ul id="errors"></ul>
+@if (Errors != null)
+{
+  <ul id="errors">
+    @foreach (string error in Errors)
+    {
+      <li>@error</li>
+    }
+  </ul>
+}

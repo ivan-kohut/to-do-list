@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,8 +8,10 @@ namespace TodoList.Client
   {
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddScoped<IAppState, AppState>();
-      services.AddScoped<IAppHttpClient, AppHttpClient >();
+      services.AddBlazoredLocalStorage();
+
+      services.AddScoped<AppState>();
+      services.AddScoped<IAppHttpClient, AppHttpClient>();
     }
 
     public void Configure(IComponentsApplicationBuilder app)
