@@ -28,10 +28,7 @@ namespace TodoList.Client.Components
 
     protected async Task OnLoginAsync()
     {
-      ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(
-        "https://localhost:44388/api/v1/users/login",
-        UserLoginModel
-      );
+      ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(ApiUrls.Login, UserLoginModel);
 
       if (loginCallResult.IsSuccess)
       {

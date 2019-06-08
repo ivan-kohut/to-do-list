@@ -23,7 +23,7 @@ namespace Controllers
 {
   [ApiController]
   [Produces("application/json")]
-  [Route("/api/v1/[controller]")]
+  [Route(Urls.Users)]
   public class UsersController : ControllerBase
   {
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -114,7 +114,7 @@ namespace Controllers
     /// <response code="400">Email is not confirmed or two-factor code is invalid or password is not valid</response> 
     /// <response code="427">If two-factor code is missing</response> 
     /// <response code="404">If user is not found by email</response> 
-    [HttpPost("login")]
+    [HttpPost(Urls.Login)]
     public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
     {
       if (!ModelState.IsValid)
