@@ -1,5 +1,6 @@
 ﻿using Entities;
 using Extensions;
+using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -96,7 +97,8 @@ namespace WebApplication
       });
 
       services.AddCors();
-      services.AddMvc();
+
+      services.AddMvc(o => o.Filters.Add(typeof(ModelStateInvalidFilter)));
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
       services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));

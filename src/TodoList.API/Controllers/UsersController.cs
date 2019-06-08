@@ -24,7 +24,7 @@ namespace Controllers
   [ApiController]
   [Produces("application/json")]
   [Route(Urls.Users)]
-  public class UsersController : ControllerBase
+  public class UsersController : Controller
   {
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -117,11 +117,6 @@ namespace Controllers
     [HttpPost(Urls.Login)]
     public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
     {
-      if (!ModelState.IsValid)
-      {
-        return BadRequestWithErrors();
-      }
-
       IActionResult actionResult;
 
       User user = await userManager.FindByEmailAsync(userLoginModel.Email);
@@ -317,11 +312,6 @@ namespace Controllers
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
-      if (!ModelState.IsValid)
-      {
-        return BadRequestWithErrors();
-      }
-
       User user = await userManager.FindByEmailAsync(userCreateModel.Email);
 
       if (user != null && user.PasswordHash != null)
