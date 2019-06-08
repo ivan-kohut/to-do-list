@@ -317,6 +317,11 @@ namespace Controllers
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
+      if (!ModelState.IsValid)
+      {
+        return BadRequestWithErrors();
+      }
+
       User user = await userManager.FindByEmailAsync(userCreateModel.Email);
 
       if (user != null && user.PasswordHash != null)

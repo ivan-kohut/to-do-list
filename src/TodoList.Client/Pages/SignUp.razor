@@ -1,0 +1,27 @@
+﻿@page "/sign-up"
+
+@inherits SignUpComponent
+
+<label for="name">Ім'я</label>
+<input bind="@UserCreateModel.Name" id="name" type="text" /><br />
+
+<label for="email">Електронна пошта</label>
+<input bind="@UserCreateModel.Email" id="email" type="text" /> <br />
+
+<label for="password">Пароль</label>
+<input bind="@UserCreateModel.Password" id="password" type="password" /> <br />
+
+<label for="confirm-password">Підтвердіть пароль</label>
+<input bind="@UserCreateModel.ConfirmPassword" id="confirm-password" type="password" /> <br />
+
+<p onclick="@OnSignUpAsync">Зареєструватися</p>
+
+@if (Errors != null)
+{
+  <ul id="errors">
+    @foreach (string error in Errors)
+    {
+      <li>@error</li>
+    }
+  </ul>
+}

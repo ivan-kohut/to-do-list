@@ -1,0 +1,14 @@
+﻿@layout MainLayout
+@inherits LayoutComponentBase
+
+@inject AppState AppState
+
+@if (AppState.IsUserLoggedIn)
+{
+  @Body
+}
+else
+{
+  <a href="login">Log in</a>
+  <a href="sign-up">Sign up</a>
+}

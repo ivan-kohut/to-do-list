@@ -1,15 +1,3 @@
 @inherits LayoutComponentBase
 
-@inject AppState AppState
-@inject IUriHelper UriHelper
-
-@if (AppState.IsUserLoggedIn || UriHelper.GetAbsoluteUri().Substring(UriHelper.GetBaseUri().Length) == "login")
-{
-  @Body
-}
-else
-{
-  <div>
-    You are not logged in. Please click <a href="login">here</a> to log in.
-  </div>
-}
+@Body
