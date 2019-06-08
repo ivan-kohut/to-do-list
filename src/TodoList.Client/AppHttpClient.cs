@@ -27,7 +27,8 @@ namespace TodoList.Client
 
         ApiCallResult<T> apiCallResult = new ApiCallResult<T>
         {
-          IsSuccess = httpResponse.IsSuccessStatusCode
+          IsSuccess = httpResponse.IsSuccessStatusCode,
+          StatusCode = (int)httpResponse.StatusCode
         };
 
         string httpResponseContent = await httpResponse.Content.ReadAsStringAsync();

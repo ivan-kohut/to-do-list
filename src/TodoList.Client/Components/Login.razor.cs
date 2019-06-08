@@ -41,6 +41,11 @@ namespace TodoList.Client.Components
       }
       else
       {
+        if (loginCallResult.StatusCode == 427)
+        {
+          IsTwoFactorTokenFieldDisplayed = true;
+        }
+
         Errors = loginCallResult.Errors;
       }
     }
