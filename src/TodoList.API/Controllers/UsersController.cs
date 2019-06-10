@@ -387,7 +387,7 @@ namespace Controllers
     }
 
     /// <response code="404">If user is not found by email</response> 
-    [HttpPost("password")]
+    [HttpPost(Urls.PasswordRecovery)]
     public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
     {
       User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);

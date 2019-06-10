@@ -1,0 +1,36 @@
+﻿using API.Models;
+using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace TodoList.Client.Components
+{
+  public class PasswordRecoveryComponent : ComponentBase
+  {
+    [Inject]
+    private IAppHttpClient AppHttpClient { get; set; }
+
+    protected UserForgotPasswordModel UserForgotPasswordModel { get; set; }
+    protected bool IsPasswordRecovered { get; set; }
+    protected IEnumerable<string> Errors { get; set; }
+
+    protected override void OnInit()
+    {
+      UserForgotPasswordModel = new UserForgotPasswordModel();
+    }
+
+    protected async Task OnRecoverPasswordAsync()
+    {
+      ApiCallResult<object> passwordRecoveryCallResult = await AppHttpClient.PostAsync<object>(ApiUrls.PasswordRecovery, UserForgotPasswordModel);
+
+      if (passwordRecoveryCallResult.IsSuccess)
+      {
+        IsPasswordRecovered = true;
+      }
+      else
+      {
+        Errors = passwordRecoveryCallResult.Errors;
+      }
+    }
+  }
+}
