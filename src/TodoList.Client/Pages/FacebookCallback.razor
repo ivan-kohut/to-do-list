@@ -1,0 +1,28 @@
+﻿@page "/facebook-callback"
+
+@using API.Models;
+@using Blazored.LocalStorage;
+
+@inject IUriHelper UriHelper
+@inject IAppHttpClient AppHttpClient
+@inject ILocalStorageService LocalStorageService
+
+@functions {
+
+  protected override async Task OnInitAsync()
+  {
+    string absoluteUri = UriHelper.GetAbsoluteUri();
+
+    UserExternalLoginModel model = new UserExternalLoginModel
+    {
+      Code = absoluteUri.Substring(absoluteUri.IndexOf("=") + 1),
+      RedirectUri = "https://localhost:44328/facebook-callback"
+    };
+
+    ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(ApiUrls.LoginByFacebook, model);
+
+    await LocalStorageService.SetItemAsync(AppState.AuthTokenKey, loginCallResult.Value);
+
+    UriHelper.NavigateTo(string.Empty);
+  }
+}

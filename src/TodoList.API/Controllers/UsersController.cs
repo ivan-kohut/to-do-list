@@ -173,7 +173,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("login-by-facebook")]
+    [HttpPost(Urls.LoginByFacebook)]
     public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();

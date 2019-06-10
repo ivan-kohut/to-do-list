@@ -6,5 +6,6 @@
 
     public const string Login = "login";
     public const string PasswordRecovery = "password";
+    public const string LoginByFacebook = "login-by-facebook";
   }
 }
