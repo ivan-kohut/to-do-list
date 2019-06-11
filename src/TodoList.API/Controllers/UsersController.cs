@@ -268,7 +268,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("login-by-linkedin")]
+    [HttpPost(Urls.LoginByLinkedin)]
     public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();

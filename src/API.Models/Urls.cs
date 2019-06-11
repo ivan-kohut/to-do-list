@@ -9,5 +9,6 @@
     public const string LoginByFacebook = "login-by-facebook";
     public const string LoginByGoogle = "login-by-google";
     public const string LoginByGithub = "login-by-github";
+    public const string LoginByLinkedin = "login-by-linkedin";
   }
 }
