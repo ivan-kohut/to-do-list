@@ -11,5 +11,6 @@ namespace TodoList.Client
     public static readonly string PasswordRecovery = $"{apiUrl}{Urls.Users}/{Urls.PasswordRecovery}";
     public static readonly string LoginByFacebook = $"{apiUrl}{Urls.Users}/{Urls.LoginByFacebook}";
     public static readonly string LoginByGoogle = $"{apiUrl}{Urls.Users}/{Urls.LoginByGoogle}";
+    public static readonly string LoginByGithub = $"{apiUrl}{Urls.Users}/{Urls.LoginByGithub}";
   }
 }

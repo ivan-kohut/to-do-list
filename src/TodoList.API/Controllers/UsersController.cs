@@ -230,7 +230,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("login-by-github")]
+    [HttpPost(Urls.LoginByGithub)]
     public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
