@@ -196,7 +196,7 @@ namespace Controllers
 
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPost("login-by-google")]
+    [HttpPost(Urls.LoginByGoogle)]
     public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
