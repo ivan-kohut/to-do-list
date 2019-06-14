@@ -9,20 +9,17 @@
     {
       @foreach (var item in Items)
       {
-        <li>@item.Text</li>
+        <li>
+          <input type="checkbox" bind="@item.IsDone" />
+          <input bind="@item.Text" />
+        </li>
       }
     }
   </ul>
 
-  <input type="text" id="text_input" />
-  <p onclick="app.addItem();">Добавити</p>
+  <input type="text" />
+  <button onclick="app.addItem();">Добавити</button>
 
-  <ul id="buttons">
-    <li id="update_button" class="red" onclick="app.updateItemText();">Зберегти</li>
-    <li id="up_button" class="red" onclick="app.moveUpItem();">Вгору</li>
-    <li id="down_button" class="red" onclick="app.moveDownItem();">Вниз</li>
-    <li id="delete_button" class="red" onclick="app.deleteItem();">Видалити</li>
-  </ul>
   <div>
     <br />
     <a href="/users">Користувачі</a>

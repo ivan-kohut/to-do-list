@@ -30,6 +30,7 @@ namespace Controllers
         .Select(i => new ItemListApiModel
         {
           Id = i.Id,
+          IsDone = i.IsDone,
           StatusId = i.StatusId,
           Text = i.Text,
           Priority = i.Priority
