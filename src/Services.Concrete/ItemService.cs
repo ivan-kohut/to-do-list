@@ -52,6 +52,7 @@ namespace Services
       await transactionManager.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
+      itemDTO.IsDone = false;
       itemDTO.StatusId = (int)item.Status;
       itemDTO.Priority = item.Priority;
 

@@ -17,8 +17,8 @@
     }
   </ul>
 
-  <input type="text" />
-  <button onclick="app.addItem();">Добавити</button>
+  <input bind="@NewItem.Text" type="text" />
+  <button onclick="@OnCreateItemAsync">Добавити</button>
 
   <div>
     <br />

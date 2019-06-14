@@ -15,5 +15,6 @@ namespace TodoList.Client
     public static readonly string LoginByLinkedin = $"{apiUrl}{Urls.Users}/{Urls.LoginByLinkedin}";
 
     public static readonly string GetItemsList = $"{apiUrl}{Urls.Items}";
+    public static readonly string CreateItem = $"{apiUrl}{Urls.Items}";
   }
 }

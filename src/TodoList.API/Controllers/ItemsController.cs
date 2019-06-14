@@ -49,6 +49,7 @@ namespace Controllers
       return new ItemListApiModel
       {
         Id = result.Id,
+        IsDone = result.IsDone,
         StatusId = result.StatusId,
         Text = result.Text,
         Priority = result.Priority
