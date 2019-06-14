@@ -13,5 +13,7 @@ namespace TodoList.Client
     public static readonly string LoginByGoogle = $"{apiUrl}{Urls.Users}/{Urls.LoginByGoogle}";
     public static readonly string LoginByGithub = $"{apiUrl}{Urls.Users}/{Urls.LoginByGithub}";
     public static readonly string LoginByLinkedin = $"{apiUrl}{Urls.Users}/{Urls.LoginByLinkedin}";
+
+    public static readonly string GetItemsList = $"{apiUrl}{Urls.Items}";
   }
 }

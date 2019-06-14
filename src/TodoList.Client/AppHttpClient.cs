@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Blazored.LocalStorage;
+using Newtonsoft.Json;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,41 +10,28 @@ namespace TodoList.Client
   public class AppHttpClient : IAppHttpClient
   {
     private readonly HttpClient httpClient;
+    private readonly ILocalStorageService localStorageService;
 
-    public AppHttpClient(HttpClient httpClient)
+    public AppHttpClient(HttpClient httpClient, ILocalStorageService localStorageService)
     {
       this.httpClient = httpClient;
+      this.localStorageService = localStorageService;
     }
 
-    public async Task<HttpResponseMessage> GetAsync(string url)
+    public async Task<ApiCallResult<T>> GetAsync<T>(string url)
     {
-      return await httpClient.GetAsync(url);
+      await SetAuthorizationHeader();
+
+      return await GenerateApiCallResultAsync<T>(await httpClient.GetAsync(url));
     }
 
     public async Task<ApiCallResult<T>> PostAsync<T>(string url, object requestBody)
     {
+      await SetAuthorizationHeader();
+
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        HttpResponseMessage httpResponse = await httpClient.PostAsync(url, httpContent);
-
-        ApiCallResult<T> apiCallResult = new ApiCallResult<T>
-        {
-          IsSuccess = httpResponse.IsSuccessStatusCode,
-          StatusCode = (int)httpResponse.StatusCode
-        };
-
-        string httpResponseContent = await httpResponse.Content.ReadAsStringAsync();
-
-        if (apiCallResult.IsSuccess)
-        {
-          apiCallResult.Value = JsonConvert.DeserializeObject<T>(httpResponseContent);
-        }
-        else
-        {
-          apiCallResult.Errors = JsonConvert.DeserializeObject<ApiCallResult<T>>(httpResponseContent).Errors;
-        }
-
-        return apiCallResult;
+        return await GenerateApiCallResultAsync<T>(await httpClient.PostAsync(url, httpContent));
       }
     }
 
@@ -62,6 +51,41 @@ namespace TodoList.Client
     private HttpContent CreateHttpContent(object requestBody)
     {
       return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+    }
+
+    private async Task<ApiCallResult<T>> GenerateApiCallResultAsync<T>(HttpResponseMessage httpResponse)
+    {
+      ApiCallResult<T> apiCallResult = new ApiCallResult<T>
+      {
+        IsSuccess = httpResponse.IsSuccessStatusCode,
+        StatusCode = (int)httpResponse.StatusCode
+      };
+
+      string httpResponseContent = await httpResponse.Content.ReadAsStringAsync();
+
+      if (apiCallResult.IsSuccess)
+      {
+        apiCallResult.Value = JsonConvert.DeserializeObject<T>(httpResponseContent);
+      }
+      else
+      {
+        apiCallResult.Errors = JsonConvert.DeserializeObject<ApiCallResult<T>>(httpResponseContent).Errors;
+      }
+
+      return apiCallResult;
+    }
+
+    private async Task SetAuthorizationHeader()
+    {
+      if (httpClient.DefaultRequestHeaders.Authorization == null)
+      {
+        string authToken = await localStorageService.GetItemAsync<string>(AppState.AuthTokenKey);
+
+        if (!string.IsNullOrWhiteSpace(authToken))
+        {
+          httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+        }
+      }
     }
   }
 }

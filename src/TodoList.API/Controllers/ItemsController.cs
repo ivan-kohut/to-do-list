@@ -12,7 +12,7 @@ namespace Controllers
   [ApiController]
   [Authorize(Roles = "user")]
   [Produces("application/json")]
-  [Route("/api/v1/[controller]")]
+  [Route(Urls.Items)]
   public class ItemsController : Controller
   {
     private readonly IItemService itemService;
