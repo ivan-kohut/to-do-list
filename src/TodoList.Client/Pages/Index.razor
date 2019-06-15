@@ -7,12 +7,26 @@
   <ul id="item-list">
     @if (Items != null)
     {
+      var firstItem = Items.FirstOrDefault();
+      var lastItem = Items.LastOrDefault();
+
       @foreach (var item in Items)
       {
         <li>
-          <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item.Id))" />
-          <input value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item.Id))" />
-          <div onclick="@(() => DeleteItemAsync(item.Id))">delete</div>
+          <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item))" />
+          <input value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item))" />
+          <a onclick="@(() => DeleteItemAsync(item))">delete</a>
+
+          @if (item != firstItem)
+          {
+            <a onclick="@(() => MoveUpItemAsync(item))">move up</a>
+          }
+
+          @if (item != lastItem)
+          {
+            <a onclick="@(() => MoveDownItemAsync(item))">move down</a>
+          }
+
         </li>
       }
     }

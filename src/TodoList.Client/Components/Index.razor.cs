@@ -1,7 +1,6 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
@@ -32,46 +31,61 @@ namespace TodoList.Client.Components
       }
     }
 
-    protected async Task UpdateItemStatusAsync(UIChangeEventArgs e, int itemId)
+    protected async Task UpdateItemStatusAsync(UIChangeEventArgs e, ItemListApiModel item)
     {
-      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
-
-      if (item == null)
-      {
-        return;
-      }
-
       item.IsDone = (bool)e.Value;
 
-      await AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, itemId.ToString()), item);
+      await UpdateItemAsync(item);
     }
 
-    protected async Task UpdateItemTextAsync(UIChangeEventArgs e, int itemId)
+    protected async Task UpdateItemTextAsync(UIChangeEventArgs e, ItemListApiModel item)
     {
-      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
-
-      if (item == null)
-      {
-        return;
-      }
-
       item.Text = (string)e.Value;
 
-      await AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, itemId.ToString()), item);
+      await UpdateItemAsync(item);
     }
 
-    protected async Task DeleteItemAsync(int itemId)
+    protected async Task DeleteItemAsync(ItemListApiModel item)
     {
-      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
-
-      if (item == null)
-      {
-        return;
-      }
-
       Items.Remove(item);
 
-      await AppHttpClient.DeleteAsync(ApiUrls.DeleteItem.Replace(Urls.DeleteItem, itemId.ToString()));
+      await AppHttpClient.DeleteAsync(ApiUrls.DeleteItem.Replace(Urls.DeleteItem, item.Id.ToString()));
+    }
+
+    protected async Task MoveUpItemAsync(ItemListApiModel item)
+    {
+      int indexOfItem = Items.IndexOf(item);
+      int indexOfPrevItem = indexOfItem - 1;
+
+      await SwapItemsAsync(item, indexOfItem, indexOfPrevItem);
+    }
+
+    protected async Task MoveDownItemAsync(ItemListApiModel item)
+    {
+      int indexOfItem = Items.IndexOf(item);
+      int indexOfNextItem = indexOfItem + 1;
+
+      await SwapItemsAsync(item, indexOfItem, indexOfNextItem);
+    }
+
+    private Task SwapItemsAsync(ItemListApiModel item, int indexOfSelectedItem, int indexOfAnotherItem)
+    {
+      ItemListApiModel anotherItem = Items[indexOfAnotherItem];
+
+      Items[indexOfSelectedItem] = anotherItem;
+      Items[indexOfAnotherItem] = item;
+
+      int itemPriority = item.Priority;
+
+      item.Priority = anotherItem.Priority;
+      anotherItem.Priority = itemPriority;
+
+      return Task.WhenAll(UpdateItemAsync(item), UpdateItemAsync(anotherItem));
+    }
+
+    private Task UpdateItemAsync(ItemListApiModel item)
+    {
+      return AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, item.Id.ToString()), item);
     }
   }
 }
