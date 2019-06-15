@@ -1,5 +1,4 @@
 ﻿using Entities;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +10,6 @@ namespace Repositories
     Task<int> GetMaxItemPriorityAsync(int userId);
     IQueryable<Item> All(int userId);
     Task CreateAsync(Item item);
-    void UpdatePartially(Item item, IDictionary<string, object> fieldsToUpdate);
     void Delete(Item item);
   }
 }

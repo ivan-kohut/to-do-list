@@ -12,5 +12,8 @@
     public const string LoginByLinkedin = "login-by-linkedin";
 
     public const string Items = "/api/v1/items";
+
+    public const string UpdateItem = "{id}";
+
   }
 }

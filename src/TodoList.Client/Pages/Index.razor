@@ -10,7 +10,7 @@
       @foreach (var item in Items)
       {
         <li>
-          <input type="checkbox" bind="@item.IsDone" />
+          <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item.Id))" />
           <input bind="@item.Text" />
         </li>
       }

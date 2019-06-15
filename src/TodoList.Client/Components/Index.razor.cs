@@ -1,6 +1,7 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
@@ -29,6 +30,20 @@ namespace TodoList.Client.Components
         Items.Add(itemCreationCallResult.Value);
         NewItem.Text = string.Empty;
       }
+    }
+
+    protected async Task UpdateItemStatusAsync(UIChangeEventArgs e, int itemId)
+    {
+      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
+
+      if (item == null)
+      {
+        return;
+      }
+
+      item.IsDone = (bool)e.Value;
+
+      await AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, itemId.ToString()), item);
     }
   }
 }

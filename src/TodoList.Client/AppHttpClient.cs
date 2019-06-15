@@ -35,17 +35,21 @@ namespace TodoList.Client
       }
     }
 
-    public async Task<HttpResponseMessage> PutAsync(string url, object requestBody)
+    public async Task<ApiCallResult> PutAsync(string url, object requestBody)
     {
+      await SetAuthorizationHeader();
+
       using (HttpContent httpContent = CreateHttpContent(requestBody))
       {
-        return await httpClient.PutAsync(url, httpContent);
+        return await GenerateApiCallResultAsync(await httpClient.PutAsync(url, httpContent));
       }
     }
 
-    public async Task<HttpResponseMessage> DeleteAsync(string url)
+    public async Task<ApiCallResult> DeleteAsync(string url)
     {
-      return await httpClient.DeleteAsync(url);
+      await SetAuthorizationHeader();
+
+      return await GenerateApiCallResultAsync(await httpClient.DeleteAsync(url));
     }
 
     private HttpContent CreateHttpContent(object requestBody)
@@ -70,6 +74,23 @@ namespace TodoList.Client
       else
       {
         apiCallResult.Errors = JsonConvert.DeserializeObject<ApiCallResult<T>>(httpResponseContent).Errors;
+      }
+
+      return apiCallResult;
+    }
+
+    private async Task<ApiCallResult> GenerateApiCallResultAsync(HttpResponseMessage httpResponse)
+    {
+      ApiCallResult apiCallResult = new ApiCallResult
+      {
+        IsSuccess = httpResponse.IsSuccessStatusCode,
+        StatusCode = (int)httpResponse.StatusCode
+      };
+
+      if (!apiCallResult.IsSuccess)
+      {
+        apiCallResult.Errors = JsonConvert.DeserializeObject<ApiCallResult>(await httpResponse.Content.ReadAsStringAsync())
+          .Errors;
       }
 
       return apiCallResult;

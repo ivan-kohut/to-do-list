@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using API.Models;
 using Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,12 +58,23 @@ namespace Controllers
 
     /// <response code="401">If user does not have role "user"</response> 
     /// <response code="404">If item is not found by id</response> 
-    [HttpPatch("{id}")]
+    [HttpPut(Urls.UpdateItem)]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PatchAsync(int id, [FromBody]ICollection<PatchDTO> patches)
+    public async Task<IActionResult> PutAsync(int id, [FromBody] ItemListApiModel item)
     {
-      await itemService.UpdatePartiallyAsync(id, GetUserId(), patches);
+      if (id != item.Id)
+      {
+        return BadRequest();
+      }
+
+      await itemService.UpdateAsync(GetUserId(), new ItemDTO
+      {
+        Id = item.Id,
+        IsDone = item.IsDone,
+        Text = item.Text,
+        Priority = item.Priority
+      });
 
       return Ok();
     }
