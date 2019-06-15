@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,12 @@ namespace TodoList.Client.Components
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
+
+    [Inject]
+    private ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    private IUriHelper UriHelper { get; set; }
 
     protected ItemCreateApiModel NewItem { get; set; }
     protected IList<ItemApiModel> Items { get; set; }
@@ -66,6 +73,13 @@ namespace TodoList.Client.Components
       int indexOfNextItem = indexOfItem + 1;
 
       await SwapItemsAsync(item, indexOfItem, indexOfNextItem);
+    }
+
+    protected async Task OnLogoutAsync()
+    {
+      await LocalStorageService.RemoveItemAsync(AppState.AuthTokenKey);
+
+      UriHelper.NavigateTo(string.Empty);
     }
 
     private Task SwapItemsAsync(ItemApiModel item, int indexOfSelectedItem, int indexOfAnotherItem)
