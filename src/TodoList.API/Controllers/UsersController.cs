@@ -87,13 +87,13 @@ namespace Controllers
     /// <response code="401">If user does not have role "admin"</response>
     [HttpGet("{userId}/items")]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetUserItemsAsync(int userId)
+    public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetUserItemsAsync(int userId)
     {
       return (await itemService.GetAllAsync(userId))
-        .Select(i => new ItemListApiModel
+        .Select(i => new ItemApiModel
         {
           Id = i.Id,
-          StatusId = i.StatusId,
+          IsDone = i.IsDone,
           Text = i.Text,
           Priority = i.Priority
         })

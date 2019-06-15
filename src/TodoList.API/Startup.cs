@@ -118,7 +118,6 @@ namespace WebApplication
       services.AddScoped<IUserRoleService, UserRoleService>();
       services.AddScoped<IUserLoginService, UserLoginService>();
       services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
-      services.AddSingleton<ISelectListService, SelectListService>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)

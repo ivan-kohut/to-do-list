@@ -28,7 +28,6 @@ namespace Services
           Id = i.Id,
           IsDone = i.Status == ItemStatus.Done,
           UserId = i.UserId,
-          StatusId = (int)i.Status,
           Text = i.Text,
           Priority = i.Priority
         })
@@ -52,7 +51,6 @@ namespace Services
 
       itemDTO.Id = item.Id;
       itemDTO.IsDone = false;
-      itemDTO.StatusId = (int)item.Status;
       itemDTO.Priority = item.Priority;
 
       return itemDTO;

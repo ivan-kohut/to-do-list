@@ -2,11 +2,11 @@
 
 namespace API.Models
 {
-  public class ItemListApiModel
+  public class ItemApiModel
   {
     public int Id { get; set; }
+
     public bool IsDone { get; set; }
-    public int StatusId { get; set; }
 
     [Required]
     [StringLength(128, MinimumLength = 1)]

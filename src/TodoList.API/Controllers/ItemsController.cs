@@ -24,14 +24,13 @@ namespace Controllers
 
     /// <response code="401">If user does not have role "user"</response> 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ItemListApiModel>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync()
     {
       return (await itemService.GetAllAsync(GetUserId()))
-        .Select(i => new ItemListApiModel
+        .Select(i => new ItemApiModel
         {
           Id = i.Id,
           IsDone = i.IsDone,
-          StatusId = i.StatusId,
           Text = i.Text,
           Priority = i.Priority
         })
@@ -42,15 +41,14 @@ namespace Controllers
     [HttpPost]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<ItemListApiModel>> SaveAsync(ItemCreateApiModel item)
+    public async Task<ActionResult<ItemApiModel>> SaveAsync(ItemCreateApiModel item)
     {
       ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
 
-      return new ItemListApiModel
+      return new ItemApiModel
       {
         Id = result.Id,
         IsDone = result.IsDone,
-        StatusId = result.StatusId,
         Text = result.Text,
         Priority = result.Priority
       };
@@ -61,7 +59,7 @@ namespace Controllers
     [HttpPut(Urls.UpdateItem)]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] ItemListApiModel item)
+    public async Task<IActionResult> PutAsync(int id, [FromBody] ItemApiModel item)
     {
       if (id != item.Id)
       {
