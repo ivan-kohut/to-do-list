@@ -45,5 +45,33 @@ namespace TodoList.Client.Components
 
       await AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, itemId.ToString()), item);
     }
+
+    protected async Task UpdateItemTextAsync(UIChangeEventArgs e, int itemId)
+    {
+      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
+
+      if (item == null)
+      {
+        return;
+      }
+
+      item.Text = (string)e.Value;
+
+      await AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, itemId.ToString()), item);
+    }
+
+    protected async Task DeleteItemAsync(int itemId)
+    {
+      ItemListApiModel item = Items.SingleOrDefault(x => x.Id == itemId);
+
+      if (item == null)
+      {
+        return;
+      }
+
+      Items.Remove(item);
+
+      await AppHttpClient.DeleteAsync(ApiUrls.DeleteItem.Replace(Urls.DeleteItem, itemId.ToString()));
+    }
   }
 }

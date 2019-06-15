@@ -81,7 +81,7 @@ namespace Controllers
 
     /// <response code="401">If user does not have role "user"</response> 
     /// <response code="404">If item is not found by id</response> 
-    [HttpDelete("{id}")]
+    [HttpDelete(Urls.DeleteItem)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
       await itemService.DeleteAsync(id, GetUserId());

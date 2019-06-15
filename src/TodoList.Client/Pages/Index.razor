@@ -11,7 +11,8 @@
       {
         <li>
           <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item.Id))" />
-          <input bind="@item.Text" />
+          <input value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item.Id))" />
+          <div onclick="@(() => DeleteItemAsync(item.Id))">delete</div>
         </li>
       }
     }

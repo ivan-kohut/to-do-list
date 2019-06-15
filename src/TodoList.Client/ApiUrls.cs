@@ -17,5 +17,6 @@ namespace TodoList.Client
     public static readonly string GetItemsList = $"{apiUrl}{Urls.Items}";
     public static readonly string CreateItem = $"{apiUrl}{Urls.Items}";
     public static readonly string UpdateItem = $"{apiUrl}{Urls.Items}/{Urls.UpdateItem}";
+    public static readonly string DeleteItem = $"{apiUrl}{Urls.Items}/{Urls.DeleteItem}";
   }
 }
