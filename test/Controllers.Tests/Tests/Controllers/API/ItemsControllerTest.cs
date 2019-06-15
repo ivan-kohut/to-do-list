@@ -1,11 +1,10 @@
-﻿using Controllers.Tests.Extensions;
+﻿using API.Models;
+using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using API.Models;
 using Repositories;
-using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +38,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response));
+        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response));
       }
 
       [Fact]
@@ -51,7 +50,7 @@ namespace Controllers.Tests
           new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
         };
 
-        IEnumerable<ItemListApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
           .OrderBy(i => i.Priority)
           .ToList();
 
@@ -60,7 +59,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemListApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response);
+        IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }
@@ -91,26 +90,48 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        ItemListApiModel itemSaved = await DeserializeResponseBodyAsync<ItemListApiModel>(response);
+        ItemApiModel itemSaved = await DeserializeResponseBodyAsync<ItemApiModel>(response);
 
         Assert.NotEqual(0, itemSaved.Id);
         Assert.Equal(itemToSave.Text, itemSaved.Text);
         Assert.Equal(1, itemSaved.Priority);
-        Assert.Equal((int)ItemStatus.Todo, itemSaved.StatusId);
+        Assert.False(itemSaved.IsDone);
       }
     }
 
-    public class PatchAsync : ItemsControllerTest
+    public class PutAsync : ItemsControllerTest
     {
-      public PatchAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      public PutAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
       }
 
       [Fact]
       public async Task When_InputModelIsNotValid_Expect_BadRequest()
       {
+        ItemApiModel itemToUpdate = new ItemApiModel
+        {
+          Id = 1,
+          Text = string.Empty,
+          Priority = 10
+        };
+
         // Act
-        HttpResponseMessage response = await PatchAsync($"{url}/{1}", null);
+        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+      }
+
+      [Fact]
+      public async Task When_IdFromRequestPathDoesNotEqualToIdFromModel_Expect_BadRequest()
+      {
+        ItemApiModel itemToUpdate = new ItemApiModel
+        {
+          Id = 2,
+          Text = "itemText"
+        };
+
+        // Act
+        HttpResponseMessage response = await PutAsync($"{url}/{1}", itemToUpdate);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
       }
@@ -118,8 +139,14 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_ItemIsNotFound_Expect_NotFound()
       {
+        ItemApiModel itemToUpdate = new ItemApiModel
+        {
+          Id = 1,
+          Text = "itemText"
+        };
+
         // Act
-        HttpResponseMessage response = await PatchAsync($"{url}/{1}", Enumerable.Empty<PatchDTO>());
+        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
       }
@@ -127,37 +154,25 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_InputModelIsValid_Expect_Updated()
       {
-        ItemListApiModel itemToUpdate = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemApiModel itemToUpdate = await SaveItemAsync(
+          new Item { UserId = UserId, Text = "itemText", Priority = 10, Status = ItemStatus.Todo }
+        );
 
-        PatchDTO textPatchDTO = new PatchDTO
-        {
-          Name = "Text",
-          Value = "newItemText"
-        };
-
-        PatchDTO priorityPatchDTO = new PatchDTO
-        {
-          Name = "Priority",
-          Value = 2
-        };
-
-        PatchDTO statusPatchDTO = new PatchDTO
-        {
-          Name = "StatusId",
-          Value = 2
-        };
+        itemToUpdate.IsDone = true;
+        itemToUpdate.Text = "newItemText";
+        itemToUpdate.Priority = 25;
 
         // Act
-        HttpResponseMessage response = await PatchAsync($"{url}/{itemToUpdate.Id}", new List<PatchDTO> { textPatchDTO, priorityPatchDTO, statusPatchDTO });
+        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
         response.EnsureSuccessStatusCode();
 
         Item itemUpdated = (await GetAllItemsAsync())
           .Single(i => i.Id == itemToUpdate.Id);
 
-        Assert.Equal(textPatchDTO.Value, itemUpdated.Text);
-        Assert.Equal(priorityPatchDTO.Value, itemUpdated.Priority);
-        Assert.Equal(statusPatchDTO.Value, (int)itemUpdated.Status);
+        Assert.Equal(ItemStatus.Done, itemUpdated.Status);
+        Assert.Equal(itemToUpdate.Text, itemUpdated.Text);
+        Assert.Equal(itemToUpdate.Priority, itemUpdated.Priority);
       }
     }
 
@@ -179,7 +194,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_ItemIsFound_Expect_Deleted()
       {
-        ItemListApiModel itemSaved = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
+        ItemApiModel itemSaved = await SaveItemAsync(new Item { UserId = UserId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo });
 
         // Act
         HttpResponseMessage response = await DeleteAsync($"{url}/{itemSaved.Id}");

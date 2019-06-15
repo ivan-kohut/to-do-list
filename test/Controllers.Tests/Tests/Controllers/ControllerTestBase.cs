@@ -31,14 +31,6 @@ namespace Controllers.Tests
       }
     }
 
-    protected async Task<HttpResponseMessage> PatchAsync(string url, object requestBody)
-    {
-      using (HttpContent httpContent = CreateHttpContent(requestBody))
-      {
-        return await Client.PatchAsync(url, httpContent);
-      }
-    }
-
     protected async Task<HttpResponseMessage> DeleteAsync(string url)
     {
       return await Client.DeleteAsync(url);

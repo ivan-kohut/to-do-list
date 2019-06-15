@@ -70,7 +70,7 @@ namespace Controllers.Tests
           new Item { UserId = user.Id, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
         };
 
-        IEnumerable<ItemListApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
           .OrderBy(i => i.Priority)
           .ToList();
 
@@ -79,7 +79,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        IEnumerable<ItemListApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemListApiModel>>(response);
+        IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
       }

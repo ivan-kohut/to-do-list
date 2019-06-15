@@ -4,7 +4,6 @@ using MockQueryable.Moq;
 using Moq;
 using Repositories;
 using Services.Exceptions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,17 +73,17 @@ namespace Services.Tests
           new ItemDTO {
             Id = firstItem.Id,
             UserId = firstItem.UserId,
+            IsDone = firstItem.Status == ItemStatus.Done,
             Text = firstItem.Text,
-            Priority = firstItem.Priority,
-            StatusId = (int)firstItem.Status
+            Priority = firstItem.Priority
           },
 
           new ItemDTO {
             Id = secondItem.Id,
             UserId = secondItem.UserId,
+            IsDone = secondItem.Status == ItemStatus.Done,
             Text = secondItem.Text,
-            Priority = secondItem.Priority,
-            StatusId = (int)secondItem.Status
+            Priority = secondItem.Priority
           }
         };
 
@@ -124,9 +123,9 @@ namespace Services.Tests
         {
           Id = generatedItemId,
           UserId = itemToSave.UserId,
+          IsDone = false,
           Text = itemToSave.Text,
-          Priority = maxPriority + 1,
-          StatusId = (int)ItemStatus.Todo
+          Priority = maxPriority + 1
         };
 
         // Act
@@ -140,76 +139,65 @@ namespace Services.Tests
       }
     }
 
-    public class UpdatePartiallyAsync : ItemServiceTest
+    public class UpdateAsync : ItemServiceTest
     {
-      [Fact]
-      public async Task When_PatchCollectionIsNull_Expect_ArgumentException()
-      {
-        // Act
-        await Assert.ThrowsAsync<ArgumentException>(() => itemService.UpdatePartiallyAsync(default(int), default(int), null));
-      }
-
       [Fact]
       public async Task When_ItemDoesNotExist_Expect_EntityNotFoundException()
       {
-        int itemId = 1;
+        int itemToUpdateId = 1;
 
         Item notFoundItem = null;
 
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemId, userId))
+          .Setup(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId))
           .ReturnsAsync(notFoundItem);
 
-        // Act
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdatePartiallyAsync(itemId, userId, Enumerable.Empty<PatchDTO>().ToList()));
+        ItemDTO itemToUpdate = new ItemDTO { Id = itemToUpdateId };
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemId, userId), Times.Once());
+        // Act
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdateAsync(userId, itemToUpdate));
+
+        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId), Times.Once());
       }
 
       [Fact]
       public async Task When_ItemExists_Expect_Updated()
       {
-        int itemId = 1;
+        int itemToUpdateId = 1;
 
-        PatchDTO statusPatchDTO = new PatchDTO { Name = "StatusId", Value = (long)(int)ItemStatus.Done };
-
-        ICollection<PatchDTO> patches = new List<PatchDTO>()
+        Item foundItem = new Item
         {
-          new PatchDTO { Name = "Text", Value = "newItemText" },
-          new PatchDTO { Name = "Priority", Value = 2L },
-          statusPatchDTO
+          Id = itemToUpdateId,
+          UserId = userId,
+          Status = ItemStatus.Todo,
+          Text = "itemText",
+          Priority = 5
         };
 
-        Item foundItem = new Item { Id = itemId, UserId = userId, Text = "itemText", Priority = 1, Status = ItemStatus.Todo };
-
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemId, userId))
+          .Setup(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId))
           .ReturnsAsync(foundItem);
-
-        IDictionary<string, object> expectedDictionary = patches.ToDictionary(p => p.Name, p => p.Value);
-
-        expectedDictionary.Remove("StatusId");
-        expectedDictionary.Add("Status", statusPatchDTO.Value);
-
-        mockItemRepository
-          .Setup(r => r.UpdatePartially(foundItem, It.IsAny<IDictionary<string, object>>()))
-          .Callback<Item, IDictionary<string, object>>(
-            (i, d) =>
-            {
-              d.ShouldBeEquivalentTo(expectedDictionary);
-            }
-          )
-          .Verifiable();
 
         mockTransactionManager
           .Setup(m => m.SaveChangesAsync())
           .Returns(Task.CompletedTask);
 
-        // Act
-        await itemService.UpdatePartiallyAsync(itemId, userId, patches);
+        ItemDTO itemToUpdate = new ItemDTO
+        {
+          Id = itemToUpdateId,
+          IsDone = true,
+          Text = "newItemText",
+          Priority = 10
+        };
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemId, userId), Times.Once());
-        mockItemRepository.Verify(r => r.UpdatePartially(foundItem, It.IsAny<IDictionary<string, object>>()), Times.Once());
+        // Act
+        await itemService.UpdateAsync(userId, itemToUpdate);
+
+        Assert.Equal(ItemStatus.Done, foundItem.Status);
+        Assert.Equal(itemToUpdate.Text, foundItem.Text);
+        Assert.Equal(itemToUpdate.Priority, foundItem.Priority);
+
+        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId), Times.Once());
 
         mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
       }

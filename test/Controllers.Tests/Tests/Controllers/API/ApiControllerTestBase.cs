@@ -29,7 +29,7 @@ namespace Controllers.Tests
       return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
     }
 
-    protected async Task<ItemListApiModel> SaveItemAsync(Item itemToSave)
+    protected async Task<ItemApiModel> SaveItemAsync(Item itemToSave)
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
@@ -37,11 +37,11 @@ namespace Controllers.Tests
 
         await appDbContext.SaveChangesAsync();
 
-        return new ItemListApiModel
+        return new ItemApiModel
         {
           Id = itemToSave.Id,
+          IsDone = itemToSave.Status == ItemStatus.Done,
           Text = itemToSave.Text,
-          StatusId = (int)itemToSave.Status,
           Priority = itemToSave.Priority
         };
       }
