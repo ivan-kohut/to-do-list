@@ -12,6 +12,8 @@ namespace Controllers
   [ApiController]
   [Authorize(Roles = "user")]
   [Produces("application/json")]
+  [ProducesResponseType(200)]
+  [ProducesResponseType(401)]
   [Route(Urls.Items)]
   public class ItemsController : Controller
   {
@@ -22,7 +24,7 @@ namespace Controllers
       this.itemService = itemService;
     }
 
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "user"</response> 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync()
     {
@@ -37,9 +39,8 @@ namespace Controllers
         .ToList();
     }
 
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "user"</response> 
     [HttpPost]
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<ActionResult<ItemApiModel>> SaveAsync(ItemCreateApiModel item)
     {
@@ -54,10 +55,9 @@ namespace Controllers
       };
     }
 
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "user"</response> 
     /// <response code="404">If item is not found by id</response> 
     [HttpPut(Urls.UpdateItem)]
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> PutAsync(int id, [FromBody] ItemApiModel item)
     {
@@ -77,7 +77,7 @@ namespace Controllers
       return Ok();
     }
 
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "user"</response> 
     /// <response code="404">If item is not found by id</response> 
     [HttpDelete(Urls.DeleteItem)]
     public async Task<IActionResult> DeleteAsync(int id)

@@ -23,6 +23,7 @@ namespace Controllers
 {
   [ApiController]
   [Produces("application/json")]
+  [ProducesResponseType(200)]
   [Route(Urls.Users)]
   public class UsersController : Controller
   {
@@ -65,8 +66,9 @@ namespace Controllers
       this.linkedInOptions = linkedInOptions.Value;
     }
 
-    /// <response code="401">If user does not have role "admin"</response>
+    /// <response code="403">If user does not have role "admin"</response>
     [HttpGet]
+    [ProducesResponseType(401)]
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync()
     {
@@ -86,9 +88,10 @@ namespace Controllers
         .ToList();
     }
 
-    /// <response code="401">If user does not have role "admin"</response> 
+    /// <response code="403">If user does not have role "admin"</response> 
     /// <response code="404">If user is not found by id</response> 
     [HttpDelete("{id}")]
+    [ProducesResponseType(401)]
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
@@ -157,7 +160,6 @@ namespace Controllers
       return actionResult;
     }
 
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByFacebook)]
     public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
@@ -180,7 +182,6 @@ namespace Controllers
       return Json(await GenerateTokenAsync("Facebook", userInfoResponse));
     }
 
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByGoogle)]
     public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
@@ -214,7 +215,6 @@ namespace Controllers
       }
     }
 
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByGithub)]
     public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
@@ -252,7 +252,6 @@ namespace Controllers
       }
     }
 
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByLinkedin)]
     public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
@@ -294,7 +293,6 @@ namespace Controllers
     }
 
     [HttpPost]
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
     {
@@ -346,7 +344,6 @@ namespace Controllers
       return Ok();
     }
 
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [HttpGet("{id}/email/confirm")]
     public async Task<IActionResult> ConfirmEmailAsync(int id, string code)
@@ -393,10 +390,10 @@ namespace Controllers
       return Ok();
     }
 
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "admin" or "user"</response> 
     [Authorize(Roles = "admin,user")]
-    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
     [HttpPut(Urls.ChangePassword)]
     public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
     {
@@ -416,8 +413,9 @@ namespace Controllers
       }
     }
 
-    ///// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "admin" or "user"</response> 
     [Authorize(Roles = "admin,user")]
+    [ProducesResponseType(401)]
     [HttpGet(Urls.AuthenticatorUri)]
     public async Task<ActionResult<string>> GetAuthenticatorUri()
     {
@@ -436,8 +434,9 @@ namespace Controllers
     }
 
     /// <response code="400">Two factor is already enabled or verification code is invalid</response>
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "admin" or "user"</response> 
     [Authorize(Roles = "admin,user")]
+    [ProducesResponseType(401)]
     [HttpPut(Urls.EnableTwoFactorAuthentication)]
     public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
     {
@@ -467,8 +466,9 @@ namespace Controllers
     }
 
     /// <response code="400">Two factor is disabled already</response>
-    /// <response code="401">If user does not have role "user"</response> 
+    /// <response code="403">If user does not have role "admin" or "user"</response> 
     [Authorize(Roles = "admin,user")]
+    [ProducesResponseType(401)]
     [HttpPut(Urls.DisableTwoFactorAuthentication)]
     public async Task<IActionResult> DisableTwoFactorAuthentication()
     {
@@ -485,8 +485,9 @@ namespace Controllers
       return Ok();
     }
 
-    /// <response code="401">If user does not have role "user"</response>
+    /// <response code="403">If user does not have role "user"</response>
     [Authorize(Roles = "admin,user")]
+    [ProducesResponseType(401)]
     [HttpGet(Urls.IsTwoFactorAuthenticationEnabled)]
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
     {
