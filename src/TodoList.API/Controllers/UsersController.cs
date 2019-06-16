@@ -1,10 +1,10 @@
-﻿using Entities;
+﻿using API.Models;
+using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using API.Models;
 using Newtonsoft.Json;
 using Options;
 using Services;
@@ -29,48 +29,27 @@ namespace Controllers
   {
     private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    private readonly IUserService userService;
     private readonly IUserRoleService userRoleService;
     private readonly IUserLoginService userLoginService;
-    private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
-    private readonly IHttpClientFactory httpClientFactory;
     private readonly JwtOptions jwtOptions;
-    private readonly FacebookOptions facebookOptions;
-    private readonly GoogleOptions googleOptions;
-    private readonly GithubOptions githubOptions;
-    private readonly LinkedInOptions linkedInOptions;
 
-    public UsersController(IUserService userService,
-                           IUserRoleService userRoleService,
+    public UsersController(IUserRoleService userRoleService,
                            IUserLoginService userLoginService,
-                           IEmailService emailService,
                            UserManager<User> userManager,
-                           IHttpClientFactory httpClientFactory,
-                           IOptions<JwtOptions> jwtOptions,
-                           IOptions<FacebookOptions> facebookOptions,
-                           IOptions<GoogleOptions> googleOptions,
-                           IOptions<GithubOptions> githubOptions,
-                           IOptions<LinkedInOptions> linkedInOptions)
+                           IOptions<JwtOptions> jwtOptions)
     {
-      this.userService = userService;
       this.userRoleService = userRoleService;
       this.userLoginService = userLoginService;
-      this.emailService = emailService;
       this.userManager = userManager;
-      this.httpClientFactory = httpClientFactory;
       this.jwtOptions = jwtOptions.Value;
-      this.facebookOptions = facebookOptions.Value;
-      this.googleOptions = googleOptions.Value;
-      this.githubOptions = githubOptions.Value;
-      this.linkedInOptions = linkedInOptions.Value;
     }
 
     /// <response code="403">If user does not have role "admin"</response>
     [HttpGet]
     [ProducesResponseType(401)]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync([FromServices] IUserService userService)
     {
       return (await userService.GetAllAsync())
         .Select(u => new UserListApiModel
@@ -93,7 +72,7 @@ namespace Controllers
     [HttpDelete("{id}")]
     [ProducesResponseType(401)]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int id, [FromServices] IUserService userService)
     {
       await userService.DeleteAsync(id);
 
@@ -162,9 +141,14 @@ namespace Controllers
 
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByFacebook)]
-    public async Task<IActionResult> LoginByFacebookAsync(UserExternalLoginModel userExternalLoginModel)
+    public async Task<IActionResult> LoginByFacebookAsync(
+      UserExternalLoginModel userExternalLoginModel,
+      [FromServices] IHttpClientFactory httpClientFactory,
+      [FromServices] IOptions<FacebookOptions> facebookIOptions
+    )
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
+      FacebookOptions facebookOptions = facebookIOptions.Value;
 
       HttpResponseMessage accessTokenResponse = await httpClient
         .GetAsync($"{facebookOptions.GraphApiEndpoint}/oauth/access_token?client_id={facebookOptions.AppId}&client_secret={facebookOptions.AppSecret}&redirect_uri={userExternalLoginModel.RedirectUri}&code={userExternalLoginModel.Code}");
@@ -184,9 +168,14 @@ namespace Controllers
 
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByGoogle)]
-    public async Task<IActionResult> LoginByGoogleAsync(UserExternalLoginModel userExternalLoginModel)
+    public async Task<IActionResult> LoginByGoogleAsync(
+      UserExternalLoginModel userExternalLoginModel,
+      [FromServices] IHttpClientFactory httpClientFactory,
+      [FromServices] IOptions<GoogleOptions> googleIOptions
+    )
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
+      GoogleOptions googleOptions = googleIOptions.Value;
 
       object requestBody = new
       {
@@ -217,9 +206,14 @@ namespace Controllers
 
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByGithub)]
-    public async Task<IActionResult> LoginByGithubAsync(UserExternalLoginModel userExternalLoginModel)
+    public async Task<IActionResult> LoginByGithubAsync(
+      UserExternalLoginModel userExternalLoginModel,
+      [FromServices] IHttpClientFactory httpClientFactory,
+      [FromServices] IOptions<GithubOptions> githubIOptions
+    )
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
+      GithubOptions githubOptions = githubIOptions.Value;
 
       object requestBody = new
       {
@@ -254,9 +248,14 @@ namespace Controllers
 
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByLinkedin)]
-    public async Task<IActionResult> LoginByLinkedInAsync(UserExternalLoginModel userExternalLoginModel)
+    public async Task<IActionResult> LoginByLinkedInAsync(
+      UserExternalLoginModel userExternalLoginModel,
+      [FromServices] IHttpClientFactory httpClientFactory,
+      [FromServices] IOptions<LinkedInOptions> linkedInIOptions
+    )
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
+      LinkedInOptions linkedInOptions = linkedInIOptions.Value;
 
       object requestBody = new
       {
@@ -294,7 +293,7 @@ namespace Controllers
 
     [HttpPost]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel)
+    public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel, [FromServices] IEmailService emailService)
     {
       User user = await userManager.FindByEmailAsync(userCreateModel.Email);
 
@@ -371,7 +370,7 @@ namespace Controllers
 
     /// <response code="404">If user is not found by email</response> 
     [HttpPost(Urls.PasswordRecovery)]
-    public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel)
+    public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel, [FromServices] IEmailService emailService)
     {
       User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);
 
