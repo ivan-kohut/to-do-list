@@ -1,4 +1,11 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.WebUtilities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 
 namespace TodoList.Client
 {
@@ -15,5 +22,33 @@ namespace TodoList.Client
     }
 
     public bool IsUserLoggedIn => !string.IsNullOrWhiteSpace(localStorageService.GetItem<string>(AuthTokenKey));
+
+    public bool IsAdmin
+    {
+      get
+      {
+        string authToken = localStorageService.GetItem<string>(AuthTokenKey);
+
+        if (string.IsNullOrWhiteSpace(authToken))
+        {
+          return false;
+        }
+
+        object userRoles = JsonConvert.DeserializeObject<Dictionary<string, object>>(
+          Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(authToken.Split('.')[1]))
+        )[ClaimTypes.Role];
+
+        if (userRoles is JArray)
+        {
+          return ((JArray)userRoles)
+            .ToList()
+            .Contains("admin");
+        }
+        else
+        {
+          return (string)userRoles == "admin";
+        }
+      }
+    }
   }
 }

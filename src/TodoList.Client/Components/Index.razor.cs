@@ -17,13 +17,18 @@ namespace TodoList.Client.Components
     [Inject]
     private IUriHelper UriHelper { get; set; }
 
+    [Inject]
+    private AppState AppState { get; set; }
+
     protected ItemCreateApiModel NewItem { get; set; }
     protected IList<ItemApiModel> Items { get; set; }
+    protected bool? IsAdmin { get; set; }
 
     protected override async Task OnInitAsync()
     {
       NewItem = new ItemCreateApiModel();
       Items = (await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList)).Value;
+      IsAdmin = AppState.IsAdmin;
     }
 
     protected async Task OnCreateItemAsync()

@@ -35,10 +35,14 @@
   <input bind="@NewItem.Text" type="text" />
   <button onclick="@OnCreateItemAsync">Добавити</button>
 
-  <div>
-    <br />
-    <a href="users">Користувачі</a>
-  </div>
+  @if (IsAdmin.HasValue && IsAdmin.Value)
+  {
+    <div>
+      <br />
+      <a href="users">Користувачі</a>
+    </div>
+  }
+
   <div>
     <br />
     <a href="account">Керування аккаунтом</a>
