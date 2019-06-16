@@ -53,38 +53,6 @@ namespace Controllers.Tests
       }
     }
 
-    public class GetUserItemsAsync : UsersControllerTest
-    {
-      public GetUserItemsAsync(TestServerFixture testServerFixture) : base(testServerFixture)
-      {
-      }
-
-      [Fact]
-      public async Task When_UserItemsExist_Expect_Returned()
-      {
-        UserListApiModel user = await SaveUserAsync(new User { UserName = "userName", Email = "email", EmailConfirmed = true });
-
-        IEnumerable<Item> items = new List<Item>
-        {
-          new Item { UserId = user.Id, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
-          new Item { UserId = user.Id, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
-        };
-
-        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
-          .OrderBy(i => i.Priority)
-          .ToList();
-
-        // Act
-        HttpResponseMessage response = await GetAsync($"{url}/{user.Id}/items");
-
-        response.EnsureSuccessStatusCode();
-
-        IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
-
-        actual.ShouldBeEquivalentTo(expected);
-      }
-    }
-
     public class DeleteAsync : UsersControllerTest
     {
       public DeleteAsync(TestServerFixture testServerFixture) : base(testServerFixture)

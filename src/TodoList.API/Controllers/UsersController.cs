@@ -84,22 +84,6 @@ namespace Controllers
         .ToList();
     }
 
-    /// <response code="401">If user does not have role "admin"</response>
-    [HttpGet("{userId}/items")]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetUserItemsAsync(int userId)
-    {
-      return (await itemService.GetAllAsync(userId))
-        .Select(i => new ItemApiModel
-        {
-          Id = i.Id,
-          IsDone = i.IsDone,
-          Text = i.Text,
-          Priority = i.Priority
-        })
-        .ToList();
-    }
-
     /// <response code="401">If user does not have role "admin"</response> 
     /// <response code="404">If user is not found by id</response> 
     [HttpDelete("{id}")]
