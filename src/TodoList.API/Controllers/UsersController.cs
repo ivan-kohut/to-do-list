@@ -31,7 +31,6 @@ namespace Controllers
     private readonly IUserService userService;
     private readonly IUserRoleService userRoleService;
     private readonly IUserLoginService userLoginService;
-    private readonly IItemService itemService;
     private readonly IEmailService emailService;
     private readonly UserManager<User> userManager;
     private readonly IHttpClientFactory httpClientFactory;
@@ -44,7 +43,6 @@ namespace Controllers
     public UsersController(IUserService userService,
                            IUserRoleService userRoleService,
                            IUserLoginService userLoginService,
-                           IItemService itemService,
                            IEmailService emailService,
                            UserManager<User> userManager,
                            IHttpClientFactory httpClientFactory,
@@ -57,7 +55,6 @@ namespace Controllers
       this.userService = userService;
       this.userRoleService = userRoleService;
       this.userLoginService = userLoginService;
-      this.itemService = itemService;
       this.emailService = emailService;
       this.userManager = userManager;
       this.httpClientFactory = httpClientFactory;
@@ -79,6 +76,11 @@ namespace Controllers
           Id = u.Id,
           Name = u.Name,
           Email = u.Email,
+          IsRegisteredInSystem = u.IsRegisteredInSystem,
+          IsLoggedInViaFacebook = u.LoginProviders.Contains("Facebook"),
+          IsLoggedInViaGoogle = u.LoginProviders.Contains("Google"),
+          IsLoggedInViaGithub = u.LoginProviders.Contains("Github"),
+          IsLoggedInViaLinkedin = u.LoginProviders.Contains("LinkedIn"),
           IsEmailConfirmed = u.IsEmailConfirmed
         })
         .ToList();

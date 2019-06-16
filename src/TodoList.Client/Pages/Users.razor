@@ -9,7 +9,7 @@
     @foreach (var user in Users)
     {
       <li>
-        @($"{user.Name} - {user.Email} - {user.IsEmailConfirmed}")
+        @($"{user.Name} - {user.Email} - {user.IsRegisteredInSystem} - {user.IsLoggedInViaFacebook} - {user.IsLoggedInViaGoogle} - {user.IsLoggedInViaGithub} - {user.IsLoggedInViaLinkedin} - {user.IsEmailConfirmed}")
         <a onclick="@(() => DeleteUserAsync(user))">delete</a>
       </li>
     }

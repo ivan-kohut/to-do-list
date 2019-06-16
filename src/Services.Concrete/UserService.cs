@@ -14,11 +14,15 @@ namespace Services
     private const int adminId = 1;
 
     private readonly IUserRepository userRepository;
+    private readonly IUserLoginRepository userLoginRepository;
     private readonly ITransactionManager transactionManager;
 
-    public UserService(IUserRepository userRepository, ITransactionManager transactionManager)
+    public UserService(IUserRepository userRepository, 
+                       IUserLoginRepository userLoginRepository,
+                       ITransactionManager transactionManager)
     {
       this.userRepository = userRepository;
+      this.userLoginRepository = userLoginRepository;
       this.transactionManager = transactionManager;
     }
 
@@ -36,7 +40,13 @@ namespace Services
         Id = user.Id,
         Name = user.UserName,
         Email = user.Email,
-        IsEmailConfirmed = user.EmailConfirmed
+        IsRegisteredInSystem = user.PasswordHash != null,
+        IsEmailConfirmed = user.EmailConfirmed,
+        LoginProviders = await userLoginRepository
+          .GetAll()
+          .Where(l => l.UserId == user.Id)
+          .Select(l => l.LoginProvider)
+          .ToListAsync()
       };
     }
 
@@ -50,7 +60,11 @@ namespace Services
           Id = u.Id,
           Name = u.UserName,
           Email = u.Email,
-          IsEmailConfirmed = u.EmailConfirmed
+          IsRegisteredInSystem = u.PasswordHash != null,
+          IsEmailConfirmed = u.EmailConfirmed,
+          LoginProviders = u.UserLogins
+            .Select(l => l.LoginProvider)
+            .ToList()
         })
         .ToListAsync();
     }

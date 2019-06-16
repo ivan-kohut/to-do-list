@@ -15,6 +15,7 @@ namespace Services.Tests
   public class UserServiceTest
   {
     private readonly Mock<IUserRepository> mockUserRepository;
+    private readonly Mock<IUserLoginRepository> mockUserLoginRepository;
     private readonly Mock<ITransactionManager> mockTransactionManager;
 
     private readonly IUserService userService;
@@ -22,9 +23,10 @@ namespace Services.Tests
     public UserServiceTest()
     {
       this.mockUserRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+      this.mockUserLoginRepository = new Mock<IUserLoginRepository>(MockBehavior.Strict);
       this.mockTransactionManager = new Mock<ITransactionManager>(MockBehavior.Strict);
 
-      this.userService = new UserService(mockUserRepository.Object, mockTransactionManager.Object);
+      this.userService = new UserService(mockUserRepository.Object, mockUserLoginRepository.Object, mockTransactionManager.Object);
     }
 
     public class GetByIdAsync : UserServiceTest
@@ -62,12 +64,18 @@ namespace Services.Tests
           .Setup(r => r.GetByIdAsync(userId))
           .ReturnsAsync(user);
 
+        mockUserLoginRepository
+          .Setup(r => r.GetAll())
+          .Returns(Enumerable.Empty<UserLogin>().AsQueryable().BuildMock().Object);
+
         UserDTO expected = new UserDTO
         {
           Id = userId,
           Name = user.UserName,
           Email = user.Email,
-          IsEmailConfirmed = user.EmailConfirmed
+          IsRegisteredInSystem = false,
+          IsEmailConfirmed = user.EmailConfirmed,
+          LoginProviders = Enumerable.Empty<string>()
         };
 
         // Act
@@ -97,8 +105,24 @@ namespace Services.Tests
       [Fact]
       public async Task When_UsersExist_Expect_Returned()
       {
-        User firstUser = new User { Id = 2, UserName = "firstUserName", Email = "firstEmail", EmailConfirmed = true };
-        User secondUser = new User { Id = 3, UserName = "secondUserName", Email = "secondEmail", EmailConfirmed = false };
+        User firstUser = new User
+        {
+          Id = 2,
+          UserName = "firstUserName",
+          Email = "firstEmail",
+          EmailConfirmed = true,
+          UserLogins = new[] { new UserLogin { LoginProvider = "Facebook" } }
+        };
+
+        User secondUser = new User
+        {
+          Id = 3,
+          UserName = "secondUserName",
+          PasswordHash = "gerhtrgegrth",
+          Email = "secondEmail",
+          EmailConfirmed = false,
+          UserLogins = Enumerable.Empty<UserLogin>().ToList()
+        };
 
         mockUserRepository
           .Setup(r => r.GetAll())
@@ -106,8 +130,24 @@ namespace Services.Tests
 
         IEnumerable<UserDTO> expected = new List<UserDTO>
         {
-          new UserDTO { Id = 2, Name = "firstUserName", Email = "firstEmail", IsEmailConfirmed = true },
-          new UserDTO { Id = 3, Name = "secondUserName", Email = "secondEmail", IsEmailConfirmed = false }
+          new UserDTO
+          {
+            Id = 2,
+            Name = "firstUserName",
+            Email = "firstEmail",
+            IsRegisteredInSystem = false,
+            IsEmailConfirmed = true,
+            LoginProviders = new[] { "Facebook" }
+          },
+          new UserDTO
+          {
+            Id = 3,
+            Name = "secondUserName",
+            Email = "secondEmail",
+            IsRegisteredInSystem = true,
+            IsEmailConfirmed = false,
+            LoginProviders = Enumerable.Empty<string>()
+          }
         };
 
         // Act
@@ -121,8 +161,23 @@ namespace Services.Tests
       [Fact]
       public async Task Expect_AdminIsNotReturned()
       {
-        User firstUser = new User { Id = 1, UserName = "firstUserName", Email = "firstEmail", EmailConfirmed = true };
-        User secondUser = new User { Id = 2, UserName = "secondUserName", Email = "secondEmail", EmailConfirmed = false };
+        User firstUser = new User
+        {
+          Id = 1,
+          UserName = "firstUserName",
+          Email = "firstEmail",
+          EmailConfirmed = true,
+          UserLogins = Enumerable.Empty<UserLogin>().ToList()
+        };
+
+        User secondUser = new User
+        {
+          Id = 2,
+          UserName = "secondUserName",
+          Email = "secondEmail",
+          EmailConfirmed = false,
+          UserLogins = Enumerable.Empty<UserLogin>().ToList()
+        };
 
         mockUserRepository
           .Setup(r => r.GetAll())
@@ -130,7 +185,14 @@ namespace Services.Tests
 
         IEnumerable<UserDTO> expected = new List<UserDTO>
         {
-          new UserDTO { Id = 2, Name = "secondUserName", Email = "secondEmail", IsEmailConfirmed = false }
+          new UserDTO
+          {
+            Id = 2,
+            Name = "secondUserName",
+            Email = "secondEmail",
+            IsEmailConfirmed = false,
+            LoginProviders = Enumerable.Empty<string>()
+          }
         };
 
         // Act
