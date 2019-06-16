@@ -411,7 +411,7 @@ namespace Controllers
     [Authorize(Roles = "user")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [HttpPut("password")]
+    [HttpPut(Urls.ChangePassword)]
     public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
     {
       User user = await userManager.GetUserAsync(User);

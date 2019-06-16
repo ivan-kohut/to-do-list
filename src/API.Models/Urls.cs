@@ -10,6 +10,7 @@
     public const string LoginByGoogle = "login-by-google";
     public const string LoginByGithub = "login-by-github";
     public const string LoginByLinkedin = "login-by-linkedin";
+    public const string ChangePassword = "password";
 
     public const string Items = "/api/v1/items";
 

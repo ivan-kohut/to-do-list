@@ -1,0 +1,37 @@
+﻿@layout AuthLayout
+@page "/account"
+
+@inherits AccountComponent
+
+<div>
+  <a href="change-password">Change password</a>
+</div>
+
+<div id="enable">
+
+  <div id="enable-link">
+    <a href="#" onclick="app.initQrCode();">Включити двофакторну аутентифікацію</a>
+  </div>
+
+  <div id="authentication-code" style="display: none;">
+    <div id="qrCode"></div>
+
+    <div>
+      Відскануйте зображення вище за допомогою програми (наприклад, Google Authenticator)
+    </div>
+
+    <div>
+      <label for="two-factor-token">Введіть шестизначний код з програми</label>
+      <input id="two-factor-token" type="text" />
+    </div>
+
+    <p onclick="app.enableTwoFactorAuthentication();">Увімкнути</p>
+
+    <ul id="errors"></ul>
+  </div>
+
+</div>
+
+<div id="disable">
+  <a href="#" onclick="app.disableTwoFactorAuthentication();">Відключити двофакторну аутентифікацію</a>
+</div>
