@@ -432,7 +432,7 @@ namespace Controllers
 
     ///// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpGet("authenticator-uri")]
+    [HttpGet(Urls.AuthenticatorUri)]
     public async Task<ActionResult<string>> GetAuthenticatorUri()
     {
       User user = await userManager.GetUserAsync(User);
@@ -452,7 +452,7 @@ namespace Controllers
     /// <response code="400">Two factor is already enabled or verification code is invalid</response>
     /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpPut("two-factor-authentication/enable")]
+    [HttpPut(Urls.EnableTwoFactorAuthentication)]
     public async Task<IActionResult> EnableAuthenticator(UserEnableAuthenticatorModel userEnableAuthenticatorModel)
     {
       User user = await userManager.GetUserAsync(User);
@@ -483,7 +483,7 @@ namespace Controllers
     /// <response code="400">Two factor is disabled already</response>
     /// <response code="401">If user does not have role "user"</response> 
     [Authorize(Roles = "user")]
-    [HttpPut("two-factor-authentication/disable")]
+    [HttpPut(Urls.DisableTwoFactorAuthentication)]
     public async Task<IActionResult> DisableTwoFactorAuthentication()
     {
       User user = await userManager.GetUserAsync(User);
@@ -501,7 +501,7 @@ namespace Controllers
 
     /// <response code="401">If user does not have role "user"</response>
     [Authorize(Roles = "user")]
-    [HttpGet("two-factor-authentication/is-enabled")]
+    [HttpGet(Urls.IsTwoFactorAuthenticationEnabled)]
     public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
     {
       return (await userManager.GetUserAsync(User)).TwoFactorEnabled;

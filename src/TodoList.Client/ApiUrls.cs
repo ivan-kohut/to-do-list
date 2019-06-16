@@ -14,6 +14,10 @@ namespace TodoList.Client
     public static readonly string LoginByGithub = $"{apiUrl}{Urls.Users}/{Urls.LoginByGithub}";
     public static readonly string LoginByLinkedin = $"{apiUrl}{Urls.Users}/{Urls.LoginByLinkedin}";
     public static readonly string ChangePassword = $"{apiUrl}{Urls.Users}/{Urls.ChangePassword}";
+    public static readonly string IsTwoFactorAuthenticationEnabled = $"{apiUrl}{Urls.Users}/{Urls.IsTwoFactorAuthenticationEnabled}";
+    public static readonly string AuthenticatorUri = $"{apiUrl}{Urls.Users}/{Urls.AuthenticatorUri}";
+    public static readonly string EnableTwoFactorAuthentication = $"{apiUrl}{Urls.Users}/{Urls.EnableTwoFactorAuthentication}";
+    public static readonly string DisableTwoFactorAuthentication = $"{apiUrl}{Urls.Users}/{Urls.DisableTwoFactorAuthentication}";
 
     public static readonly string GetItemsList = $"{apiUrl}{Urls.Items}";
     public static readonly string CreateItem = $"{apiUrl}{Urls.Items}";

@@ -11,6 +11,10 @@
     public const string LoginByGithub = "login-by-github";
     public const string LoginByLinkedin = "login-by-linkedin";
     public const string ChangePassword = "password";
+    public const string IsTwoFactorAuthenticationEnabled = "two-factor-authentication/is-enabled";
+    public const string AuthenticatorUri = "authenticator-uri";
+    public const string EnableTwoFactorAuthentication = "two-factor-authentication/enable";
+    public const string DisableTwoFactorAuthentication = "two-factor-authentication/disable";
 
     public const string Items = "/api/v1/items";
 

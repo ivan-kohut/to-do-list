@@ -1,0 +1,27 @@
+﻿@layout AuthLayout
+@page "/enable-two-factor-authentication"
+
+@inherits TwoFactorAuthEnablingComponent
+
+<div ref="QrCodeBlock"></div>
+
+<div>
+  Відскануйте зображення вище за допомогою програми (наприклад, Google Authenticator)
+</div>
+
+<div>
+  <label for="two-factor-token">Введіть шестизначний код з програми</label>
+  <input bind="@UserEnableAuthenticatorModel.Code" id="two-factor-token" type="text" />
+</div>
+
+<p onclick="@OnEnableTwoFactorAuthenticationAsync">Увімкнути</p>
+
+@if (Errors != null)
+{
+  <ul id="errors">
+    @foreach (string error in Errors)
+    {
+      <li>@error</li>
+    }
+  </ul>
+}
