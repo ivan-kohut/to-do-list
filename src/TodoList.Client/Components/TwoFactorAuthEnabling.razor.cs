@@ -26,11 +26,9 @@ namespace TodoList.Client.Components
     {
       UserEnableAuthenticatorModel = new UserEnableAuthenticatorModel();
 
-      await JsRuntime.InvokeAsync<string>(
-        "generateQrCode", 
-        QrCodeBlock,
-        (await AppHttpClient.GetAsync<string>(ApiUrls.AuthenticatorUri)).Value
-      );
+      string authenticatorUri = (await AppHttpClient.GetAsync<string>(ApiUrls.AuthenticatorUri)).Value;
+
+      await JsRuntime.InvokeAsync<string>("generateQrCode", QrCodeBlock, authenticatorUri);
     }
 
     protected async Task OnEnableTwoFactorAuthenticationAsync()

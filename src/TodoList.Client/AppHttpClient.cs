@@ -98,14 +98,11 @@ namespace TodoList.Client
 
     private async Task SetAuthorizationHeader()
     {
-      if (httpClient.DefaultRequestHeaders.Authorization == null)
-      {
-        string authToken = await localStorageService.GetItemAsync<string>(AppState.AuthTokenKey);
+      string authToken = await localStorageService.GetItemAsync<string>(AppState.AuthTokenKey);
 
-        if (!string.IsNullOrWhiteSpace(authToken))
-        {
-          httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-        }
+      if (!string.IsNullOrWhiteSpace(authToken))
+      {
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
       }
     }
   }
