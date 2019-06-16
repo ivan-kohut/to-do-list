@@ -6,6 +6,8 @@ namespace TodoList.Client
   {
     private const string apiUrl = "https://localhost:44388";
 
+    public static readonly string GetUsersList = $"{apiUrl}{Urls.Users}";
+    public static readonly string DeleteUser = $"{apiUrl}{Urls.Users}/{Urls.DeleteUser}";
     public static readonly string Login = $"{apiUrl}{Urls.Users}/{Urls.Login}";
     public static readonly string SignUp = $"{apiUrl}{Urls.Users}";
     public static readonly string PasswordRecovery = $"{apiUrl}{Urls.Users}/{Urls.PasswordRecovery}";
