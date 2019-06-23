@@ -2,33 +2,58 @@
 
 @inherits LoginComponent
 
-<label for="email">Електронна пошта</label>
-<input bind="@UserLoginModel.Email" id="email" type="text" /> <br />
-
-<label for="password">Пароль</label>
-<input bind="@UserLoginModel.Password" id="password" type="password" /> <br />
-
-@if (IsTwoFactorTokenFieldDisplayed)
-{
-  <div id="two-factor-authentication-block">
-    <label for="authentication-code">Код аутентифікації</label>
-    <input bind="@UserLoginModel.TwoFactorToken" id="authentication-code" type="text" /> <br />
+<div class="main">
+  <div class="field">
+    <label class="display-block" for="email">Email</label>
+    <input class="input-text" bind="@UserLoginModel.Email" id="email" type="text" />
   </div>
-}
 
-<a href="https://www.facebook.com/v3.2/dialog/oauth?response_type=code&client_id=2183212631898223&redirect_uri=https://localhost:44328/facebook-callback">Facebook</a>
-<a href="https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=895102170629-q6uh1oqvltjau4v9p4lqsor155dlvdcl.apps.googleusercontent.com&redirect_uri=https://localhost:44328/google-callback&scope=email">Google</a>
-<a href="https://github.com/login/oauth/authorize?client_id=f39f5854ebe1640ebac6&redirect_uri=https://localhost:44328/github-callback&scope=user:email">Github</a>
-<a href="https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=778xsexk4ogstv&redirect_uri=https://localhost:44328/linkedin-callback&scope=r_liteprofile%20r_emailaddress%20w_member_social">LinkedIn</a>
+  <div class="field">
+    <label class="display-block" for="password">Password</label>
+    <input class="input-text" bind="@UserLoginModel.Password" id="password" type="password" />
+  </div>
 
-<p onclick="@OnLoginAsync">Увійти</p>
+  @if (IsTwoFactorTokenFieldDisplayed)
+  {
+    <div class="field">
+      <label class="display-block" for="authentication-code">Authentication code</label>
+      <input class="input-text" bind="@UserLoginModel.TwoFactorToken" id="authentication-code" type="text" />
+    </div>
+  }
 
-@if (Errors != null)
-{
-  <ul id="errors">
-    @foreach (string error in Errors)
-    {
-      <li>@error</li>
-    }
-  </ul>
-}
+  @if (Errors != null)
+  {
+    <ul id="errors">
+      @foreach (string error in Errors)
+      {
+        <li>@error</li>
+      }
+    </ul>
+  }
+
+  <div class="password-recovery">
+    <a href="password-recovery">Recover password</a>
+  </div>
+
+  <div>
+    <input class="submit-button" type="button" onclick="@OnLoginAsync" value="Log in" />
+  </div>
+
+  <div class="login-with">
+    Log in with
+  </div>
+  <div class="login-social">
+    <a class="login-social-link" href="https://www.facebook.com/v3.2/dialog/oauth?response_type=code&client_id=2183212631898223&redirect_uri=https://localhost:44328/facebook-callback">
+      <img src="img/facebook.png" />
+    </a>
+    <a class="login-social-link" href="https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=895102170629-q6uh1oqvltjau4v9p4lqsor155dlvdcl.apps.googleusercontent.com&redirect_uri=https://localhost:44328/google-callback&scope=email">
+      <img src="img/google.png" />
+    </a>
+    <a class="login-social-link" href="https://github.com/login/oauth/authorize?client_id=f39f5854ebe1640ebac6&redirect_uri=https://localhost:44328/github-callback&scope=user:email">
+      <img src="img/github.png" />
+    </a>
+    <a class="login-social-link" href="https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=778xsexk4ogstv&redirect_uri=https://localhost:44328/linkedin-callback&scope=r_liteprofile%20r_emailaddress%20w_member_social">
+      <img src="img/linkedin.png" />
+    </a>
+  </div>
+</div>
