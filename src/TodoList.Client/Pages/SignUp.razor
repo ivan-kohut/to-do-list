@@ -2,26 +2,36 @@
 
 @inherits SignUpComponent
 
-<label for="name">Ім'я</label>
-<input bind="@UserCreateModel.Name" id="name" type="text" /><br />
+<div class="main">
+  <div class="field">
+    <label class="display-block" for="name">Name</label>
+    <input class="input-text" bind="@UserCreateModel.Name" id="name" type="text" />
+  </div>
 
-<label for="email">Електронна пошта</label>
-<input bind="@UserCreateModel.Email" id="email" type="text" /> <br />
+  <div class="field">
+    <label class="display-block" for="email">Email</label>
+    <input class="input-text" bind="@UserCreateModel.Email" id="email" type="text" />
+  </div>
 
-<label for="password">Пароль</label>
-<input bind="@UserCreateModel.Password" id="password" type="password" /> <br />
+  <div class="field">
+    <label class="display-block" for="password">Password</label>
+    <input class="input-text" bind="@UserCreateModel.Password" id="password" type="password" />
+  </div>
 
-<label for="confirm-password">Підтвердіть пароль</label>
-<input bind="@UserCreateModel.ConfirmPassword" id="confirm-password" type="password" /> <br />
+  <div class="field">
+    <label class="display-block" for="confirm-password">Retype password</label>
+    <input class="input-text" bind="@UserCreateModel.ConfirmPassword" id="confirm-password" type="password" />
+  </div>
 
-<p onclick="@OnSignUpAsync">Зареєструватися</p>
+  @if (Errors != null)
+  {
+    <ul id="errors">
+      @foreach (string error in Errors)
+      {
+        <li>@error</li>
+      }
+    </ul>
+  }
 
-@if (Errors != null)
-{
-  <ul id="errors">
-    @foreach (string error in Errors)
-    {
-      <li>@error</li>
-    }
-  </ul>
-}
+  <input class="submit-button" type="button" onclick="@OnSignUpAsync" value="Sign up" />
+</div>
