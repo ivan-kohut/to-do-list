@@ -1,3 +1,50 @@
 @inherits LayoutComponentBase
 
+@inject AppState AppState
+@inject ILocalStorageService LocalStorageService
+@inject IUriHelper UriHelper
+
+@if (AppState.IsUserLoggedIn)
+{
+  @if (UriHelper.GetBaseUri() != UriHelper.GetAbsoluteUri())
+  {
+    <div>
+      <a href="">index page</a>
+    </div>
+  }
+
+  <div class="dropdown">
+    @AppState.UserName
+    <div class="show-menu"></div>
+    <div class="dropdown-content">
+      @if (AppState.IsAdmin)
+      {
+        <a href="users">Users</a>
+      }
+      <a href="account">Settings</a>
+      <a onclick="@OnLogoutAsync">Log out</a>
+    </div>
+  </div>
+}
+else
+{
+  <div>
+    <div class="login-and-signup">
+      <a class="login" href="login">Log in</a>
+      <a class="signup" href="sign-up">Sign up</a>
+    </div>
+  </div>
+}
+
 @Body
+
+@functions {
+
+  private async Task OnLogoutAsync()
+  {
+    await LocalStorageService.RemoveItemAsync(AppState.AuthTokenKey);
+
+    UriHelper.NavigateTo(string.Empty);
+  }
+
+}

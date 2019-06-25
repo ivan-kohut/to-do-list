@@ -3,19 +3,6 @@
 
 @inherits IndexComponent
 
-<div class="dropdown">
-  @UserName
-  <div class="show-menu"></div>
-  <div class="dropdown-content">
-    @if (IsAdmin.HasValue && IsAdmin.Value)
-    {
-    <a href="users">Users</a>
-    }
-    <a href="account">Settings</a>
-    <a onclick="@OnLogoutAsync">Log out</a>
-  </div>
-</div>
-
 <div class="index-main">
   <ol id="item-list">
     @if (Items != null)
