@@ -59,12 +59,8 @@
 }
 
 .show-menu {
-  background: url("/img/up.png");
+  background: url("/img/expand-arrow.png");
   display: inline-block;
   width: 24px;
-  height: 24px;
-}
-
-.dropdown:hover .show-menu {
-  background: url("/img/down.png");
+  height: 18px;
 }

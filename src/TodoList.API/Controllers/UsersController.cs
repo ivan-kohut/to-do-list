@@ -527,6 +527,7 @@ namespace Controllers
         .ToList();
 
       userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+      userClaims.Add(new Claim(ClaimTypes.Name, user.UserName));
 
       return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
         claims: userClaims,

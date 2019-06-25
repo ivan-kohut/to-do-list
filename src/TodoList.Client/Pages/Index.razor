@@ -4,7 +4,8 @@
 @inherits IndexComponent
 
 <div class="dropdown">
-  kogut.iwan@gmail.com <div class="show-menu"></div>
+  @UserName
+  <div class="show-menu"></div>
   <div class="dropdown-content">
     @if (IsAdmin.HasValue && IsAdmin.Value)
     {

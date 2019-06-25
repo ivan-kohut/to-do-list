@@ -22,12 +22,14 @@ namespace TodoList.Client.Components
 
     protected ItemCreateApiModel NewItem { get; set; }
     protected IList<ItemApiModel> Items { get; set; }
+    protected string UserName { get; set; }
     protected bool? IsAdmin { get; set; }
 
     protected override async Task OnInitAsync()
     {
       NewItem = new ItemCreateApiModel();
       Items = (await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList)).Value;
+      UserName = AppState.UserName;
       IsAdmin = AppState.IsAdmin;
     }
 

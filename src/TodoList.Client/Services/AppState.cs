@@ -23,6 +23,21 @@ namespace TodoList.Client
 
     public bool IsUserLoggedIn => !string.IsNullOrWhiteSpace(localStorageService.GetItem<string>(AuthTokenKey));
 
+    public string UserName
+    {
+      get
+      {
+        string authToken = localStorageService.GetItem<string>(AuthTokenKey);
+
+        if (string.IsNullOrWhiteSpace(authToken))
+        {
+          return string.Empty;
+        }
+
+        return (string)GetClaims(authToken)[ClaimTypes.Name];
+      }
+    }
+
     public bool IsAdmin
     {
       get
@@ -34,9 +49,7 @@ namespace TodoList.Client
           return false;
         }
 
-        object userRoles = JsonConvert.DeserializeObject<Dictionary<string, object>>(
-          Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(authToken.Split('.')[1]))
-        )[ClaimTypes.Role];
+        object userRoles = GetClaims(authToken)[ClaimTypes.Role];
 
         if (userRoles is JArray)
         {
@@ -49,6 +62,13 @@ namespace TodoList.Client
           return (string)userRoles == "admin";
         }
       }
+    }
+
+    private IDictionary<string, object> GetClaims(string authToken)
+    {
+      return JsonConvert.DeserializeObject<Dictionary<string, object>>(
+        Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(authToken.Split('.')[1]))
+      );
     }
   }
 }
