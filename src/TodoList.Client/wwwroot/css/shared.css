@@ -36,3 +36,13 @@ a {
 #errors li {
   color: #f65a5b;
 }
+
+.user-menu {
+  float: right;
+  margin: 15px 160px 35px 0;
+}
+
+.index-page-link {
+  display: inline-block;
+  margin-right: 40px;
+}

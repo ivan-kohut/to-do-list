@@ -30,8 +30,6 @@
 .dropdown {
   position: relative;
   display: inline-block;
-  float: right;
-  margin: 15px 160px 35px 0;
 }
 
 .dropdown-content {

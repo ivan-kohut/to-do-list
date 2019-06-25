@@ -6,23 +6,25 @@
 
 @if (AppState.IsUserLoggedIn)
 {
-  @if (UriHelper.GetBaseUri() != UriHelper.GetAbsoluteUri())
-  {
-    <div>
-      <a href="">index page</a>
-    </div>
-  }
+  <div class="user-menu">
+    @if (UriHelper.GetBaseUri() != UriHelper.GetAbsoluteUri())
+    {
+      <div class="index-page-link">
+        <a href="">index page</a>
+      </div>
+    }
 
-  <div class="dropdown">
-    @AppState.UserName
-    <div class="show-menu"></div>
-    <div class="dropdown-content">
-      @if (AppState.IsAdmin)
-      {
-        <a href="users">Users</a>
-      }
-      <a href="account">Settings</a>
-      <a onclick="@OnLogoutAsync">Log out</a>
+    <div class="dropdown">
+      @AppState.UserName
+      <div class="show-menu"></div>
+      <div class="dropdown-content">
+        @if (AppState.IsAdmin)
+        {
+          <a href="users">Users</a>
+        }
+        <a href="account">Settings</a>
+        <a onclick="@OnLogoutAsync">Log out</a>
+      </div>
     </div>
   </div>
 }
