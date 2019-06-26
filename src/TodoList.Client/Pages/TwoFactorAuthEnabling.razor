@@ -3,25 +3,27 @@
 
 @inherits TwoFactorAuthEnablingComponent
 
-<div ref="QrCodeBlock"></div>
+<div class="main">
+  <div class="field">
+    Please use your authentication app (such as Google Authenticator) to scan this QR code
+  </div>
 
-<div>
-  Відскануйте зображення вище за допомогою програми (наприклад, Google Authenticator)
+  <div class="qrcode field" ref="QrCodeBlock"></div>
+
+  <div class="field">
+    <label class="display-block" for="two-factor-token">Please enter the code that you see on your authentication app</label>
+    <input id="two-factor-token" class="input-text" bind="@UserEnableAuthenticatorModel.Code" type="text" />
+  </div>
+
+  @if (Errors != null)
+  {
+    <ul id="errors">
+      @foreach (string error in Errors)
+      {
+        <li>@error</li>
+      }
+    </ul>
+  }
+
+  <input class="submit-button" type="button" onclick="@OnEnableTwoFactorAuthenticationAsync" value="Turn on" />
 </div>
-
-<div>
-  <label for="two-factor-token">Введіть шестизначний код з програми</label>
-  <input bind="@UserEnableAuthenticatorModel.Code" id="two-factor-token" type="text" />
-</div>
-
-<p onclick="@OnEnableTwoFactorAuthenticationAsync">Увімкнути</p>
-
-@if (Errors != null)
-{
-  <ul id="errors">
-    @foreach (string error in Errors)
-    {
-      <li>@error</li>
-    }
-  </ul>
-}
