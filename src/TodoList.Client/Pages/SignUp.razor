@@ -23,15 +23,7 @@
     <input class="input-text" bind="@UserCreateModel.ConfirmPassword" id="confirm-password" type="password" />
   </div>
 
-  @if (Errors != null)
-  {
-    <ul id="errors">
-      @foreach (string error in Errors)
-      {
-        <li>@error</li>
-      }
-    </ul>
-  }
+  <ErrorsComponent Errors="Errors" />
 
   <div>
     @if (IsSpinnerEnabled)

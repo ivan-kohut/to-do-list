@@ -1,0 +1,16 @@
+﻿@if (Errors != null)
+{
+  <ul id="errors">
+    @foreach (string error in Errors)
+    {
+      <li>@error</li>
+    }
+  </ul>
+}
+
+@functions {
+
+  [Parameter]
+  private IEnumerable<string> Errors { get; set; }
+
+}

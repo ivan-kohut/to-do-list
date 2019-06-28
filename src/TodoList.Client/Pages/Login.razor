@@ -21,15 +21,7 @@
     </div>
   }
 
-  @if (Errors != null)
-  {
-    <ul id="errors">
-      @foreach (string error in Errors)
-      {
-        <li>@error</li>
-      }
-    </ul>
-  }
+  <ErrorsComponent Errors="Errors" />
 
   <div class="password-recovery">
     <a href="password-recovery">Recover password</a>

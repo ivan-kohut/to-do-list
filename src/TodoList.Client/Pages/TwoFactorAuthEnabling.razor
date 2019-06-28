@@ -15,15 +15,7 @@
     <input id="two-factor-token" class="input-text" bind="@UserEnableAuthenticatorModel.Code" type="text" />
   </div>
 
-  @if (Errors != null)
-  {
-    <ul id="errors">
-      @foreach (string error in Errors)
-      {
-        <li>@error</li>
-      }
-    </ul>
-  }
+  <ErrorsComponent Errors="Errors" />
 
   <div>
     @if (IsSpinnerEnabled)
