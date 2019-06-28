@@ -7,43 +7,43 @@
   <ol id="item-list">
     @if (Items != null)
     {
-    var firstItem = Items.FirstOrDefault();
-    var lastItem = Items.LastOrDefault();
+      var firstItem = Items.FirstOrDefault();
+      var lastItem = Items.LastOrDefault();
 
-    @foreach (var item in Items)
-    {
-    <li>
-      <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item))" />
-      <input class="index-field" value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item))" />
-
-      @if (item != firstItem)
+      @foreach (var item in Items)
       {
-      <a class="item-button" onclick="@(() => MoveUpItemAsync(item))">
-        <img src="img/up.png" />
-      </a>
-      }
-      else
-      {
-      <a class="empty-item-button"></a>
-      }
+        <li>
+          <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item))" />
+          <input class="index-field" value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item))" />
 
-      @if (item != lastItem)
-      {
-      <a class="item-button" onclick="@(() => MoveDownItemAsync(item))">
-        <img src="img/down.png" />
-      </a>
-      }
-      else
-      {
-      <a class="empty-item-button"></a>
-      }
+          @if (item != firstItem)
+          {
+            <a class="item-button" onclick="@(() => MoveUpItemAsync(item))">
+              <img src="img/up.png" />
+            </a>
+          }
+          else
+          {
+            <a class="empty-item-button"></a>
+          }
 
-      <a class="item-button" onclick="@(() => DeleteItemAsync(item))">
-        <img src="img/delete.png" />
-      </a>
+          @if (item != lastItem)
+          {
+            <a class="item-button" onclick="@(() => MoveDownItemAsync(item))">
+              <img src="img/down.png" />
+            </a>
+          }
+          else
+          {
+            <a class="empty-item-button"></a>
+          }
 
-    </li>
-    }
+          <a class="item-button" onclick="@(() => DeleteItemAsync(item))">
+            <img src="img/delete.png" />
+          </a>
+
+        </li>
+      }
     }
   </ol>
 
@@ -53,6 +53,10 @@
   </div>
 
   <div class="align">
-    <input class="submit-button" type="button" onclick="@OnCreateItemAsync" value="Add" />
+    @if (IsSpinnerEnabled)
+    {
+      <div class="loader"></div>
+    }
+    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Add" />
   </div>
 </div>

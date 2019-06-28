@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class PasswordRecoveryComponent : ComponentBase
+  public class PasswordRecoveryComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -19,7 +19,7 @@ namespace TodoList.Client.Components
       UserForgotPasswordModel = new UserForgotPasswordModel();
     }
 
-    protected async Task OnRecoverPasswordAsync()
+    protected override async Task HandleEventAsync()
     {
       ApiCallResult<object> passwordRecoveryCallResult = await AppHttpClient.PostAsync<object>(ApiUrls.PasswordRecovery, UserForgotPasswordModel);
 

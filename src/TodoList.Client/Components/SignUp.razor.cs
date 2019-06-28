@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class SignUpComponent : ComponentBase
+  public class SignUpComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -21,7 +21,7 @@ namespace TodoList.Client.Components
       UserCreateModel = new UserCreateModel();
     }
 
-    protected async Task OnSignUpAsync()
+    protected override async Task HandleEventAsync()
     {
       ApiCallResult<object> signUpCallResult = await AppHttpClient.PostAsync<object>(ApiUrls.SignUp, UserCreateModel);
 

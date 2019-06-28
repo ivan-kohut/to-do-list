@@ -36,7 +36,11 @@
   </div>
 
   <div>
-    <input class="submit-button" type="button" onclick="@OnLoginAsync" value="Log in" />
+    @if (IsSpinnerEnabled)
+    {
+      <div class="loader"></div>
+    }
+    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Log in" />
   </div>
 
   <div class="login-with">

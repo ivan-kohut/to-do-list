@@ -25,5 +25,11 @@
     </ul>
   }
 
-  <input class="submit-button" type="button" onclick="@OnEnableTwoFactorAuthenticationAsync" value="Turn on" />
+  <div>
+    @if (IsSpinnerEnabled)
+    {
+      <div class="loader"></div>
+    }
+    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Turn on" />
+  </div>
 </div>

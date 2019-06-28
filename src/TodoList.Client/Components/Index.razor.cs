@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class IndexComponent : ComponentBase
+  public class IndexComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -19,7 +19,7 @@ namespace TodoList.Client.Components
       Items = (await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList)).Value;
     }
 
-    protected async Task OnCreateItemAsync()
+    protected override async Task HandleEventAsync()
     {
       if (!string.IsNullOrWhiteSpace(NewItem.Text))
       {

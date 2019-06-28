@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class LoginComponent : ComponentBase
+  public class LoginComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -26,7 +26,7 @@ namespace TodoList.Client.Components
       UserLoginModel = new UserLoginModel();
     }
 
-    protected async Task OnLoginAsync()
+    protected override async Task HandleEventAsync()
     {
       ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(ApiUrls.Login, UserLoginModel);
 

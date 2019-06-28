@@ -33,5 +33,11 @@
     </ul>
   }
 
-  <input class="submit-button" type="button" onclick="@OnSignUpAsync" value="Sign up" />
+  <div>
+    @if (IsSpinnerEnabled)
+    {
+      <div class="loader"></div>
+    }
+    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Sign up" />
+  </div>
 </div>

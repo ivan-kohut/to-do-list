@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class TwoFactorAuthEnablingComponent : ComponentBase
+  public class TwoFactorAuthEnablingComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -30,7 +30,7 @@ namespace TodoList.Client.Components
       await JsRuntime.InvokeAsync<string>("generateQrCode", QrCodeBlock, authenticatorUri);
     }
 
-    protected async Task OnEnableTwoFactorAuthenticationAsync()
+    protected override async Task HandleEventAsync()
     {
       ApiCallResult enableTwoFactorAuthCallResult = await AppHttpClient
         .PutAsync(ApiUrls.EnableTwoFactorAuthentication, UserEnableAuthenticatorModel);

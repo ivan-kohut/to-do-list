@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public class ChangePasswordComponent : ComponentBase
+  public class ChangePasswordComponent : LoadingSpinnerComponentBase
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; }
@@ -21,7 +21,7 @@ namespace TodoList.Client.Components
       UserChangePasswordModel = new UserChangePasswordModel();
     }
 
-    protected async Task OnChangePasswordAsync()
+    protected override async Task HandleEventAsync()
     {
       ApiCallResult changePasswordCallResult = await AppHttpClient.PutAsync(ApiUrls.ChangePassword, UserChangePasswordModel);
 
