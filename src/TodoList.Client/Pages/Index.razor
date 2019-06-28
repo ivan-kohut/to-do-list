@@ -52,11 +52,5 @@
     <input id="new-item" class="input-text" bind="@NewItem.Text" type="text" />
   </div>
 
-  <div class="align">
-    @if (IsSpinnerEnabled)
-    {
-      <div class="loader"></div>
-    }
-    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Add" />
-  </div>
+  <ButtonComponent IsSpinnerEnabled="IsSpinnerEnabled" ButtonValue="Add" OnClick="OnEventAsync" />
 </div>

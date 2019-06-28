@@ -27,13 +27,7 @@
     <a href="password-recovery">Recover password</a>
   </div>
 
-  <div>
-    @if (IsSpinnerEnabled)
-    {
-      <div class="loader"></div>
-    }
-    <input class="submit-button" type="button" onclick="@OnEventAsync" value="Log in" />
-  </div>
+  <ButtonComponent IsSpinnerEnabled="IsSpinnerEnabled" ButtonValue="Log in" OnClick="OnEventAsync" />
 
   <div class="login-with">
     Log in with

@@ -1,0 +1,20 @@
+﻿<div class="align">
+  @if (IsSpinnerEnabled)
+  {
+    <div class="loader"></div>
+  }
+  <input class="submit-button" type="button" onclick="@OnClick" value="@ButtonValue" />
+</div>
+
+@functions {
+
+  [Parameter]
+  private bool IsSpinnerEnabled { get; set; }
+
+  [Parameter]
+  private string ButtonValue { get; set; }
+
+  [Parameter]
+  private EventCallback<UIMouseEventArgs> OnClick { get; set; }
+
+}
