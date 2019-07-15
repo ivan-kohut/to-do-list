@@ -21,15 +21,13 @@ namespace Repositories
         .SingleOrDefaultAsync(i => i.Id == id && i.UserId == userId);
     }
 
-    public async Task<int> GetMaxItemPriorityAsync(int userId)
+    public Task<int?> GetMaxItemPriorityAsync(int userId)
     {
-      return (await dbContext
+      return dbContext
         .Items
         .Where(i => i.UserId == userId)
-        .Select(i => i.Priority)
-        .ToListAsync())
-        .DefaultIfEmpty(0)
-        .Max();
+        .Select(i => (int?)i.Priority)
+        .MaxAsync();
     }
 
     public IQueryable<Item> All(int userId)

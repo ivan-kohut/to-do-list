@@ -36,14 +36,14 @@ namespace Services
 
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {
-      int maxPriority = await itemRepository.GetMaxItemPriorityAsync(itemDTO.UserId);
+      int? maxPriority = await itemRepository.GetMaxItemPriorityAsync(itemDTO.UserId);
 
       Item item = new Item
       {
         UserId = itemDTO.UserId,
         Text = itemDTO.Text,
         Status = ItemStatus.Todo,
-        Priority = maxPriority + 1
+        Priority = (maxPriority ?? 0) + 1
       };
 
       await itemRepository.CreateAsync(item);
