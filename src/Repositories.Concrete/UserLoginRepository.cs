@@ -19,9 +19,9 @@ namespace Repositories
       return dbContext.UserLogins;
     }
 
-    public async Task<UserLogin> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey)
+    public Task<UserLogin> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey)
     {
-      return await dbContext
+      return dbContext
         .UserLogins
         .SingleOrDefaultAsync(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
     }

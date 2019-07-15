@@ -14,9 +14,9 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<Item> GetByIdAndUserIdAsync(int id, int userId)
+    public Task<Item> GetByIdAndUserIdAsync(int id, int userId)
     {
-      return await dbContext
+      return dbContext
         .Items
         .SingleOrDefaultAsync(i => i.Id == id && i.UserId == userId);
     }
