@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using Delegates;
 using Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,9 @@ namespace Controllers
   {
     private readonly IItemService itemService;
 
-    public ItemsController(IItemService itemService)
+    public ItemsController(ItemServiceResolver itemServiceResolver)
     {
-      this.itemService = itemService;
+      this.itemService = itemServiceResolver("cached");
     }
 
     /// <response code="403">If user does not have role "user"</response> 

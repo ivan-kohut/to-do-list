@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿using Controllers.Services;
+using Delegates;
+using Entities;
 using Extensions;
 using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -113,7 +115,22 @@ namespace WebApplication
       services.AddScoped<IUserLoginRepository, UserLoginRepository>();
       services.AddScoped<ITransactionManager, TransactionManager>();
 
-      services.AddScoped<IItemService, ItemService>();
+      services.AddScoped<ItemService>();
+      services.AddScoped<CachedItemService>();
+
+      services.AddScoped<ItemServiceResolver>(serviceProvider => serviceKey =>
+      {
+        switch (serviceKey)
+        {
+          case "main":
+            return serviceProvider.GetService<ItemService>();
+          case "cached":
+            return serviceProvider.GetService<CachedItemService>();
+          default:
+            return null;
+        }
+      });
+
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IUserRoleService, UserRoleService>();
       services.AddScoped<IUserLoginService, UserLoginService>();
