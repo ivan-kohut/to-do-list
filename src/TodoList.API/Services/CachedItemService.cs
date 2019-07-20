@@ -3,7 +3,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Controllers.Services
@@ -26,7 +25,6 @@ namespace Controllers.Services
         userItems = await itemService.GetAllAsync(userId);
 
         MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
-          .SetSize(userItems.Count())
           .SetSlidingExpiration(TimeSpan.FromMinutes(1));
 
         memoryCache.Set(userId, userItems, cacheEntryOptions);
