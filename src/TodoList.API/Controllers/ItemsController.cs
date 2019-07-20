@@ -1,10 +1,10 @@
 ﻿using API.Models;
+using Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Controllers
@@ -28,7 +28,7 @@ namespace Controllers
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync()
     {
-      return (await itemService.GetAllAsync(GetUserId()))
+      return (await itemService.GetAllAsync(User.GetAuthorizedUserId()))
         .Select(i => new ItemApiModel
         {
           Id = i.Id,
@@ -44,7 +44,7 @@ namespace Controllers
     [ProducesResponseType(400)]
     public async Task<ActionResult<ItemApiModel>> SaveAsync(ItemCreateApiModel item)
     {
-      ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = GetUserId(), Text = item.Text });
+      ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = User.GetAuthorizedUserId(), Text = item.Text });
 
       return new ItemApiModel
       {
@@ -66,7 +66,7 @@ namespace Controllers
         return BadRequest();
       }
 
-      await itemService.UpdateAsync(GetUserId(), new ItemDTO
+      await itemService.UpdateAsync(User.GetAuthorizedUserId(), new ItemDTO
       {
         Id = item.Id,
         IsDone = item.IsDone,
@@ -82,14 +82,9 @@ namespace Controllers
     [HttpDelete(Urls.DeleteItem)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-      await itemService.DeleteAsync(id, GetUserId());
+      await itemService.DeleteAsync(id, User.GetAuthorizedUserId());
 
       return Ok();
-    }
-
-    private int GetUserId()
-    {
-      return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
     }
   }
 }
