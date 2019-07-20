@@ -100,6 +100,8 @@ namespace WebApplication
 
       services.AddCors();
 
+      services.AddMemoryCache();
+
       services.AddMvc(o => o.Filters.Add(typeof(ModelStateInvalidFilter)));
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);

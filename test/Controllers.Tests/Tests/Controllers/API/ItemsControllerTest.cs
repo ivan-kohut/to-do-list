@@ -4,6 +4,7 @@ using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Repositories;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace Controllers.Tests
     {
     }
 
-    public class GetAllAsync : ItemsControllerTest
+    public class GetAllAsync : ItemsControllerTest, IDisposable
     {
       public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
@@ -62,6 +63,12 @@ namespace Controllers.Tests
         IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
         actual.ShouldBeEquivalentTo(expected);
+      }
+
+      public override void Dispose()
+      {
+        Server.GetService<IMemoryCache>().Remove(UserId);
+        base.Dispose();
       }
     }
 
@@ -208,7 +215,7 @@ namespace Controllers.Tests
       }
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
       using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
       {
