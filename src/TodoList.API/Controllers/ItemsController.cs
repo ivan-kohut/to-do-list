@@ -59,7 +59,7 @@ namespace Controllers
     /// <response code="404">If item is not found by id</response> 
     [HttpPut(Urls.UpdateItem)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] ItemApiModel item)
+    public async Task<IActionResult> PutAsync(int id, ItemApiModel item)
     {
       if (id != item.Id)
       {
