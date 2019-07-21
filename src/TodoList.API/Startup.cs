@@ -5,7 +5,6 @@ using Extensions;
 using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -139,7 +138,7 @@ namespace WebApplication
       services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
     }
 
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    public void Configure(IApplicationBuilder app)
     {
       app.UseHttpsRedirection();
       app.UseMiniProfiler();

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Serilog;
+using System;
+using System.IO;
 
 namespace WebApplication
 {
@@ -7,13 +10,30 @@ namespace WebApplication
   {
     static void Main(string[] args)
     {
-      BuildWebHost(args).Run();
+      Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Warning()
+        .WriteTo.Async(c => c.File(Path.Combine("Logs", "log-.txt"), rollingInterval: RollingInterval.Day))
+        .CreateLogger();
+
+      try
+      {
+        BuildWebHost(args).Run();
+      }
+      catch (Exception ex)
+      {
+        Log.Fatal(ex, "Host terminated unexpectedly");
+      }
+      finally
+      {
+        Log.CloseAndFlush();
+      }
     }
 
     public static IWebHost BuildWebHost(string[] args)
     {
       return WebHost.CreateDefaultBuilder(args)
         .UseStartup<Startup>()
+        .UseSerilog()
         .Build();
     }
   }
