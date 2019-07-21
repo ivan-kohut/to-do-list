@@ -65,6 +65,39 @@ namespace Controllers.Tests
         actual.ShouldBeEquivalentTo(expected);
       }
 
+      [Fact]
+      public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
+      {
+        IEnumerable<Item> items = new List<Item>
+        {
+          new Item { UserId = UserId, Text = "firstItemText", Priority = 2, Status = ItemStatus.Todo },
+          new Item { UserId = UserId, Text = "secondItemText", Priority = 1, Status = ItemStatus.Done }
+        };
+
+        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+          .OrderBy(i => i.Priority)
+          .ToList();
+
+        HttpResponseMessage response = await GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        IEnumerable<ItemApiModel> actualFromDb = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
+
+        actualFromDb.ShouldBeEquivalentTo(expected);
+
+        await SaveItemAsync(new Item { UserId = UserId, Text = "thirdItemText", Priority = 3, Status = ItemStatus.Todo });
+
+        // Act
+        response = await GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        IEnumerable<ItemApiModel> actualFromCache = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
+
+        actualFromCache.ShouldBeEquivalentTo(expected);
+      }
+
       public override void Dispose()
       {
         Server.GetService<IMemoryCache>().Remove(UserId);
