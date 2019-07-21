@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories.Concrete", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API.Models", "src\API.Models\API.Models.csproj", "{69F1C485-9525-4367-A768-1005599BA68A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Client", "src\TodoList.Client\TodoList.Client.csproj", "{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Client", "src\TodoList.Client\TodoList.Client.csproj", "{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controllers.Services.Tests", "test\Controllers.Services.Tests\Controllers.Services.Tests.csproj", "{11BA6F78-70F4-4B1C-857C-84836F07B729}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11BA6F78-70F4-4B1C-857C-84836F07B729}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11BA6F78-70F4-4B1C-857C-84836F07B729}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11BA6F78-70F4-4B1C-857C-84836F07B729}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11BA6F78-70F4-4B1C-857C-84836F07B729}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{B29F4DC6-FAF5-4D23-B00D-8AC4A49587F2} = {337EC26C-F807-4745-9572-8F450C087E37}
 		{69F1C485-9525-4367-A768-1005599BA68A} = {337EC26C-F807-4745-9572-8F450C087E37}
 		{A694BD7B-E44C-4A5E-AE73-49AEDB93B4DF} = {337EC26C-F807-4745-9572-8F450C087E37}
+		{11BA6F78-70F4-4B1C-857C-84836F07B729} = {A3A6BC7A-78D2-45DA-826E-305B1BFBCE1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF2C320D-66BF-4E26-B71D-45DF0D8802F3}
