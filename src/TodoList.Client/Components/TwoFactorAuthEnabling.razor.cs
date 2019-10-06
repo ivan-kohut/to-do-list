@@ -15,13 +15,13 @@ namespace TodoList.Client.Components
     private IJSRuntime JsRuntime { get; set; }
 
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
-    protected ElementRef QrCodeBlock { get; set; }
+    protected ElementReference QrCodeBlock { get; set; }
     protected UserEnableAuthenticatorModel UserEnableAuthenticatorModel { get; set; }
     protected IEnumerable<string> Errors { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
       UserEnableAuthenticatorModel = new UserEnableAuthenticatorModel();
 
@@ -37,7 +37,7 @@ namespace TodoList.Client.Components
 
       if (enableTwoFactorAuthCallResult.IsSuccess)
       {
-        UriHelper.NavigateTo(string.Empty);
+        NavigationManager.NavigateTo(string.Empty);
       }
       else
       {

@@ -5,22 +5,22 @@
 <div class="main">
   <div class="field">
     <label class="display-block" for="name">Name</label>
-    <input class="input-text" bind="@UserCreateModel.Name" id="name" type="text" />
+    <input class="input-text" @bind="UserCreateModel.Name" id="name" type="text" />
   </div>
 
   <div class="field">
     <label class="display-block" for="email">Email</label>
-    <input class="input-text" bind="@UserCreateModel.Email" id="email" type="text" />
+    <input class="input-text" @bind="UserCreateModel.Email" id="email" type="text" />
   </div>
 
   <div class="field">
     <label class="display-block" for="password">Password</label>
-    <input class="input-text" bind="@UserCreateModel.Password" id="password" type="password" />
+    <input class="input-text" @bind="UserCreateModel.Password" id="password" type="password" />
   </div>
 
   <div class="field">
     <label class="display-block" for="confirm-password">Retype password</label>
-    <input class="input-text" bind="@UserCreateModel.ConfirmPassword" id="confirm-password" type="password" />
+    <input class="input-text" @bind="UserCreateModel.ConfirmPassword" id="confirm-password" type="password" />
   </div>
 
   <ErrorsComponent Errors="Errors" />

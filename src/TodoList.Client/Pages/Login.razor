@@ -5,19 +5,19 @@
 <div class="main">
   <div class="field">
     <label class="display-block" for="email">Email</label>
-    <input class="input-text" bind="@UserLoginModel.Email" id="email" type="text" />
+    <input class="input-text" @bind="UserLoginModel.Email" id="email" type="text" />
   </div>
 
   <div class="field">
     <label class="display-block" for="password">Password</label>
-    <input class="input-text" bind="@UserLoginModel.Password" id="password" type="password" />
+    <input class="input-text" @bind="UserLoginModel.Password" id="password" type="password" />
   </div>
 
   @if (IsTwoFactorTokenFieldDisplayed)
   {
     <div class="field">
       <label class="display-block" for="authentication-code">Authentication code</label>
-      <input class="input-text" bind="@UserLoginModel.TwoFactorToken" id="authentication-code" type="text" />
+      <input class="input-text" @bind="@UserLoginModel.TwoFactorToken" id="authentication-code" type="text" />
     </div>
   }
 

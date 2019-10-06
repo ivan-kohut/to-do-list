@@ -11,12 +11,12 @@ namespace TodoList.Client.Components
     private IAppHttpClient AppHttpClient { get; set; }
 
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
     protected UserCreateModel UserCreateModel { get; set; }
     protected IEnumerable<string> Errors { get; set; }
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
       UserCreateModel = new UserCreateModel();
     }
@@ -27,7 +27,7 @@ namespace TodoList.Client.Components
 
       if (signUpCallResult.IsSuccess)
       {
-        UriHelper.NavigateTo("login");
+        NavigationManager.NavigateTo("login");
       }
       else
       {

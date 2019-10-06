@@ -15,13 +15,13 @@ namespace TodoList.Client.Components
     private ILocalStorageService LocalStorageService { get; set; }
 
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
     protected UserLoginModel UserLoginModel { get; set; }
     protected bool IsTwoFactorTokenFieldDisplayed { get; set; }
     protected IEnumerable<string> Errors { get; set; }
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
       UserLoginModel = new UserLoginModel();
     }
@@ -34,7 +34,7 @@ namespace TodoList.Client.Components
       {
         await LocalStorageService.SetItemAsync(AppState.AuthTokenKey, loginCallResult.Value);
 
-        UriHelper.NavigateTo(string.Empty);
+        NavigationManager.NavigateTo(string.Empty);
       }
       else
       {

@@ -30,7 +30,7 @@
           <td>@user.IsLoggedInViaLinkedin</td>
           <td>@user.IsEmailConfirmed</td>
           <td>
-            <a class="item-button" onclick="@(() => DeleteUserAsync(user))">
+            <a class="item-button" @onclick="() => DeleteUserAsync(user)">
               <img src="img/delete.png" />
             </a>
           </td>

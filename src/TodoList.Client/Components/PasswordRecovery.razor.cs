@@ -14,7 +14,7 @@ namespace TodoList.Client.Components
     protected bool IsPasswordRecovered { get; set; }
     protected IEnumerable<string> Errors { get; set; }
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
       UserForgotPasswordModel = new UserForgotPasswordModel();
     }

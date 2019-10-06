@@ -9,7 +9,7 @@ namespace TodoList.Client.Components
   public abstract class CallbackComponentBase : ComponentBase
   {
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
     [Inject]
     private IJSRuntime JsRuntime { get; set; }
@@ -23,7 +23,7 @@ namespace TodoList.Client.Components
     protected abstract string ApiUri { get; }
     protected abstract string RelativeRedirectUri { get; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
       UserExternalLoginModel model = new UserExternalLoginModel
       {
@@ -37,7 +37,7 @@ namespace TodoList.Client.Components
 
       await LocalStorageService.SetItemAsync(AppState.AuthTokenKey, loginCallResult.Value);
 
-      UriHelper.NavigateTo(string.Empty);
+      NavigationManager.NavigateTo(string.Empty);
     }
   }
 }

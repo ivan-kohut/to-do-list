@@ -11,12 +11,12 @@ namespace TodoList.Client.Components
     private IAppHttpClient AppHttpClient { get; set; }
 
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
     protected UserChangePasswordModel UserChangePasswordModel;
     protected IEnumerable<string> Errors { get; set; }
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
       UserChangePasswordModel = new UserChangePasswordModel();
     }
@@ -27,7 +27,7 @@ namespace TodoList.Client.Components
 
       if (changePasswordCallResult.IsSuccess)
       {
-        UriHelper.NavigateTo(string.Empty);
+        NavigationManager.NavigateTo(string.Empty);
       }
       else
       {

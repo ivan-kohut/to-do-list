@@ -13,12 +13,12 @@
       @foreach (var item in Items)
       {
         <li>
-          <input type="checkbox" checked="@item.IsDone" onchange="@(e => UpdateItemStatusAsync(e, item))" />
-          <input class="index-field" value="@item.Text" onchange="@(e => UpdateItemTextAsync(e, item))" />
+          <input type="checkbox" checked="@item.IsDone" @onchange="e => UpdateItemStatusAsync(e, item)" />
+          <input class="index-field" value="@item.Text" @onchange="e => UpdateItemTextAsync(e, item)" />
 
           @if (item != firstItem)
           {
-            <a class="item-button" onclick="@(() => MoveUpItemAsync(item))">
+            <a class="item-button" @onclick="() => MoveUpItemAsync(item)">
               <img src="img/up.png" />
             </a>
           }
@@ -29,7 +29,7 @@
 
           @if (item != lastItem)
           {
-            <a class="item-button" onclick="@(() => MoveDownItemAsync(item))">
+            <a class="item-button" @onclick="() => MoveDownItemAsync(item)">
               <img src="img/down.png" />
             </a>
           }
@@ -38,7 +38,7 @@
             <a class="empty-item-button"></a>
           }
 
-          <a class="item-button" onclick="@(() => DeleteItemAsync(item))">
+          <a class="item-button" @onclick="() => DeleteItemAsync(item)">
             <img src="img/delete.png" />
           </a>
 
@@ -49,7 +49,7 @@
 
   <div class="align">
     <label class="display-block" for="new-item">New item text:</label>
-    <input id="new-item" class="input-text" bind="@NewItem.Text" type="text" />
+    <input id="new-item" class="input-text" @bind="NewItem.Text" type="text" />
   </div>
 
   <ButtonComponent IsSpinnerEnabled="IsSpinnerEnabled" ButtonValue="Add" OnClick="OnEventAsync" />

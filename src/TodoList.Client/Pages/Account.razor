@@ -13,7 +13,7 @@
       {
         @if (IsTwoFactorAuthenticationEnabled.Value)
         {
-          <a onclick="@OnDisableTwoFactorAuthenticationAsync" style="cursor: pointer; color: rgb(85, 26, 139);">Turn off two-factor authentiction</a>
+          <a @onclick="OnDisableTwoFactorAuthenticationAsync" style="cursor: pointer; color: rgb(85, 26, 139);">Turn off two-factor authentiction</a>
         }
         else
         {

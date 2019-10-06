@@ -13,7 +13,7 @@ namespace TodoList.Client.Components
     protected ItemCreateApiModel NewItem { get; set; }
     protected IList<ItemApiModel> Items { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
       NewItem = new ItemCreateApiModel();
       Items = (await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList)).Value;
@@ -31,14 +31,14 @@ namespace TodoList.Client.Components
       }
     }
 
-    protected async Task UpdateItemStatusAsync(UIChangeEventArgs e, ItemApiModel item)
+    protected async Task UpdateItemStatusAsync(ChangeEventArgs e, ItemApiModel item)
     {
       item.IsDone = (bool)e.Value;
 
       await UpdateItemAsync(item);
     }
 
-    protected async Task UpdateItemTextAsync(UIChangeEventArgs e, ItemApiModel item)
+    protected async Task UpdateItemTextAsync(ChangeEventArgs e, ItemApiModel item)
     {
       item.Text = (string)e.Value;
 

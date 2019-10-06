@@ -9,11 +9,11 @@ namespace TodoList.Client.Components
     private IAppHttpClient AppHttpClient { get; set; }
 
     [Inject]
-    private IUriHelper UriHelper { get; set; }
+    private NavigationManager NavigationManager { get; set; }
 
     protected bool? IsTwoFactorAuthenticationEnabled { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
       IsTwoFactorAuthenticationEnabled = (await AppHttpClient.GetAsync<bool>(ApiUrls.IsTwoFactorAuthenticationEnabled)).Value;
     }
@@ -22,7 +22,7 @@ namespace TodoList.Client.Components
     {
       await AppHttpClient.PutAsync(ApiUrls.DisableTwoFactorAuthentication, null);
 
-      UriHelper.NavigateTo(string.Empty);
+      NavigationManager.NavigateTo(string.Empty);
     }
   }
 }

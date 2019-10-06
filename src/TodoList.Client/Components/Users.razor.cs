@@ -12,7 +12,7 @@ namespace TodoList.Client.Components
 
     protected IList<UserListApiModel> Users { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
       Users = (await AppHttpClient.GetAsync<IList<UserListApiModel>>(ApiUrls.GetUsersList)).Value;
     }

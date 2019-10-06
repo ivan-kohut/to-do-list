@@ -2,12 +2,12 @@
 
 @inject AppState AppState
 @inject ILocalStorageService LocalStorageService
-@inject IUriHelper UriHelper
+@inject NavigationManager NavigationManager
 
 @if (AppState.IsUserLoggedIn)
 {
   <div class="user-menu">
-    @if (UriHelper.GetBaseUri() != UriHelper.GetAbsoluteUri())
+    @if (NavigationManager.BaseUri != NavigationManager.Uri)
     {
       <div class="index-page-link">
         <a href="">index page</a>
@@ -23,7 +23,7 @@
           <a href="users">Users</a>
         }
         <a href="account">Settings</a>
-        <a onclick="@OnLogoutAsync">Log out</a>
+        <a @onclick="OnLogoutAsync">Log out</a>
       </div>
     </div>
   </div>
@@ -40,13 +40,13 @@ else
 
 @Body
 
-@functions {
+@code {
 
   private async Task OnLogoutAsync()
   {
     await LocalStorageService.RemoveItemAsync(AppState.AuthTokenKey);
 
-    UriHelper.NavigateTo(string.Empty);
+    NavigationManager.NavigateTo(string.Empty);
   }
 
 }
