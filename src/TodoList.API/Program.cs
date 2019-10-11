@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.IO;
@@ -17,7 +17,7 @@ namespace WebApplication
 
       try
       {
-        BuildWebHost(args).Run();
+        CreateHostBuilder(args).Build().Run();
       }
       catch (Exception ex)
       {
@@ -29,12 +29,14 @@ namespace WebApplication
       }
     }
 
-    public static IWebHost BuildWebHost(string[] args)
-    {
-      return WebHost.CreateDefaultBuilder(args)
-        .UseStartup<Startup>()
-        .UseSerilog()
-        .Build();
-    }
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host
+          .CreateDefaultBuilder(args)
+          .ConfigureWebHostDefaults(webBuilder =>
+          {
+            webBuilder
+              .UseStartup<Startup>()
+              .UseSerilog();
+          });
   }
 }

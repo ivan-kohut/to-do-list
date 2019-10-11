@@ -79,7 +79,7 @@ namespace WebApplication
         {
           Version = "v1",
           Title = "Todo List",
-          Description = "Simple Todo List API developed using C#, ASP.NET Core 2.2 and EF Core 2.2"
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 3.0 and EF Core 3.0"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -101,7 +101,9 @@ namespace WebApplication
 
       services.AddMemoryCache();
 
-      services.AddMvc(o => o.Filters.Add(typeof(ModelStateInvalidFilter)));
+      services
+        .AddControllers(o => o.Filters.Add(typeof(ModelStateInvalidFilter)))
+        .AddApplicationPart(typeof(Startup).Assembly);
 
       services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
       services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
@@ -121,15 +123,12 @@ namespace WebApplication
 
       services.AddScoped<ItemServiceResolver>(serviceProvider => serviceKey =>
       {
-        switch (serviceKey)
+        return serviceKey switch
         {
-          case "main":
-            return serviceProvider.GetService<ItemService>();
-          case "cached":
-            return serviceProvider.GetService<CachedItemService>();
-          default:
-            return null;
-        }
+          "main" => serviceProvider.GetService<ItemService>(),
+          "cached" => serviceProvider.GetService<CachedItemService>(),
+          _ => null
+        };
       });
 
       services.AddScoped<IUserService, UserService>();
@@ -150,10 +149,15 @@ namespace WebApplication
         c.IndexStream = () => File.OpenRead("Swagger/index.html");
       });
 
+      app.UseRouting();
       app.UseCors(b => b.WithOrigins("http://localhost:5000", "https://localhost:44328").AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
       app.UseAuthentication();
-      app.UseMvc();
+      app.UseAuthorization();
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllers();
+      });
     }
   }
 }

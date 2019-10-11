@@ -539,7 +539,7 @@ namespace Controllers
     private async Task<string> GenerateEmailConfirmationMessageAsync(User user)
     {
       string callbackUrl = Url.Action(
-        nameof(ConfirmEmailAsync),
+        "ConfirmEmail",
         "Users",
         new { id = user.Id, code = await userManager.GenerateEmailConfirmationTokenAsync(user) },
         protocol: HttpContext.Request.Scheme
