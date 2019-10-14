@@ -49,9 +49,8 @@ namespace Controllers
     [HttpGet]
     [ProducesResponseType(401)]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync([FromServices] IUserService userService)
-    {
-      return (await userService.GetAllAsync())
+    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync([FromServices] IUserService userService) =>
+      (await userService.GetAllAsync())
         .Select(u => new UserListApiModel
         {
           Id = u.Id,
@@ -65,7 +64,6 @@ namespace Controllers
           IsEmailConfirmed = u.IsEmailConfirmed
         })
         .ToList();
-    }
 
     /// <response code="403">If user does not have role "admin"</response> 
     /// <response code="404">If user is not found by id</response> 
@@ -144,8 +142,7 @@ namespace Controllers
     public async Task<IActionResult> LoginByFacebookAsync(
       UserExternalLoginModel userExternalLoginModel,
       [FromServices] IHttpClientFactory httpClientFactory,
-      [FromServices] IOptions<FacebookOptions> facebookIOptions
-    )
+      [FromServices] IOptions<FacebookOptions> facebookIOptions)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
       FacebookOptions facebookOptions = facebookIOptions.Value;
@@ -171,8 +168,7 @@ namespace Controllers
     public async Task<IActionResult> LoginByGoogleAsync(
       UserExternalLoginModel userExternalLoginModel,
       [FromServices] IHttpClientFactory httpClientFactory,
-      [FromServices] IOptions<GoogleOptions> googleIOptions
-    )
+      [FromServices] IOptions<GoogleOptions> googleIOptions)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
       GoogleOptions googleOptions = googleIOptions.Value;
@@ -186,22 +182,21 @@ namespace Controllers
         redirect_uri = userExternalLoginModel.RedirectUri
       };
 
-      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json"))
+      using HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+
+      HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(googleOptions.AccessTokenEndpoint, httpContent);
+
+      if (!accessTokenResponse.IsSuccessStatusCode)
       {
-        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(googleOptions.AccessTokenEndpoint, httpContent);
-
-        if (!accessTokenResponse.IsSuccessStatusCode)
-        {
-          return BadRequest();
-        }
-
-        UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
-
-        string userInfoResponse = await httpClient
-          .GetStringAsync($"{googleOptions.UserInfoEndpoint}?access_token={userExternalLoginAccessToken.AccessToken}");
-
-        return Json(await GenerateTokenAsync("Google", userInfoResponse));
+        return BadRequest();
       }
+
+      UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+
+      string userInfoResponse = await httpClient
+        .GetStringAsync($"{googleOptions.UserInfoEndpoint}?access_token={userExternalLoginAccessToken.AccessToken}");
+
+      return Json(await GenerateTokenAsync("Google", userInfoResponse));
     }
 
     [ProducesResponseType(400)]
@@ -209,8 +204,7 @@ namespace Controllers
     public async Task<IActionResult> LoginByGithubAsync(
       UserExternalLoginModel userExternalLoginModel,
       [FromServices] IHttpClientFactory httpClientFactory,
-      [FromServices] IOptions<GithubOptions> githubIOptions
-    )
+      [FromServices] IOptions<GithubOptions> githubIOptions)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
       GithubOptions githubOptions = githubIOptions.Value;
@@ -222,28 +216,27 @@ namespace Controllers
         client_secret = githubOptions.ClientSecret
       };
 
-      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json"))
+      using HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+
+      HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(githubOptions.AccessTokenEndpoint, httpContent);
+
+      if (!accessTokenResponse.IsSuccessStatusCode)
       {
-        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(githubOptions.AccessTokenEndpoint, httpContent);
-
-        if (!accessTokenResponse.IsSuccessStatusCode)
-        {
-          return BadRequest();
-        }
-
-        string accessToken = (await accessTokenResponse.Content.ReadAsStringAsync())
-          .Split("&")
-          .Where(p => p.StartsWith("access_token"))
-          .Select(p => p.Split("=").Last())
-          .Single();
-
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "Todo List API");
-
-        string userInfoResponse = await httpClient
-          .GetStringAsync($"{githubOptions.UserInfoEndpoint}?access_token={accessToken}");
-
-        return Json(await GenerateTokenAsync("Github", userInfoResponse));
+        return BadRequest();
       }
+
+      string accessToken = (await accessTokenResponse.Content.ReadAsStringAsync())
+        .Split("&")
+        .Where(p => p.StartsWith("access_token"))
+        .Select(p => p.Split("=").Last())
+        .Single();
+
+      httpClient.DefaultRequestHeaders.Add("User-Agent", "Todo List API");
+
+      string userInfoResponse = await httpClient
+        .GetStringAsync($"{githubOptions.UserInfoEndpoint}?access_token={accessToken}");
+
+      return Json(await GenerateTokenAsync("Github", userInfoResponse));
     }
 
     [ProducesResponseType(400)]
@@ -251,8 +244,7 @@ namespace Controllers
     public async Task<IActionResult> LoginByLinkedInAsync(
       UserExternalLoginModel userExternalLoginModel,
       [FromServices] IHttpClientFactory httpClientFactory,
-      [FromServices] IOptions<LinkedInOptions> linkedInIOptions
-    )
+      [FromServices] IOptions<LinkedInOptions> linkedInIOptions)
     {
       HttpClient httpClient = httpClientFactory.CreateClient();
       LinkedInOptions linkedInOptions = linkedInIOptions.Value;
@@ -266,29 +258,28 @@ namespace Controllers
         redirect_uri = userExternalLoginModel.RedirectUri
       };
 
-      using (HttpContent httpContent = new FormUrlEncodedContent(JsonConvert.DeserializeObject<IDictionary<string, string>>(JsonConvert.SerializeObject(requestBody))))
+      using HttpContent httpContent = new FormUrlEncodedContent(JsonConvert.DeserializeObject<IDictionary<string, string>>(JsonConvert.SerializeObject(requestBody)));
+
+      HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(linkedInOptions.AccessTokenEndpoint, httpContent);
+
+      if (!accessTokenResponse.IsSuccessStatusCode)
       {
-        HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(linkedInOptions.AccessTokenEndpoint, httpContent);
-
-        if (!accessTokenResponse.IsSuccessStatusCode)
-        {
-          return BadRequest();
-        }
-
-        UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
-
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userExternalLoginAccessToken.AccessToken);
-
-        LinkedInUserIdModel linkedInUserIdModel = JsonConvert.DeserializeObject<LinkedInUserIdModel>(await httpClient.GetStringAsync(linkedInOptions.IdEndpoint));
-
-        string userEmail = JsonConvert.DeserializeObject<LinkedInUserEmailModel>(await httpClient.GetStringAsync(linkedInOptions.EmailAddressEndpoint))
-          .Elements
-          .Single()
-          .Handle
-          .EmailAddress;
-
-        return Json(await GenerateTokenAsync("LinkedIn", linkedInUserIdModel.Id, userEmail));
+        return BadRequest();
       }
+
+      UserExternalLoginAccessToken userExternalLoginAccessToken = JsonConvert.DeserializeObject<UserExternalLoginAccessToken>(await accessTokenResponse.Content.ReadAsStringAsync());
+
+      httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userExternalLoginAccessToken.AccessToken);
+
+      LinkedInUserIdModel linkedInUserIdModel = JsonConvert.DeserializeObject<LinkedInUserIdModel>(await httpClient.GetStringAsync(linkedInOptions.IdEndpoint));
+
+      string userEmail = JsonConvert.DeserializeObject<LinkedInUserEmailModel>(await httpClient.GetStringAsync(linkedInOptions.EmailAddressEndpoint))
+        .Elements
+        .Single()
+        .Handle
+        .EmailAddress;
+
+      return Json(await GenerateTokenAsync("LinkedIn", linkedInUserIdModel.Id, userEmail));
     }
 
     [HttpPost]
@@ -488,13 +479,11 @@ namespace Controllers
     [Authorize(Roles = "admin,user")]
     [ProducesResponseType(401)]
     [HttpGet(Urls.IsTwoFactorAuthenticationEnabled)]
-    public async Task<ActionResult<UserTwoFactorAuthEnabledModel>> IsTwoFactorAuthenticationEnabled()
-    {
-      return new UserTwoFactorAuthEnabledModel
+    public async Task<ActionResult<UserTwoFactorAuthEnabledModel>> IsTwoFactorAuthenticationEnabled() =>
+      new UserTwoFactorAuthEnabledModel
       {
         IsEnabled = (await userManager.GetUserAsync(User)).TwoFactorEnabled
       };
-    }
 
     private async Task<string> GenerateTokenAsync(string loginProvider, string userInfoResponse)
     {
@@ -551,10 +540,8 @@ namespace Controllers
       return $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
     }
 
-    private string GeneratePasswordRecoveryMessage(string password)
-    {
-      return $"The '{password}' is your new random password for login. Please change it in your account for security.";
-    }
+    private string GeneratePasswordRecoveryMessage(string password) =>
+      $"The '{password}' is your new random password for login. Please change it in your account for security.";
 
     private string GenerateRandomPassword()
     {
@@ -568,12 +555,10 @@ namespace Controllers
       );
     }
 
-    private IEnumerable<string> GenerateErrorMessages(IdentityResult identityResult)
-    {
-      return identityResult
+    private IEnumerable<string> GenerateErrorMessages(IdentityResult identityResult) =>
+      identityResult
         .Errors
         .Select(e => e.Description)
         .ToList();
-    }
   }
 }

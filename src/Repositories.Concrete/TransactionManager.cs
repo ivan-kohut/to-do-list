@@ -11,9 +11,6 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task SaveChangesAsync()
-    {
-      await dbContext.SaveChangesAsync();
-    }
+    public async Task SaveChangesAsync() => await dbContext.SaveChangesAsync();
   }
 }

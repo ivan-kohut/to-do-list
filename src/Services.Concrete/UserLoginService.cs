@@ -43,11 +43,9 @@ namespace Services
       await transactionManager.SaveChangesAsync();
     }
 
-    public async Task<bool> ExistsWithUserIdAndLoginProviderAsync(int userId, string loginProvider)
-    {
-      return await userLoginRepository
+    public async Task<bool> ExistsWithUserIdAndLoginProviderAsync(int userId, string loginProvider) =>
+      await userLoginRepository
         .GetAll()
         .AnyAsync(p => p.UserId == userId && p.LoginProvider == loginProvider);
-    }
   }
 }

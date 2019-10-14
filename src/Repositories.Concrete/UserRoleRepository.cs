@@ -13,16 +13,11 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<UserRole?> GetByUserIdAndRoleIdAsync(int userId, int roleId)
-    {
-      return await dbContext
+    public async Task<UserRole?> GetByUserIdAndRoleIdAsync(int userId, int roleId) =>
+      await dbContext
         .UserRoles
         .SingleOrDefaultAsync(r => r.UserId == userId && r.RoleId == roleId);
-    }
 
-    public async Task CreateAsync(UserRole userRole)
-    {
-      await dbContext.AddAsync(userRole);
-    }
+    public async Task CreateAsync(UserRole userRole) => await dbContext.AddAsync(userRole);
   }
 }

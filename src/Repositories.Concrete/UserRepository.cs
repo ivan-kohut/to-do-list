@@ -14,23 +14,16 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<User?> GetByIdAsync(int id)
-    {
-      return await dbContext
+    public async Task<User?> GetByIdAsync(int id) =>
+      await dbContext
         .Users
         .SingleOrDefaultAsync(u => u.Id == id);
-    }
 
-    public IQueryable<User> GetAll()
-    {
-      return dbContext
+    public IQueryable<User> GetAll() =>
+      dbContext
         .Users
         .AsNoTracking();
-    }
 
-    public void Delete(User user)
-    {
-      dbContext.Remove(user);
-    }
+    public void Delete(User user) => dbContext.Remove(user);
   }
 }

@@ -28,9 +28,8 @@ namespace Controllers
 
     /// <response code="403">If user does not have role "user"</response> 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync()
-    {
-      return (await itemService.GetAllAsync(User.GetAuthorizedUserId()))
+    public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync() =>
+      (await itemService.GetAllAsync(User.GetAuthorizedUserId()))
         .Select(i => new ItemApiModel
         {
           Id = i.Id,
@@ -39,7 +38,6 @@ namespace Controllers
           Priority = i.Priority
         })
         .ToList();
-    }
 
     /// <response code="403">If user does not have role "user"</response> 
     [HttpPost]

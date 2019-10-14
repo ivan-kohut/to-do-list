@@ -14,21 +14,13 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public IQueryable<UserLogin> GetAll()
-    {
-      return dbContext.UserLogins;
-    }
+    public IQueryable<UserLogin> GetAll() => dbContext.UserLogins;
 
-    public async Task<UserLogin?> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey)
-    {
-      return await dbContext
+    public async Task<UserLogin?> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey) =>
+      await dbContext
         .UserLogins
         .SingleOrDefaultAsync(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
-    }
 
-    public async Task CreateAsync(UserLogin userLogin)
-    {
-      await dbContext.AddAsync(userLogin);
-    }
+    public async Task CreateAsync(UserLogin userLogin) => await dbContext.AddAsync(userLogin);
   }
 }

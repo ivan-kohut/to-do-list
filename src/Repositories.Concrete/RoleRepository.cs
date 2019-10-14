@@ -13,11 +13,9 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<Role?> GetByNameAsync(string name)
-    {
-      return await dbContext
+    public async Task<Role?> GetByNameAsync(string name) =>
+      await dbContext
         .Roles
         .SingleOrDefaultAsync(r => r.NormalizedName == name.ToUpper());
-    }
   }
 }

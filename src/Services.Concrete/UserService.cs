@@ -50,9 +50,8 @@ namespace Services
       };
     }
 
-    public async Task<IEnumerable<UserDTO>> GetAllAsync()
-    {
-      return await userRepository
+    public async Task<IEnumerable<UserDTO>> GetAllAsync() =>
+      await userRepository
         .GetAll()
         .Where(u => u.Id != adminId)
         .Select(u => new UserDTO
@@ -67,7 +66,6 @@ namespace Services
             .ToList()
         })
         .ToListAsync();
-    }
 
     public async Task DeleteAsync(int id)
     {

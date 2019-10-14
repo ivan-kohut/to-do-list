@@ -19,9 +19,8 @@ namespace Services
       this.transactionManager = transactionManager;
     }
 
-    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int userId)
-    {
-      return await itemRepository
+    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int userId) => 
+      await itemRepository
         .All(userId)
         .Select(i => new ItemDTO
         {
@@ -32,7 +31,6 @@ namespace Services
           Priority = i.Priority
         })
         .ToListAsync();
-    }
 
     public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
     {

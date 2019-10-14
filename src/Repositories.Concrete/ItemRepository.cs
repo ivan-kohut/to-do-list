@@ -14,39 +14,27 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<Item?> GetByIdAndUserIdAsync(int id, int userId)
-    {
-      return await dbContext
+    public async Task<Item?> GetByIdAndUserIdAsync(int id, int userId) =>
+      await dbContext
         .Items
         .SingleOrDefaultAsync(i => i.Id == id && i.UserId == userId);
-    }
 
-    public async Task<int?> GetMaxItemPriorityAsync(int userId)
-    {
-      return await dbContext
+    public async Task<int?> GetMaxItemPriorityAsync(int userId) =>
+      await dbContext
         .Items
         .Where(i => i.UserId == userId)
         .Select(i => (int?)i.Priority)
         .MaxAsync();
-    }
 
-    public IQueryable<Item> All(int userId)
-    {
-      return dbContext
+    public IQueryable<Item> All(int userId) =>
+      dbContext
         .Items
         .Where(i => i.UserId == userId)
         .OrderBy(i => i.Priority)
         .AsNoTracking();
-    }
 
-    public async Task CreateAsync(Item item)
-    {
-      await dbContext.AddAsync(item);
-    }
+    public async Task CreateAsync(Item item) => await dbContext.AddAsync(item);
 
-    public void Delete(Item item)
-    {
-      dbContext.Remove(item);
-    }
+    public void Delete(Item item) => dbContext.Remove(item);
   }
 }

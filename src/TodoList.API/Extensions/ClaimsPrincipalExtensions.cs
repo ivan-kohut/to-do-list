@@ -4,9 +4,7 @@ namespace Extensions
 {
   public static class ClaimsPrincipalExtensions
   {
-    public static int GetAuthorizedUserId(this ClaimsPrincipal claimsPrincipal)
-    {
-      return int.Parse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier).Value);
-    }
+    public static int GetAuthorizedUserId(this ClaimsPrincipal claimsPrincipal) =>
+      int.Parse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier).Value);
   }
 }
