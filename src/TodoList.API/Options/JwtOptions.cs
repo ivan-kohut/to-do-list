@@ -4,6 +4,6 @@ namespace Options
 {
   public class JwtOptions
   {
-    public SecurityKey SecurityKey { get; set; }
+    public SecurityKey SecurityKey { get; set; } = null!;
   }
 }

@@ -14,16 +14,16 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public Task<Item> GetByIdAndUserIdAsync(int id, int userId)
+    public async Task<Item?> GetByIdAndUserIdAsync(int id, int userId)
     {
-      return dbContext
+      return await dbContext
         .Items
         .SingleOrDefaultAsync(i => i.Id == id && i.UserId == userId);
     }
 
-    public Task<int?> GetMaxItemPriorityAsync(int userId)
+    public async Task<int?> GetMaxItemPriorityAsync(int userId)
     {
-      return dbContext
+      return await dbContext
         .Items
         .Where(i => i.UserId == userId)
         .Select(i => (int?)i.Priority)

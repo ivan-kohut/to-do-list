@@ -8,11 +8,11 @@ namespace TodoList.Client.Components
   public class PasswordRecoveryComponent : LoadingSpinnerComponentBase
   {
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
-    protected UserForgotPasswordModel UserForgotPasswordModel { get; set; }
+    protected UserForgotPasswordModel UserForgotPasswordModel { get; set; } = null!;
     protected bool IsPasswordRecovered { get; set; }
-    protected IEnumerable<string> Errors { get; set; }
+    protected IEnumerable<string>? Errors { get; set; }
 
     protected override void OnInitialized()
     {

@@ -9,17 +9,17 @@ namespace TodoList.Client.Components
   public class LoginComponent : LoadingSpinnerComponentBase
   {
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
     [Inject]
-    private ILocalStorageService LocalStorageService { get; set; }
+    private ILocalStorageService LocalStorageService { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; }
+    private NavigationManager NavigationManager { get; set; } = null!;
 
-    protected UserLoginModel UserLoginModel { get; set; }
+    protected UserLoginModel UserLoginModel { get; set; } = null!;
     protected bool IsTwoFactorTokenFieldDisplayed { get; set; }
-    protected IEnumerable<string> Errors { get; set; }
+    protected IEnumerable<string>? Errors { get; set; }
 
     protected override void OnInitialized()
     {

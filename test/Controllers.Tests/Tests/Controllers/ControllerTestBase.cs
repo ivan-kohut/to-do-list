@@ -17,18 +17,14 @@ namespace Controllers.Tests
 
     protected async Task<HttpResponseMessage> PostAsync(string url, object requestBody)
     {
-      using (HttpContent httpContent = CreateHttpContent(requestBody))
-      {
-        return await Client.PostAsync(url, httpContent);
-      }
+      using HttpContent httpContent = CreateHttpContent(requestBody);
+      return await Client.PostAsync(url, httpContent);
     }
 
-    protected async Task<HttpResponseMessage> PutAsync(string url, object requestBody)
+    protected async Task<HttpResponseMessage> PutAsync(string url, object? requestBody)
     {
-      using (HttpContent httpContent = CreateHttpContent(requestBody))
-      {
-        return await Client.PutAsync(url, httpContent);
-      }
+      using HttpContent httpContent = CreateHttpContent(requestBody);
+      return await Client.PutAsync(url, httpContent);
     }
 
     protected async Task<HttpResponseMessage> DeleteAsync(string url)
@@ -36,6 +32,6 @@ namespace Controllers.Tests
       return await Client.DeleteAsync(url);
     }
 
-    protected abstract HttpContent CreateHttpContent(object requestBody);
+    protected abstract HttpContent CreateHttpContent(object? requestBody);
   }
 }

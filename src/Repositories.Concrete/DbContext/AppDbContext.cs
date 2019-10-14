@@ -6,7 +6,7 @@ namespace Repositories
 {
   public class AppDbContext : IdentityDbContext<User, Role, int, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
   {
-    public DbSet<Item> Items { get; set; }
+    public DbSet<Item> Items { get; set; } = null!;
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

@@ -2,9 +2,9 @@
 {
   public class GoogleOptions
   {
-    public string ClientId { get; set; }
-    public string ClientSecret { get; set; }
-    public string AccessTokenEndpoint { get; set; }
-    public string UserInfoEndpoint { get; set; }
+    public string ClientId { get; set; } = null!;
+    public string ClientSecret { get; set; } = null!;
+    public string AccessTokenEndpoint { get; set; } = null!;
+    public string UserInfoEndpoint { get; set; } = null!;
   }
 }

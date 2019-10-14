@@ -78,7 +78,7 @@ namespace Services.Tests
         string providerKey = "testProviderKey";
 
         UserDTO user = new UserDTO { Id = userId };
-        UserLogin userLogin = null;
+        UserLogin? userLogin = null;
 
         mockUserService
           .Setup(s => s.GetByIdAsync(userId))

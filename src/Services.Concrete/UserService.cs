@@ -28,7 +28,7 @@ namespace Services
 
     public async Task<UserDTO> GetByIdAsync(int id)
     {
-      User user = await userRepository.GetByIdAsync(id);
+      User? user = await userRepository.GetByIdAsync(id);
 
       if (user == null)
       {
@@ -76,7 +76,7 @@ namespace Services
         throw new ArgumentException($"You can not delete user with id {id}");
       }
 
-      User user = await userRepository.GetByIdAsync(id);
+      User? user = await userRepository.GetByIdAsync(id);
 
       if (user == null)
       {

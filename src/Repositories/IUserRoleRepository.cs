@@ -5,7 +5,7 @@ namespace Repositories
 {
   public interface IUserRoleRepository
   {
-    Task<UserRole> GetByUserIdAndRoleIdAsync(int userId, int roleId);
+    Task<UserRole?> GetByUserIdAndRoleIdAsync(int userId, int roleId);
     Task CreateAsync(UserRole userRole);
   }
 }

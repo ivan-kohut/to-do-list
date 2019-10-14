@@ -4,6 +4,7 @@ using Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Controllers
 
     public ItemsController(ItemServiceResolver itemServiceResolver)
     {
-      this.itemService = itemServiceResolver("cached");
+      this.itemService = itemServiceResolver("cached") ?? throw new ArgumentNullException("Cached item service");
     }
 
     /// <response code="403">If user does not have role "user"</response> 

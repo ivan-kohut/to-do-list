@@ -13,7 +13,7 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public async Task<Role> GetByNameAsync(string name)
+    public async Task<Role?> GetByNameAsync(string name)
     {
       return await dbContext
         .Roles

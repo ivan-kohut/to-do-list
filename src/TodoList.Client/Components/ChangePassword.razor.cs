@@ -8,13 +8,13 @@ namespace TodoList.Client.Components
   public class ChangePasswordComponent : LoadingSpinnerComponentBase
   {
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; }
+    private NavigationManager NavigationManager { get; set; } = null!;
 
-    protected UserChangePasswordModel UserChangePasswordModel;
-    protected IEnumerable<string> Errors { get; set; }
+    protected UserChangePasswordModel UserChangePasswordModel { get; set; } = null!;
+    protected IEnumerable<string>? Errors { get; set; }
 
     protected override void OnInitialized()
     {

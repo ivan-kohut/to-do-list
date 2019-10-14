@@ -6,7 +6,7 @@ namespace Repositories
 {
   public interface IItemRepository
   {
-    Task<Item> GetByIdAndUserIdAsync(int id, int userId);
+    Task<Item?> GetByIdAndUserIdAsync(int id, int userId);
     Task<int?> GetMaxItemPriorityAsync(int userId);
     IQueryable<Item> All(int userId);
     Task CreateAsync(Item item);

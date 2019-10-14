@@ -4,6 +4,6 @@
   {
     protected override string ApiUri => ApiUrls.LoginByGithub;
 
-    protected override string RelativeRedirectUri => null;
+    protected override string? RelativeRedirectUri => null;
   }
 }

@@ -13,9 +13,9 @@ namespace Repositories
       this.dbContext = dbContext;
     }
 
-    public Task<UserRole> GetByUserIdAndRoleIdAsync(int userId, int roleId)
+    public async Task<UserRole?> GetByUserIdAndRoleIdAsync(int userId, int roleId)
     {
-      return dbContext
+      return await dbContext
         .UserRoles
         .SingleOrDefaultAsync(r => r.UserId == userId && r.RoleId == roleId);
     }

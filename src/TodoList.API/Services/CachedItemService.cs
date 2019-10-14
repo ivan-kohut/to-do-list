@@ -14,7 +14,7 @@ namespace Controllers.Services
 
     public CachedItemService(ItemServiceResolver itemServiceResolver, IMemoryCache memoryCache)
     {
-      this.itemService = itemServiceResolver("main");
+      this.itemService = itemServiceResolver("main") ?? throw new ArgumentNullException("Main item service");
       this.memoryCache = memoryCache;
     }
 

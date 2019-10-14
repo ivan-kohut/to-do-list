@@ -8,13 +8,13 @@ namespace TodoList.Client.Components
   public class SignUpComponent : LoadingSpinnerComponentBase
   {
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; }
+    private NavigationManager NavigationManager { get; set; } = null!;
 
-    protected UserCreateModel UserCreateModel { get; set; }
-    protected IEnumerable<string> Errors { get; set; }
+    protected UserCreateModel UserCreateModel { get; set; } = null!;
+    protected IEnumerable<string>? Errors { get; set; }
 
     protected override void OnInitialized()
     {

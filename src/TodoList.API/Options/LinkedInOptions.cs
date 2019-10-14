@@ -2,10 +2,10 @@
 {
   public class LinkedInOptions
   {
-    public string ClientId { get; set; }
-    public string ClientSecret { get; set; }
-    public string AccessTokenEndpoint { get; set; }
-    public string IdEndpoint { get; set; }
-    public string EmailAddressEndpoint { get; set; }
+    public string ClientId { get; set; } = null!;
+    public string ClientSecret { get; set; } = null!;
+    public string AccessTokenEndpoint { get; set; } = null!;
+    public string IdEndpoint { get; set; } = null!;
+    public string EmailAddressEndpoint { get; set; } = null!;
   }
 }

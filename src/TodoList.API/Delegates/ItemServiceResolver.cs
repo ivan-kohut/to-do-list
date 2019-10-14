@@ -2,5 +2,5 @@
 
 namespace Delegates
 {
-  public delegate IItemService ItemServiceResolver(string serviceKey);
+  public delegate IItemService? ItemServiceResolver(string serviceKey);
 }

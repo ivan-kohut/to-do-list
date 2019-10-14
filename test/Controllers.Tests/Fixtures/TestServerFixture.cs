@@ -43,21 +43,20 @@ namespace Controllers.Tests.Fixtures
         password = "abcABC123."
       };
 
-      using (HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"))
-      {
-        string userToken = JsonConvert.DeserializeObject<string>(
-          Client.PostAsync("/api/v1/users/login", httpContent).Result.Content.ReadAsStringAsync().Result
-        );
+      using HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+      
+      string userToken = JsonConvert.DeserializeObject<string>(
+        Client.PostAsync("/api/v1/users/login", httpContent).Result.Content.ReadAsStringAsync().Result
+      );
 
-        UserId = int.Parse(
-          (new JwtSecurityTokenHandler().ReadToken(userToken) as JwtSecurityToken)
-            .Claims
-            .Single(c => c.Type == ClaimTypes.NameIdentifier)
-            .Value
-        );
+      UserId = int.Parse(
+        (new JwtSecurityTokenHandler().ReadToken(userToken) as JwtSecurityToken)!
+          .Claims
+          .Single(c => c.Type == ClaimTypes.NameIdentifier)
+          .Value
+      );
 
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
-      }
+      Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
     }
 
     public void Dispose()

@@ -146,7 +146,7 @@ namespace Services.Tests
       {
         int itemToUpdateId = 1;
 
-        Item notFoundItem = null;
+        Item? notFoundItem = null;
 
         mockItemRepository
           .Setup(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId))
@@ -210,7 +210,7 @@ namespace Services.Tests
       {
         int itemToDeleteId = 1;
 
-        Item notFoundItem = null;
+        Item? notFoundItem = null;
 
         mockItemRepository
           .Setup(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId))

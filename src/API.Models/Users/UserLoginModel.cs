@@ -6,12 +6,12 @@ namespace API.Models
   {
     [Required]
     [EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
     [Required]
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 
     [RegularExpression("[0-9]{6}")]
-    public string TwoFactorToken { get; set; }
+    public string? TwoFactorToken { get; set; }
   }
 }

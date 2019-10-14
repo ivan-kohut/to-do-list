@@ -5,7 +5,7 @@ namespace Entities
 {
   public class Role : IdentityRole<int>
   {
-    public ICollection<UserRole> UserRoles { get; set; }
-    public ICollection<RoleClaim> RoleClaims { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; } = null!;
+    public ICollection<RoleClaim> RoleClaims { get; set; } = null!;
   }
 }

@@ -5,6 +5,6 @@ namespace Repositories
 {
   public interface IRoleRepository
   {
-    Task<Role> GetByNameAsync(string name);
+    Task<Role?> GetByNameAsync(string name);
   }
 }

@@ -12,7 +12,7 @@
   public bool IsSpinnerEnabled { get; set; }
 
   [Parameter]
-  public string ButtonValue { get; set; }
+  public string ButtonValue { get; set; } = null!;
 
   [Parameter]
   public EventCallback<MouseEventArgs> OnClick { get; set; }

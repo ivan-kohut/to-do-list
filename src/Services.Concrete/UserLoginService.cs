@@ -25,7 +25,7 @@ namespace Services
     {
       UserDTO user = await userService.GetByIdAsync(userId);
 
-      UserLogin userLogin = await userLoginRepository.GetByLoginProviderAndProviderKeyAsync(loginProvider, providerKey);
+      UserLogin? userLogin = await userLoginRepository.GetByLoginProviderAndProviderKeyAsync(loginProvider, providerKey);
 
       if (userLogin != null)
       {

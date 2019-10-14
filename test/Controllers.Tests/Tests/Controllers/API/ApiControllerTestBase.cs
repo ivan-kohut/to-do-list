@@ -19,7 +19,7 @@ namespace Controllers.Tests
       this.UserId = testServerFixture.UserId;
     }
 
-    protected override HttpContent CreateHttpContent(object requestBody)
+    protected override HttpContent CreateHttpContent(object? requestBody)
     {
       return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
     }
@@ -31,38 +31,36 @@ namespace Controllers.Tests
 
     protected async Task<ItemApiModel> SaveItemAsync(Item itemToSave)
     {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+
+      appDbContext.Add(itemToSave);
+
+      await appDbContext.SaveChangesAsync();
+
+      return new ItemApiModel
       {
-        appDbContext.Add(itemToSave);
-
-        await appDbContext.SaveChangesAsync();
-
-        return new ItemApiModel
-        {
-          Id = itemToSave.Id,
-          IsDone = itemToSave.Status == ItemStatus.Done,
-          Text = itemToSave.Text,
-          Priority = itemToSave.Priority
-        };
-      }
+        Id = itemToSave.Id,
+        IsDone = itemToSave.Status == ItemStatus.Done,
+        Text = itemToSave.Text,
+        Priority = itemToSave.Priority
+      };
     }
 
     protected async Task<UserListApiModel> SaveUserAsync(User userToSave)
     {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+
+      appDbContext.Add(userToSave);
+
+      await appDbContext.SaveChangesAsync();
+
+      return new UserListApiModel
       {
-        appDbContext.Add(userToSave);
-
-        await appDbContext.SaveChangesAsync();
-
-        return new UserListApiModel
-        {
-          Id = userToSave.Id,
-          Name = userToSave.UserName,
-          Email = userToSave.Email,
-          IsEmailConfirmed = userToSave.EmailConfirmed
-        };
-      }
+        Id = userToSave.Id,
+        Name = userToSave.UserName,
+        Email = userToSave.Email,
+        IsEmailConfirmed = userToSave.EmailConfirmed
+      };
     }
   }
 }

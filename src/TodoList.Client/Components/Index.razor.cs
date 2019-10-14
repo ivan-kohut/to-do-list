@@ -1,5 +1,6 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,15 +9,20 @@ namespace TodoList.Client.Components
   public class IndexComponent : LoadingSpinnerComponentBase
   {
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
-    protected ItemCreateApiModel NewItem { get; set; }
-    protected IList<ItemApiModel> Items { get; set; }
+    protected ItemCreateApiModel NewItem { get; set; } = null!;
+    protected IList<ItemApiModel> Items { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
       NewItem = new ItemCreateApiModel();
-      Items = (await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList)).Value;
+
+      ApiCallResult<IList<ItemApiModel>> apiCallResult = await AppHttpClient.GetAsync<IList<ItemApiModel>>(ApiUrls.GetItemsList);
+
+      Items = apiCallResult.IsSuccess
+        ? apiCallResult.Value!
+        : throw new Exception("API call is not successful");
     }
 
     protected override async Task HandleEventAsync()
@@ -26,7 +32,12 @@ namespace TodoList.Client.Components
         ApiCallResult<ItemApiModel> itemCreationCallResult = await AppHttpClient
           .PostAsync<ItemApiModel>(ApiUrls.CreateItem, NewItem);
 
-        Items.Add(itemCreationCallResult.Value);
+        Items.Add(
+          itemCreationCallResult.IsSuccess
+            ? itemCreationCallResult.Value!
+            : throw new Exception("API call is not successful")
+        );
+
         NewItem.Text = string.Empty;
       }
     }

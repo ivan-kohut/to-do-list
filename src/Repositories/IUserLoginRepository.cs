@@ -7,7 +7,7 @@ namespace Repositories
   public interface IUserLoginRepository
   {
     IQueryable<UserLogin> GetAll();
-    Task<UserLogin> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey);
+    Task<UserLogin?> GetByLoginProviderAndProviderKeyAsync(string loginProvider, string providerKey);
     Task CreateAsync(UserLogin userLogin);
   }
 }

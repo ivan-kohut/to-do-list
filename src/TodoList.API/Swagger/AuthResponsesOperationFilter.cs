@@ -11,7 +11,7 @@ namespace Swagger
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
       object[] customAttributes = context.MethodInfo.DeclaringType
-        .GetCustomAttributes(true);
+        ?.GetCustomAttributes(true) ?? new object[] { };
 
       IEnumerable<AuthorizeAttribute> authAttributes = customAttributes
         .Union(context.MethodInfo.GetCustomAttributes(true))

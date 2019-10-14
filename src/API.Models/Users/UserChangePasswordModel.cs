@@ -6,15 +6,15 @@ namespace API.Models
   {
     [Required]
     [Display(Name = "Current")]
-    public string OldPassword { get; set; }
+    public string OldPassword { get; set; } = null!;
 
     [Required]
     [Display(Name = "New")]
-    public string NewPassword { get; set; }
+    public string NewPassword { get; set; } = null!;
 
     [Required]
     [Display(Name = "Retype new")]
     [Compare(nameof(NewPassword))]
-    public string ConfirmNewPassword { get; set; }
+    public string ConfirmNewPassword { get; set; } = null!;
   }
 }

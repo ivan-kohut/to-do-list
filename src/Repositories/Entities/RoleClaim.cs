@@ -4,6 +4,6 @@ namespace Entities
 {
   public class RoleClaim : IdentityRoleClaim<int>
   {
-    public Role Role { get; set; }
+    public Role Role { get; set; } = null!;
   }
 }

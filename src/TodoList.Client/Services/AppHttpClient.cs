@@ -18,31 +18,27 @@ namespace TodoList.Client
       this.localStorageService = localStorageService;
     }
 
-    public async Task<ApiCallResult<T>> GetAsync<T>(string url)
+    public async Task<ApiCallResult<T>> GetAsync<T>(string url) where T : class
     {
       await SetAuthorizationHeader();
 
       return await GenerateApiCallResultAsync<T>(await httpClient.GetAsync(url));
     }
 
-    public async Task<ApiCallResult<T>> PostAsync<T>(string url, object requestBody)
+    public async Task<ApiCallResult<T>> PostAsync<T>(string url, object? requestBody) where T : class
     {
       await SetAuthorizationHeader();
 
-      using (HttpContent httpContent = CreateHttpContent(requestBody))
-      {
-        return await GenerateApiCallResultAsync<T>(await httpClient.PostAsync(url, httpContent));
-      }
+      using HttpContent httpContent = CreateHttpContent(requestBody);
+      return await GenerateApiCallResultAsync<T>(await httpClient.PostAsync(url, httpContent));
     }
 
-    public async Task<ApiCallResult> PutAsync(string url, object requestBody)
+    public async Task<ApiCallResult> PutAsync(string url, object? requestBody)
     {
       await SetAuthorizationHeader();
 
-      using (HttpContent httpContent = CreateHttpContent(requestBody))
-      {
-        return await GenerateApiCallResultAsync(await httpClient.PutAsync(url, httpContent));
-      }
+      using HttpContent httpContent = CreateHttpContent(requestBody);
+      return await GenerateApiCallResultAsync(await httpClient.PutAsync(url, httpContent));
     }
 
     public async Task<ApiCallResult> DeleteAsync(string url)
@@ -52,12 +48,12 @@ namespace TodoList.Client
       return await GenerateApiCallResultAsync(await httpClient.DeleteAsync(url));
     }
 
-    private HttpContent CreateHttpContent(object requestBody)
+    private HttpContent CreateHttpContent(object? requestBody)
     {
       return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
     }
 
-    private async Task<ApiCallResult<T>> GenerateApiCallResultAsync<T>(HttpResponseMessage httpResponse)
+    private async Task<ApiCallResult<T>> GenerateApiCallResultAsync<T>(HttpResponseMessage httpResponse) where T : class
     {
       ApiCallResult<T> apiCallResult = new ApiCallResult<T>
       {

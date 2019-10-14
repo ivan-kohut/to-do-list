@@ -2,6 +2,6 @@
 {
   public class LinkedInUserIdModel
   {
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
   }
 }

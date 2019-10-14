@@ -139,9 +139,9 @@ namespace Controllers.Tests
       }
     }
 
-    public class PutAsync : ItemsControllerTest
+    public class PutItemAsync : ItemsControllerTest
     {
-      public PutAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      public PutItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
       }
 
@@ -216,9 +216,9 @@ namespace Controllers.Tests
       }
     }
 
-    public class DeleteAsync : ItemsControllerTest
+    public class DeleteItemAsync : ItemsControllerTest
     {
-      public DeleteAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      public DeleteItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
       }
 

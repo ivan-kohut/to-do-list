@@ -1,10 +1,10 @@
-﻿using Controllers.Tests.Extensions;
+﻿using API.Models;
+using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using API.Models;
 using Repositories;
 using System;
 using System.Collections.Generic;
@@ -53,9 +53,9 @@ namespace Controllers.Tests
       }
     }
 
-    public class DeleteAsync : UsersControllerTest
+    public class DeleteUserAsync : UsersControllerTest
     {
-      public DeleteAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+      public DeleteUserAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
       }
 
@@ -911,31 +911,30 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Assert.False(await DeserializeResponseBodyAsync<bool>(response));
+        Assert.False((await DeserializeResponseBodyAsync<UserTwoFactorAuthEnabledModel>(response)).IsEnabled);
       }
 
       [Fact]
       public async Task When_TwoFactorIsEnabled_Expect_True()
       {
-        using (UserManager<User> userManager = Server.GetService<UserManager<User>>())
-        {
-          User admin = await userManager.FindByIdAsync(UserId.ToString());
+        using UserManager<User> userManager = Server.GetService<UserManager<User>>();
 
-          admin.TwoFactorEnabled = true;
+        User admin = await userManager.FindByIdAsync(UserId.ToString());
 
-          await userManager.UpdateAsync(admin);
+        admin.TwoFactorEnabled = true;
 
-          // Act
-          HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication/is-enabled");
+        await userManager.UpdateAsync(admin);
 
-          response.EnsureSuccessStatusCode();
+        // Act
+        HttpResponseMessage response = await GetAsync($"{url}/two-factor-authentication/is-enabled");
 
-          Assert.True(await DeserializeResponseBodyAsync<bool>(response));
+        response.EnsureSuccessStatusCode();
 
-          admin.TwoFactorEnabled = false;
+        Assert.True((await DeserializeResponseBodyAsync<UserTwoFactorAuthEnabledModel>(response)).IsEnabled);
 
-          await userManager.UpdateAsync(admin);
-        }
+        admin.TwoFactorEnabled = false;
+
+        await userManager.UpdateAsync(admin);
       }
     }
 

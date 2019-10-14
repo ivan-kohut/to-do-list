@@ -26,16 +26,16 @@ namespace Services
 
     public async Task CreateAsync(int userId, string roleName)
     {
-      UserDTO user = await userService.GetByIdAsync(userId);
+      _ = await userService.GetByIdAsync(userId);
 
-      Role role = await roleRepository.GetByNameAsync(roleName);
+      Role? role = await roleRepository.GetByNameAsync(roleName);
 
       if (role == null)
       {
         throw new EntityNotFoundException($"Role with name {roleName} is not found");
       }
 
-      UserRole userRole = await userRoleRepository.GetByUserIdAndRoleIdAsync(userId, role.Id);
+      UserRole? userRole = await userRoleRepository.GetByUserIdAndRoleIdAsync(userId, role.Id);
 
       if (userRole != null)
       {

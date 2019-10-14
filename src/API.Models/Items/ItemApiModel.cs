@@ -10,7 +10,7 @@ namespace API.Models
 
     [Required]
     [StringLength(128, MinimumLength = 1)]
-    public string Text { get; set; }
+    public string Text { get; set; } = null!;
 
     public int Priority { get; set; }
   }

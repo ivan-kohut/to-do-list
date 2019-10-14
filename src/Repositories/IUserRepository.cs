@@ -6,7 +6,7 @@ namespace Repositories
 {
   public interface IUserRepository
   {
-    Task<User> GetByIdAsync(int id);
+    Task<User?> GetByIdAsync(int id);
     IQueryable<User> GetAll();
     void Delete(User user);
   }

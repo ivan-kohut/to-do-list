@@ -5,10 +5,10 @@ namespace Entities
 {
   public class User : IdentityUser<int>
   {
-    public ICollection<UserRole> UserRoles { get; set; }
-    public ICollection<UserLogin> UserLogins { get; set; }
-    public ICollection<UserToken> UserTokens { get; set; }
-    public ICollection<UserClaim> UserClaims { get; set; }
-    public ICollection<Item> Items { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; } = null!;
+    public ICollection<UserLogin> UserLogins { get; set; } = null!;
+    public ICollection<UserToken> UserTokens { get; set; } = null!;
+    public ICollection<UserClaim> UserClaims { get; set; } = null!;
+    public ICollection<Item> Items { get; set; } = null!;
   }
 }

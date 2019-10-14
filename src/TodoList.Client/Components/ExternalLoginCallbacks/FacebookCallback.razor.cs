@@ -4,6 +4,6 @@
   {
     protected override string ApiUri => ApiUrls.LoginByFacebook;
 
-    protected override string RelativeRedirectUri => "/facebook-callback";
+    protected override string? RelativeRedirectUri => "/facebook-callback";
   }
 }

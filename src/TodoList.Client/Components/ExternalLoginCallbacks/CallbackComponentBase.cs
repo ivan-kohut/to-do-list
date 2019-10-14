@@ -9,19 +9,19 @@ namespace TodoList.Client.Components
   public abstract class CallbackComponentBase : ComponentBase
   {
     [Inject]
-    private NavigationManager NavigationManager { get; set; }
+    private NavigationManager NavigationManager { get; set; } = null!;
 
     [Inject]
-    private IJSRuntime JsRuntime { get; set; }
+    private IJSRuntime JsRuntime { get; set; } = null!;
 
     [Inject]
-    private IAppHttpClient AppHttpClient { get; set; }
+    private IAppHttpClient AppHttpClient { get; set; } = null!;
 
     [Inject]
-    private ILocalStorageService LocalStorageService { get; set; }
+    private ILocalStorageService LocalStorageService { get; set; } = null!;
 
     protected abstract string ApiUri { get; }
-    protected abstract string RelativeRedirectUri { get; }
+    protected abstract string? RelativeRedirectUri { get; }
 
     protected override async Task OnInitializedAsync()
     {

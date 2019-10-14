@@ -6,6 +6,6 @@ namespace TodoList.Client
   {
     public bool IsSuccess { get; set; }
     public int StatusCode { get; set; }
-    public IEnumerable<string> Errors { get; set; }
+    public IEnumerable<string>? Errors { get; set; }
   }
 }

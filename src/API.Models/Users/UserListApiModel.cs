@@ -3,8 +3,8 @@
   public class UserListApiModel
   {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
     public bool IsRegisteredInSystem { get; set; }
     public bool IsLoggedInViaFacebook { get; set; }
     public bool IsLoggedInViaGoogle { get; set; }

@@ -488,9 +488,12 @@ namespace Controllers
     [Authorize(Roles = "admin,user")]
     [ProducesResponseType(401)]
     [HttpGet(Urls.IsTwoFactorAuthenticationEnabled)]
-    public async Task<ActionResult<bool>> IsTwoFactorAuthenticationEnabled()
+    public async Task<ActionResult<UserTwoFactorAuthEnabledModel>> IsTwoFactorAuthenticationEnabled()
     {
-      return (await userManager.GetUserAsync(User)).TwoFactorEnabled;
+      return new UserTwoFactorAuthEnabledModel
+      {
+        IsEnabled = (await userManager.GetUserAsync(User)).TwoFactorEnabled
+      };
     }
 
     private async Task<string> GenerateTokenAsync(string loginProvider, string userInfoResponse)

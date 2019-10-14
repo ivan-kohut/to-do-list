@@ -35,7 +35,7 @@ namespace Services.Tests
       public async Task When_UserDoesNotExist_Expect_EntityNotFoundException()
       {
         int userId = 10;
-        User user = null;
+        User? user = null;
 
         mockUserRepository
           .Setup(r => r.GetByIdAsync(userId))
@@ -217,7 +217,7 @@ namespace Services.Tests
       public async Task When_UserIsNotFound_Expect_EntityNotFoundException()
       {
         int userId = 10;
-        User user = null;
+        User? user = null;
 
         mockUserRepository
           .Setup(r => r.GetByIdAsync(userId))

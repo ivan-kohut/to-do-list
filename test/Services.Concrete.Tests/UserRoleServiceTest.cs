@@ -51,7 +51,7 @@ namespace Services.Tests
         string roleName = "user";
 
         UserDTO user = new UserDTO();
-        Role role = null;
+        Role? role = null;
 
         mockUserService
           .Setup(s => s.GetByIdAsync(userId))
@@ -107,7 +107,7 @@ namespace Services.Tests
 
         UserDTO user = new UserDTO { Id = userId };
         Role role = new Role { Id = roleId };
-        UserRole userRole = null;
+        UserRole? userRole = null;
 
         mockUserService
           .Setup(s => s.GetByIdAsync(userId))

@@ -58,7 +58,7 @@ namespace Services
 
     public async Task UpdateAsync(int userId, ItemDTO item)
     {
-      Item itemDb = await itemRepository.GetByIdAndUserIdAsync(item.Id, userId);
+      Item? itemDb = await itemRepository.GetByIdAndUserIdAsync(item.Id, userId);
 
       if (itemDb == null)
       {
@@ -74,10 +74,12 @@ namespace Services
 
     public async Task DeleteAsync(int id, int userId)
     {
-      Item item = await itemRepository.GetByIdAndUserIdAsync(id, userId);
+      Item? item = await itemRepository.GetByIdAndUserIdAsync(id, userId);
 
       if (item == null)
+      {
         throw new EntityNotFoundException($"Item with id {id} is not found");
+      }
 
       itemRepository.Delete(item);
 

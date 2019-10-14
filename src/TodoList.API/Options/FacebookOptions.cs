@@ -2,8 +2,8 @@
 {
   public class FacebookOptions
   {
-    public string AppId { get; set; }
-    public string AppSecret { get; set; }
-    public string GraphApiEndpoint { get; set; }
+    public string AppId { get; set; } = null!;
+    public string AppSecret { get; set; } = null!;
+    public string GraphApiEndpoint { get; set; } = null!;
   }
 }
