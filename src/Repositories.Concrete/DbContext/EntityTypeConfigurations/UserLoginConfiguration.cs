@@ -10,10 +10,10 @@ namespace Repositories
     {
       builder.HasKey(e => new { e.LoginProvider, e.ProviderKey });
 
-      builder.HasOne(e => e.User)
+      builder
+        .HasOne(e => e.User)
         .WithMany(e => e.UserLogins)
-        .HasForeignKey(e => e.UserId)
-        .IsRequired();
+        .HasForeignKey(e => e.UserId);
     }
   }
 }

@@ -12,22 +12,19 @@ namespace Repositories
 
       builder.HasIndex(e => e.Id);
 
-      builder.Property(e => e.UserId)
-        .IsRequired();
+      builder.Property(e => e.UserId);
 
       builder
         .HasOne(e => e.User)
         .WithMany(e => e.Items);
-      
-      builder.Property(e => e.Status)
-        .IsRequired();
 
-      builder.Property(e => e.Text)
-        .IsRequired()
+      builder.Property(e => e.Status);
+
+      builder
+        .Property(e => e.Text)
         .HasMaxLength(255);
 
-      builder.Property(e => e.Priority)
-        .IsRequired();
+      builder.Property(e => e.Priority);
     }
   }
 }
