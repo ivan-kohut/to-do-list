@@ -79,7 +79,7 @@ namespace WebApplication
         {
           Version = "v1",
           Title = "Todo List",
-          Description = "Simple Todo List API developed using C#, ASP.NET Core 3.0 and EF Core 3.0"
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 3.1 and EF Core 3.1"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -154,10 +154,7 @@ namespace WebApplication
       app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseAuthorization();
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
-      });
+      app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
   }
 }
