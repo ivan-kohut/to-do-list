@@ -3,3 +3,6 @@ bin/
 
 obj/
 Logs/
+
+PublishProfiles/
+*.csproj.user
