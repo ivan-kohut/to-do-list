@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using WebApplication;
 
 namespace Controllers.Tests
@@ -7,7 +8,7 @@ namespace Controllers.Tests
   {
     protected override string ConnectionStringName { get; } = "DefaultTestConnection";
 
-    public TestStartup(IConfiguration configuration) : base(configuration)
+    public TestStartup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment) : base(configuration, webHostEnvironment)
     {
     }
   }

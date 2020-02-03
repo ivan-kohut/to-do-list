@@ -5,12 +5,14 @@ using Extensions;
 using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Options;
@@ -30,10 +32,12 @@ namespace WebApplication
     protected virtual string ConnectionStringName { get; } = "DefaultConnection";
 
     private readonly IConfiguration configuration;
+    private readonly IWebHostEnvironment webHostEnvironment;
 
-    public Startup(IConfiguration configuration)
+    public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
       this.configuration = configuration;
+      this.webHostEnvironment = webHostEnvironment;
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -46,9 +50,12 @@ namespace WebApplication
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
-      services
-        .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
-        .AddEntityFramework();
+      if (webHostEnvironment.IsDevelopment())
+      {
+        services
+          .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
+          .AddEntityFramework();
+      }
 
       services
         .AddHttpClient();
@@ -141,7 +148,12 @@ namespace WebApplication
     public void Configure(IApplicationBuilder app)
     {
       app.UseHttpsRedirection();
-      app.UseMiniProfiler();
+
+      if (webHostEnvironment.IsDevelopment())
+      {
+        app.UseMiniProfiler();
+      }
+
       app.UseSwagger(c => c.RouteTemplate = "api-docs/{documentName}/swagger.json");
 
       app.UseSwaggerUI(c =>

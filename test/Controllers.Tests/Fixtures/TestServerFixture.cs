@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -32,6 +33,7 @@ namespace Controllers.Tests.Fixtures
 
       IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
         .UseContentRoot(projectRootPath)
+        .UseEnvironment(Environments.Development)
         .UseStartup<TestStartup>();
 
       Server = new TestServer(webHostBuilder);
