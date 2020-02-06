@@ -232,9 +232,9 @@ namespace Controllers
         .Single();
 
       httpClient.DefaultRequestHeaders.Add("User-Agent", "Todo List API");
+      httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-      string userInfoResponse = await httpClient
-        .GetStringAsync($"{githubOptions.UserInfoEndpoint}?access_token={accessToken}");
+      string userInfoResponse = await httpClient.GetStringAsync(githubOptions.UserInfoEndpoint);
 
       return Json(await GenerateTokenAsync("Github", userInfoResponse));
     }
