@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,20 +10,25 @@ namespace TodoList.Client
 {
   public class AppHttpClient : IAppHttpClient
   {
+    private readonly string apiUrl;
     private readonly HttpClient httpClient;
     private readonly ILocalStorageService localStorageService;
 
-    public AppHttpClient(HttpClient httpClient, ILocalStorageService localStorageService)
+    public AppHttpClient(HttpClient httpClient, ILocalStorageService localStorageService, NavigationManager navigationManager)
     {
       this.httpClient = httpClient;
       this.localStorageService = localStorageService;
+
+      this.apiUrl = navigationManager.BaseUri.Contains("localhost")
+        ? "https://localhost:44388"
+        : "https://todo-list-api.azurewebsites.net";
     }
 
     public async Task<ApiCallResult<T>> GetAsync<T>(string url) where T : class
     {
       await SetAuthorizationHeader();
 
-      return await GenerateApiCallResultAsync<T>(await httpClient.GetAsync(url));
+      return await GenerateApiCallResultAsync<T>(await httpClient.GetAsync($"{apiUrl}{url}"));
     }
 
     public async Task<ApiCallResult<T>> PostAsync<T>(string url, object? requestBody) where T : class
@@ -30,7 +36,8 @@ namespace TodoList.Client
       await SetAuthorizationHeader();
 
       using HttpContent httpContent = CreateHttpContent(requestBody);
-      return await GenerateApiCallResultAsync<T>(await httpClient.PostAsync(url, httpContent));
+
+      return await GenerateApiCallResultAsync<T>(await httpClient.PostAsync($"{apiUrl}{url}", httpContent));
     }
 
     public async Task<ApiCallResult> PutAsync(string url, object? requestBody)
@@ -38,20 +45,18 @@ namespace TodoList.Client
       await SetAuthorizationHeader();
 
       using HttpContent httpContent = CreateHttpContent(requestBody);
-      return await GenerateApiCallResultAsync(await httpClient.PutAsync(url, httpContent));
+
+      return await GenerateApiCallResultAsync(await httpClient.PutAsync($"{apiUrl}{url}", httpContent));
     }
 
     public async Task<ApiCallResult> DeleteAsync(string url)
     {
       await SetAuthorizationHeader();
 
-      return await GenerateApiCallResultAsync(await httpClient.DeleteAsync(url));
+      return await GenerateApiCallResultAsync(await httpClient.DeleteAsync($"{apiUrl}{url}"));
     }
 
-    private HttpContent CreateHttpContent(object? requestBody)
-    {
-      return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-    }
+    private HttpContent CreateHttpContent(object? requestBody) => new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
 
     private async Task<ApiCallResult<T>> GenerateApiCallResultAsync<T>(HttpResponseMessage httpResponse) where T : class
     {

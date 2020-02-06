@@ -22,6 +22,7 @@ using StackExchange.Profiling;
 using Swagger;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -163,7 +164,7 @@ namespace WebApplication
       });
 
       app.UseRouting();
-      app.UseCors(b => b.WithOrigins("http://localhost:5000", "https://localhost:44328").AllowAnyHeader().AllowAnyMethod());
+      app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? new string[] { }).AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
       app.UseAuthentication();
       app.UseAuthorization();

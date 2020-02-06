@@ -12,7 +12,6 @@ namespace TodoList.Client
   public class AppState
   {
     public const string AuthTokenKey = "auth-token";
-    public const string IndexUrl = "https://localhost:44328";
 
     private readonly ISyncLocalStorageService localStorageService;
 
@@ -64,11 +63,9 @@ namespace TodoList.Client
       }
     }
 
-    private IDictionary<string, object> GetClaims(string authToken)
-    {
-      return JsonConvert.DeserializeObject<Dictionary<string, object>>(
+    private IDictionary<string, object> GetClaims(string authToken) =>
+      JsonConvert.DeserializeObject<Dictionary<string, object>>(
         Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(authToken.Split('.')[1]))
       );
-    }
   }
 }

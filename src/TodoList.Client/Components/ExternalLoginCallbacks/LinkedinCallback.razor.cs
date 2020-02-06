@@ -4,6 +4,6 @@
   {
     protected override string ApiUri => ApiUrls.LoginByLinkedin;
 
-    protected override string? RelativeRedirectUri => "/linkedin-callback";
+    protected override string? RelativeRedirectUri => "linkedin-callback";
   }
 }

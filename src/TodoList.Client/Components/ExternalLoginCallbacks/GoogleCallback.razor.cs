@@ -4,6 +4,6 @@
   {
     protected override string ApiUri => ApiUrls.LoginByGoogle;
 
-    protected override string? RelativeRedirectUri => "/google-callback";
+    protected override string? RelativeRedirectUri => "google-callback";
   }
 }

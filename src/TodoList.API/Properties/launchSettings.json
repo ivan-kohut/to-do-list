@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebApplication": {
+    "TodoList.API": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

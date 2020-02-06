@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "TodoList.Client.Blazor.Server": {
+    "TodoList.Client.Server": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

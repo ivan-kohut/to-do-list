@@ -30,7 +30,7 @@ namespace TodoList.Client.Components
         Code = await JsRuntime.InvokeAsync<string>("getQueryParameterValue", "code"),
         RedirectUri = string.IsNullOrWhiteSpace(RelativeRedirectUri) 
           ? null 
-          : $"{AppState.IndexUrl}{RelativeRedirectUri}"
+          : $"{NavigationManager.BaseUri}{RelativeRedirectUri}"
       };
 
       ApiCallResult<string> loginCallResult = await AppHttpClient.PostAsync<string>(ApiUri, model);
