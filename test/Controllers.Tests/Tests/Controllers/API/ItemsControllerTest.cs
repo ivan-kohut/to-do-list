@@ -241,7 +241,7 @@ namespace Controllers.Tests
 
         response.EnsureSuccessStatusCode();
 
-        Item itemDeleted = (await GetAllItemsAsync())
+        Item? itemDeleted = (await GetAllItemsAsync())
           .SingleOrDefault(i => i.Id == itemSaved.Id);
 
         Assert.Null(itemDeleted);
