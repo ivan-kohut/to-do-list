@@ -12,6 +12,7 @@ namespace WebApplication
     {
       Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Warning()
+        .WriteTo.Console()
         .WriteTo.Async(c => c.File(Path.Combine("Logs", "log-.txt"), rollingInterval: RollingInterval.Day))
         .CreateLogger();
 

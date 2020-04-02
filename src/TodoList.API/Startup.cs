@@ -160,7 +160,7 @@ namespace WebApplication
       app.UseSwaggerUI(c =>
       {
         c.SwaggerEndpoint("/api-docs/v1/swagger.json", "Todo List v1");
-        c.IndexStream = () => File.OpenRead("Swagger/index.html");
+        c.IndexStream = () => File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Swagger/index.html"));
       });
 
       app.UseRouting();
