@@ -150,7 +150,7 @@ namespace Controllers
       HttpResponseMessage accessTokenResponse = await httpClient
         .GetAsync($"{facebookOptions.GraphApiEndpoint}/oauth/access_token?client_id={facebookOptions.AppId}&client_secret={facebookOptions.AppSecret}&redirect_uri={userExternalLoginModel.RedirectUri}&code={userExternalLoginModel.Code}");
 
-      if (!accessTokenResponse.IsSuccessStatusCode)
+      if (!accessTokenResponse.IsSuccessStatusCode || accessTokenResponse.Content == null)
       {
         return BadRequest();
       }
@@ -186,7 +186,7 @@ namespace Controllers
 
       HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(googleOptions.AccessTokenEndpoint, httpContent);
 
-      if (!accessTokenResponse.IsSuccessStatusCode)
+      if (!accessTokenResponse.IsSuccessStatusCode || accessTokenResponse.Content == null)
       {
         return BadRequest();
       }
@@ -220,7 +220,7 @@ namespace Controllers
 
       HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(githubOptions.AccessTokenEndpoint, httpContent);
 
-      if (!accessTokenResponse.IsSuccessStatusCode)
+      if (!accessTokenResponse.IsSuccessStatusCode || accessTokenResponse.Content == null)
       {
         return BadRequest();
       }
@@ -258,11 +258,11 @@ namespace Controllers
         redirect_uri = userExternalLoginModel.RedirectUri
       };
 
-      using HttpContent httpContent = new FormUrlEncodedContent(JsonConvert.DeserializeObject<IDictionary<string, string>>(JsonConvert.SerializeObject(requestBody)));
+      using HttpContent httpContent = new FormUrlEncodedContent(JsonConvert.DeserializeObject<IDictionary<string?, string?>>(JsonConvert.SerializeObject(requestBody)));
 
       HttpResponseMessage accessTokenResponse = await httpClient.PostAsync(linkedInOptions.AccessTokenEndpoint, httpContent);
 
-      if (!accessTokenResponse.IsSuccessStatusCode)
+      if (!accessTokenResponse.IsSuccessStatusCode || accessTokenResponse.Content == null)
       {
         return BadRequest();
       }
