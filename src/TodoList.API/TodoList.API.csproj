@@ -19,7 +19,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0-preview.5.20279.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0-preview.6.20312.15" />
   </ItemGroup>
 
   <ItemGroup>
