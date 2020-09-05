@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Repositories;
 using Serilog;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace WebApplication
 {
   public class Program
   {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
       Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Warning()
@@ -18,7 +22,21 @@ namespace WebApplication
 
       try
       {
-        CreateHostBuilder(args).Build().Run();
+        IHost host = CreateHostBuilder(args).Build();
+
+        using IServiceScope scope = host.Services.CreateScope();
+
+        IWebHostEnvironment webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+
+        if (webHostEnvironment.IsDevelopment())
+        {
+          await scope.ServiceProvider
+            .GetRequiredService<AppDbContext>()
+            .Database
+            .MigrateAsync();
+        }
+
+        await host.RunAsync();
       }
       catch (Exception ex)
       {
