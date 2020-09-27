@@ -6,7 +6,6 @@ using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +87,7 @@ namespace WebApplication
         {
           Version = "v1",
           Title = "Todo List",
-          Description = configuration["Description"]
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 3.1 and EF Core 3.1"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -169,7 +168,6 @@ namespace WebApplication
       app.UseAuthentication();
       app.UseAuthorization();
       app.UseEndpoints(endpoints => endpoints.MapControllers());
-      app.Map(string.Empty, appBuilder => appBuilder.Run(async context => await context.Response.WriteAsync(configuration["Description"])));
     }
   }
 }
