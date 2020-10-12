@@ -9,3 +9,7 @@ services:
       dockerfile: src/TodoList.API/Dockerfile
     depends_on:
       - db
+  blazor-wasm:
+    build:
+      context: .
+      dockerfile: src/TodoList.Client.Server/Dockerfile
