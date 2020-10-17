@@ -1,7 +1,11 @@
+using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading.Tasks;
+using TodoList.Identity.API.Data;
+using TodoList.Identity.API.Data.Seed;
 
 namespace TodoList.Identity.API
 {
@@ -9,7 +13,28 @@ namespace TodoList.Identity.API
   {
     static async Task Main(string[] args)
     {
-      await CreateHostBuilder(args).Build().RunAsync();
+      IHost host = CreateHostBuilder(args).Build();
+
+      using IServiceScope scope = host.Services.CreateScope();
+
+      IWebHostEnvironment webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+
+      if (webHostEnvironment.IsDevelopment())
+      {
+        await scope.ServiceProvider
+          .GetRequiredService<AppDbContext>()
+          .InitializeAsync();
+
+        await scope.ServiceProvider
+          .GetRequiredService<ConfigurationDbContext>()
+          .InitializeAsync();
+
+        await scope.ServiceProvider
+          .GetRequiredService<PersistedGrantDbContext>()
+          .InitializeAsync();
+      }
+
+      await host.RunAsync();
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
