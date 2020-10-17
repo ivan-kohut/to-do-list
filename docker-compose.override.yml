@@ -9,7 +9,7 @@ services:
       - 1433:1433
     volumes:
       - mssql-data-volume:/var/opt/mssql
-  app:
+  items-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=ToDoList;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
@@ -26,6 +26,11 @@ services:
       - Facebook__AppId=${TODOLIST_FACEBOOK_APPID}
     ports:
       - 8080:80
+  identity-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 8082:80
   blazor-wasm:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
