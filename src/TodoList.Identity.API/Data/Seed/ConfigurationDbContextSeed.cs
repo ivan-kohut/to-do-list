@@ -14,6 +14,14 @@ namespace TodoList.Identity.API.Data.Seed
         .Database
         .MigrateAsync();
 
+      if (!await context.ApiScopes.AnyAsync())
+      {
+        foreach (ApiScope apiScope in Config.ApiScopes)
+        {
+          context.ApiScopes.Add(apiScope.ToEntity());
+        }
+      }
+
       if (!await context.ApiResources.AnyAsync())
       {
         foreach (ApiResource apiResource in Config.ApiResources)

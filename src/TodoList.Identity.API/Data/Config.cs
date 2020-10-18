@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 
-namespace TodoList.Identity.API.Data.Seed
+namespace TodoList.Identity.API.Data
 {
   public static class Config
   {
@@ -28,17 +28,26 @@ namespace TodoList.Identity.API.Data.Seed
         new IdentityRole<int> { Name = "user", NormalizedName = "USER" }
       };
 
+    public static IEnumerable<ApiScope> ApiScopes =>
+      new[]
+      {
+        new ApiScope(name: "items", displayName: "Items Service")
+      };
+
     public static IEnumerable<ApiResource> ApiResources =>
       new[]
       {
-          new ApiResource("items", "Items Service")
+          new ApiResource(name: "items", displayName: "Items Service", userClaims: new[] { "role" })
+          {
+              Scopes = { "items" }
+          }
       };
 
     public static IEnumerable<IdentityResource> IdentityResources =>
       new IdentityResource[]
       {
         new IdentityResources.OpenId(),
-        new IdentityResources.Profile()
+        new IdentityResource(name: "profile", userClaims: new[] { "name" }, displayName: "User profile")
       };
 
     public static IEnumerable<Client> Clients =>
