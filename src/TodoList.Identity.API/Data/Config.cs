@@ -60,8 +60,8 @@ namespace TodoList.Identity.API.Data
           AllowedGrantTypes = GrantTypes.Code,
           RequireClientSecret = false,
 
-          RedirectUris =           { "https://localhost:44399/callback.html" },
-          PostLogoutRedirectUris = { "https://localhost:44399/index.html" },
+          RedirectUris =           { "https://localhost:44399/authentication/login-callback" },
+          PostLogoutRedirectUris = { "https://localhost:44399/" },
           AllowedCorsOrigins =     { "https://localhost:44399" },
 
           AllowedScopes =

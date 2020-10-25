@@ -1,4 +1,4 @@
-﻿using Blazored.LocalStorage;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,8 +14,27 @@ namespace TodoList.Client
       WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
 
       builder.Services
-        .AddBlazoredLocalStorage()
-        .AddSingleton(new HttpClient { BaseAddress = new Uri(builder.Configuration["ItemsUrl"]) })
+        .AddOidcAuthentication(options =>
+        {
+          options.ProviderOptions.Authority = builder.Configuration["IdentityUrl"];
+          options.ProviderOptions.ClientId = "wasm";
+          options.ProviderOptions.ResponseType = "code";
+          options.ProviderOptions.PostLogoutRedirectUri = "/";
+          options.ProviderOptions.DefaultScopes.Add("items");
+        });
+
+      builder.Services
+        .AddHttpClient("items-api", c => c.BaseAddress = new Uri(builder.Configuration["ItemsUrl"]))
+        .AddHttpMessageHandler(s =>
+          s
+            .GetService<AuthorizationMessageHandler>()
+            ?.ConfigureHandler(authorizedUrls: new[] { builder.Configuration["ItemsUrl"] }, scopes: new[] { "items" })
+       );
+
+      builder.Services
+        .AddScoped(sp => sp.GetService<IHttpClientFactory>()!.CreateClient("items-api"));
+
+      builder.Services
         .AddScoped<AppState>()
         .AddScoped<IAppHttpClient, AppHttpClient>();
 

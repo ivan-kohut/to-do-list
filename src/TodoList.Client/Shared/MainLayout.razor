@@ -1,7 +1,6 @@
 @inherits LayoutComponentBase
 
 @inject AppState AppState
-@inject ILocalStorageService LocalStorageService
 @inject NavigationManager NavigationManager
 
 @if (AppState.IsUserLoggedIn)
@@ -23,7 +22,7 @@
           <a href="users">Users</a>
         }
         <a href="account">Settings</a>
-        <a @onclick="OnLogoutAsync">Log out</a>
+        <a @onclick="OnLogout">Log out</a>
       </div>
     </div>
   </div>
@@ -42,10 +41,8 @@ else
 
 @code {
 
-  private async Task OnLogoutAsync()
+  private void OnLogout()
   {
-    await LocalStorageService.RemoveItemAsync(AppState.AuthTokenKey);
-
     NavigationManager.NavigateTo(string.Empty);
   }
 

@@ -1,5 +1,4 @@
 ﻿using API.Models;
-using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,9 +9,6 @@ namespace TodoList.Client.Components
   {
     [Inject]
     private IAppHttpClient AppHttpClient { get; set; } = null!;
-
-    [Inject]
-    private ILocalStorageService LocalStorageService { get; set; } = null!;
 
     [Inject]
     private NavigationManager NavigationManager { get; set; } = null!;
@@ -32,8 +28,6 @@ namespace TodoList.Client.Components
 
       if (loginCallResult.IsSuccess)
       {
-        await LocalStorageService.SetItemAsync(AppState.AuthTokenKey, loginCallResult.Value);
-
         NavigationManager.NavigateTo(string.Empty);
       }
       else
