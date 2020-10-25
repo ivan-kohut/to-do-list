@@ -34,7 +34,8 @@ services:
   blazor-wasm:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ApiUrl=http://localhost:8080
+      - IdentityUrl=http://localhost:8082
+      - ItemsUrl=http://localhost:8080
     ports:
       - 8081:80
 

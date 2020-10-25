@@ -15,7 +15,7 @@ namespace TodoList.Client
 
       builder.Services
         .AddBlazoredLocalStorage()
-        .AddSingleton(new HttpClient { BaseAddress = new Uri(builder.Configuration["ApiUrl"]) })
+        .AddSingleton(new HttpClient { BaseAddress = new Uri(builder.Configuration["ItemsUrl"]) })
         .AddScoped<AppState>()
         .AddScoped<IAppHttpClient, AppHttpClient>();
 

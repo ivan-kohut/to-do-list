@@ -2,6 +2,8 @@
 {
   public class AppOptions
   {
-    public string ApiUrl { get; set; } = null!;
+    public string IdentityUrl { get; set; } = null!;
+
+    public string ItemsUrl { get; set; } = null!;
   }
 }
