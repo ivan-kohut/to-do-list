@@ -63,8 +63,6 @@ namespace WebApplication
       services
         .Configure<ApiBehaviorOptions>(o => o.SuppressModelStateInvalidFilter = true);
 
-      SecurityKey securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]));
-
       services
         .AddAuthentication(o =>
         {
@@ -73,12 +71,9 @@ namespace WebApplication
         })
         .AddJwtBearer(o =>
         {
-          o.TokenValidationParameters = new TokenValidationParameters
-          {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            IssuerSigningKey = securityKey
-          };
+          o.Authority = configuration["IdentityUrl"];
+          o.Audience = "items";
+          o.RequireHttpsMetadata = false;
         });
 
       services.AddSwaggerGen(c =>
@@ -113,7 +108,7 @@ namespace WebApplication
         .AddControllers(o => o.Filters.Add(typeof(ModelStateInvalidFilter)))
         .AddApplicationPart(typeof(Startup).Assembly);
 
-      services.Configure<JwtOptions>(o => o.SecurityKey = securityKey);
+      services.Configure<JwtOptions>(o => o.SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"])));
       services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
       services.Configure<GoogleOptions>(configuration.GetSection("Google"));
       services.Configure<GithubOptions>(configuration.GetSection("Github"));

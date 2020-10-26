@@ -2,13 +2,14 @@
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
 namespace TodoList.Identity.API.Data.Seed
 {
   public static class ConfigurationDbContextSeed
   {
-    public static async Task InitializeAsync(this ConfigurationDbContext context)
+    public static async Task InitializeAsync(this ConfigurationDbContext context, IConfiguration configuration)
     {
       await context
         .Database
@@ -40,7 +41,7 @@ namespace TodoList.Identity.API.Data.Seed
 
       if (!await context.Clients.AnyAsync())
       {
-        foreach (Client client in Config.Clients)
+        foreach (Client client in Config.Clients(configuration))
         {
           context.Clients.Add(client.ToEntity());
         }

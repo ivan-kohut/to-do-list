@@ -1,6 +1,7 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -50,8 +51,11 @@ namespace TodoList.Identity.API.Data
         new IdentityResource(name: "profile", userClaims: new[] { "name" }, displayName: "User profile")
       };
 
-    public static IEnumerable<Client> Clients =>
-      new[]
+    public static IEnumerable<Client> Clients(IConfiguration configuration)
+    {
+      string blazorWasmClientUrl = configuration["BlazorWasmClientUrl"];
+
+      return new[]
       {
         new Client
         {
@@ -60,9 +64,9 @@ namespace TodoList.Identity.API.Data
           AllowedGrantTypes = GrantTypes.Code,
           RequireClientSecret = false,
 
-          RedirectUris =           { "https://localhost:44399/authentication/login-callback" },
-          PostLogoutRedirectUris = { "https://localhost:44399/" },
-          AllowedCorsOrigins =     { "https://localhost:44399" },
+          RedirectUris =           { $"{blazorWasmClientUrl}/authentication/login-callback" },
+          PostLogoutRedirectUris = { $"{blazorWasmClientUrl}/" },
+          AllowedCorsOrigins =     { blazorWasmClientUrl },
 
           AllowedScopes =
           {
@@ -72,5 +76,6 @@ namespace TodoList.Identity.API.Data
           }
         }
       };
+    }
   }
 }

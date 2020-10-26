@@ -12,9 +12,10 @@ services:
   items-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=ToDoList;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
       - Jwt__Secret=peRhtr7oth7nh98rtx78Tdy0g98graKfYrovjhaz5dX75h56trOdKvnghruGYdxm
       - Cors__Origins=http://localhost:8081
+      - IdentityUrl=http://localhost:8082
       - SendGrid__ApiKey=${TODOLIST_SENDGRID_APIKEY}
       - LinkedIn__ClientSecret=${TODOLIST_LINKEDIN_CLIENTSECRET}
       - LinkedIn__ClientId=${TODOLIST_LINKEDIN_CLIENTID}
@@ -29,6 +30,8 @@ services:
   identity-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - BlazorWasmClientUrl=http://localhost:8081
     ports:
       - 8082:80
   blazor-wasm:

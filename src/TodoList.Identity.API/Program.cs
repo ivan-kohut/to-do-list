@@ -1,5 +1,6 @@
 using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -17,9 +18,7 @@ namespace TodoList.Identity.API
 
       using IServiceScope scope = host.Services.CreateScope();
 
-      IWebHostEnvironment webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-
-      if (webHostEnvironment.IsDevelopment())
+      if (scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
       {
         await scope.ServiceProvider
           .GetRequiredService<AppDbContext>()
@@ -27,7 +26,7 @@ namespace TodoList.Identity.API
 
         await scope.ServiceProvider
           .GetRequiredService<ConfigurationDbContext>()
-          .InitializeAsync();
+          .InitializeAsync(scope.ServiceProvider.GetRequiredService<IConfiguration>());
 
         await scope.ServiceProvider
           .GetRequiredService<PersistedGrantDbContext>()
