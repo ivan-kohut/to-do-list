@@ -32,11 +32,9 @@ namespace TodoList.Client
        );
 
       builder.Services
-        .AddScoped(sp => sp.GetService<IHttpClientFactory>()!.CreateClient("items-api"));
-
-      builder.Services
-        .AddScoped<AppState>()
+        .AddScoped(sp => sp.GetService<IHttpClientFactory>()!.CreateClient("items-api"))
         .AddScoped<IAppHttpClient, AppHttpClient>();
+
 
       builder.RootComponents.Add<App>("app");
 
