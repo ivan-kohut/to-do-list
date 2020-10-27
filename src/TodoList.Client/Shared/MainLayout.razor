@@ -1,49 +1,51 @@
 @inherits LayoutComponentBase
 
-@inject AppState AppState
 @inject NavigationManager NavigationManager
+@inject SignOutSessionStateManager SignOutManager
 
-@if (AppState.IsUserLoggedIn)
-{
-  <div class="user-menu">
-    @if (NavigationManager.BaseUri != NavigationManager.Uri)
-    {
-      <div class="index-page-link">
-        <a href="">index page</a>
-      </div>
-    }
-
-    <div class="dropdown">
-      @AppState.UserName
-      <div class="show-menu"></div>
-      <div class="dropdown-content">
-        @if (AppState.IsAdmin)
-        {
-          <a href="users">Users</a>
-        }
-        <a href="account">Settings</a>
-        <a @onclick="OnLogout">Log out</a>
+<AuthorizeView>
+  <Authorized>
+    <div class="user-menu">
+      @if (NavigationManager.BaseUri != NavigationManager.Uri)
+      {
+        <div class="index-page-link">
+          <a href="">index page</a>
+        </div>
+      }
+      <div class="dropdown">
+        @context.User.Identity?.Name
+        <div class="show-menu"></div>
+        <div class="dropdown-content">
+          @*check the role in claims*@
+          @*@if (AppState.IsAdmin)
+            {
+              <a href="users">Users</a>
+            }*@
+          <a href="account">Settings</a>
+          <a @onclick="OnLogout">Log out</a>
+        </div>
       </div>
     </div>
-  </div>
-}
-else
-{
-  <div>
-    <div class="login-and-signup">
-      <a class="login" href="login">Log in</a>
-      <a class="signup" href="sign-up">Sign up</a>
+  </Authorized>
+  <NotAuthorized>
+    <div>
+      <div class="login-and-signup">
+        <a class="login" href="authentication/login">Log in</a>
+        <a class="signup" href="sign-up">Sign up</a>
+      </div>
     </div>
-  </div>
-}
+  </NotAuthorized>
+</AuthorizeView>
 
 @Body
 
 @code {
 
-  private void OnLogout()
+  private async Task OnLogout(MouseEventArgs args)
   {
-    NavigationManager.NavigateTo(string.Empty);
+    await SignOutManager.SetSignOutState();
+
+    NavigationManager.NavigateTo("authentication/logout");
   }
 
 }
