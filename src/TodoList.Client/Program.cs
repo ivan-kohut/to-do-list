@@ -19,7 +19,7 @@ namespace TodoList.Client
           options.ProviderOptions.Authority = builder.Configuration["IdentityUrl"];
           options.ProviderOptions.ClientId = "wasm";
           options.ProviderOptions.ResponseType = "code";
-          options.ProviderOptions.PostLogoutRedirectUri = "/";
+          options.ProviderOptions.PostLogoutRedirectUri = builder.HostEnvironment.BaseAddress;
           options.ProviderOptions.DefaultScopes.Add("items");
         });
 
