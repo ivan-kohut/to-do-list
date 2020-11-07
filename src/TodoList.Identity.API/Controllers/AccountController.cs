@@ -8,11 +8,16 @@ namespace TodoList.Identity.API.Controllers
 {
   public class AccountController : Controller
   {
+    private readonly UserManager<IdentityUser<int>> userManager;
     private readonly SignInManager<IdentityUser<int>> signInManager;
     private readonly IIdentityServerInteractionService interaction;
 
-    public AccountController(SignInManager<IdentityUser<int>> signInManager, IIdentityServerInteractionService interaction)
+    public AccountController(
+      UserManager<IdentityUser<int>> userManager,
+      SignInManager<IdentityUser<int>> signInManager,
+      IIdentityServerInteractionService interaction)
     {
+      this.userManager = userManager;
       this.signInManager = signInManager;
       this.interaction = interaction;
     }
@@ -24,14 +29,19 @@ namespace TodoList.Identity.API.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-      if (ModelState.IsValid && (await signInManager.PasswordSignInAsync(model.Username, model.Password, false, lockoutOnFailure: true)).Succeeded)
+      if (ModelState.IsValid)
       {
-        return Url.IsLocalUrl(model.ReturnUrl)
-          ? Redirect(model.ReturnUrl)
-          : Redirect("/");
+        IdentityUser<int> user = await userManager.FindByEmailAsync(model.Email);
+
+        if (user != null && (await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true)).Succeeded)
+        {
+          return Url.IsLocalUrl(model.ReturnUrl)
+            ? Redirect(model.ReturnUrl)
+            : Redirect("/");
+        }
       }
 
-      return View(new LoginViewModel { Username = model.Username, ReturnUrl = model.ReturnUrl });
+      return View(new LoginViewModel { Email = model.Email, ReturnUrl = model.ReturnUrl });
     }
 
     [HttpGet]
