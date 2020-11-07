@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 
+@inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
 @inject SignOutSessionStateManager SignOutManager
 
@@ -16,11 +17,11 @@
         @context.User.Identity?.Name
         <div class="show-menu"></div>
         <div class="dropdown-content">
-          @*check the role in claims*@
-          @*@if (AppState.IsAdmin)
-            {
-              <a href="users">Users</a>
-            }*@
+          <AuthorizeView Roles="admin">
+            <Authorized Context="adminContext">
+              <a href="@($"{Configuration["IdentityUrl"]}/admin/users")">Users</a>
+            </Authorized>
+          </AuthorizeView>
           <a href="account">Settings</a>
           <a @onclick="OnLogout">Log out</a>
         </div>

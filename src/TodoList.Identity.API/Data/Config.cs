@@ -48,7 +48,7 @@ namespace TodoList.Identity.API.Data
       new IdentityResource[]
       {
         new IdentityResources.OpenId(),
-        new IdentityResource(name: "profile", userClaims: new[] { "name" }, displayName: "User profile")
+        new IdentityResource(name: "profile", userClaims: new[] { "name", "role" }, displayName: "User profile")
       };
 
     public static IEnumerable<Client> Clients(IConfiguration configuration)

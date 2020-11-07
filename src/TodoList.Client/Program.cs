@@ -21,7 +21,9 @@ namespace TodoList.Client
           options.ProviderOptions.ResponseType = "code";
           options.ProviderOptions.PostLogoutRedirectUri = builder.HostEnvironment.BaseAddress;
           options.ProviderOptions.DefaultScopes.Add("items");
-        });
+          options.UserOptions.RoleClaim = "role";
+        })
+        .AddAccountClaimsPrincipalFactory<ArrayClaimsPrincipalFactory<RemoteUserAccount>>();
 
       builder.Services
         .AddHttpClient("items-api", c => c.BaseAddress = new Uri(builder.Configuration["ItemsUrl"]))
