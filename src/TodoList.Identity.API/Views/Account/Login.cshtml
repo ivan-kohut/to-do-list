@@ -10,11 +10,13 @@
   <div class="field">
     <label class="display-block" asp-for="Email">Email</label>
     <input class="input-text" asp-for="Email" type="text" />
+    <span asp-validation-for="Email"></span>
   </div>
 
   <div class="field">
     <label class="display-block" asp-for="Password">Password</label>
     <input class="input-text" asp-for="Password" type="password" />
+    <span asp-validation-for="Password"></span>
   </div>
 
   <div class="password-recovery">

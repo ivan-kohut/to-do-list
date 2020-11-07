@@ -33,15 +33,23 @@ namespace TodoList.Identity.API.Controllers
       {
         IdentityUser<int> user = await userManager.FindByEmailAsync(model.Email);
 
-        if (user != null && (await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true)).Succeeded)
+        if (user == null)
         {
-          return Url.IsLocalUrl(model.ReturnUrl)
+          ModelState.AddModelError(nameof(LoginViewModel.Email), "The User is not found.");
+        }
+        else if (!(await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true)).Succeeded)
+        {
+          ModelState.AddModelError(nameof(LoginViewModel.Password), "The Password is invalid.");
+        }
+        else
+        {
+          return interaction.IsValidReturnUrl(model.ReturnUrl)
             ? Redirect(model.ReturnUrl)
             : Redirect("/");
         }
       }
 
-      return View(new LoginViewModel { Email = model.Email, ReturnUrl = model.ReturnUrl });
+      return View(new LoginViewModel { ReturnUrl = model.ReturnUrl });
     }
 
     [HttpGet]

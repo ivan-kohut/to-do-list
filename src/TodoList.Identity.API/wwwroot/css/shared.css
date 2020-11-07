@@ -21,6 +21,7 @@ a {
   text-indent: 10px;
   padding: 10px 0;
   width: 100%;
+  margin-bottom: 5px;
 }
 
 .submit-button {
@@ -31,10 +32,6 @@ a {
   border: none;
   cursor: pointer;
   margin-bottom: 15px;
-}
-
-#errors li {
-  color: #f65a5b;
 }
 
 .user-menu {
@@ -49,4 +46,8 @@ a {
 
 .hide {
   display: none;
+}
+
+.field-validation-error {
+  color: #f65a5b;
 }
