@@ -24,7 +24,7 @@ table {
   color: white;
 }
 
-th, td {
+.users-main th, .users-main td {
   width: 200px;
 }
 

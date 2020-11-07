@@ -14,10 +14,12 @@ namespace TodoList.Identity.API
   public class Startup
   {
     private readonly IConfiguration configuration;
+    private readonly IWebHostEnvironment webHostEnvironment;
 
-    public Startup(IConfiguration configuration)
+    public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
       this.configuration = configuration;
+      this.webHostEnvironment = webHostEnvironment;
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -49,6 +51,13 @@ namespace TodoList.Identity.API
         })
         .AddAspNetIdentity<User>()
         .AddDeveloperSigningCredential();
+
+      if (webHostEnvironment.IsDevelopment())
+      {
+        services
+          .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
+          .AddEntityFramework();
+      }
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
