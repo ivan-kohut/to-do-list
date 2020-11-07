@@ -27,3 +27,7 @@ table {
 th, td {
   width: 200px;
 }
+
+.delete-btn {
+  cursor: pointer;
+}

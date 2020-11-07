@@ -68,6 +68,7 @@ namespace TodoList.Identity.API
       app.UseAuthorization();
       app.UseEndpoints(endpoints =>
       {
+        endpoints.MapControllerRoute(name: "Delete user", pattern: "admin/users/delete/{id}", defaults: new { controller = "Admin", action = "DeleteUser" });
         endpoints.MapDefaultControllerRoute();
       });
     }

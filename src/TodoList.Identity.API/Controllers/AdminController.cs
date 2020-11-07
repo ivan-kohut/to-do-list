@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TodoList.Identity.API.Data;
+using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.ViewModels;
 
 namespace TodoList.Identity.API.Controllers
@@ -21,7 +23,7 @@ namespace TodoList.Identity.API.Controllers
     }
 
     [HttpGet]
-    public async Task<IActionResult> Users()
+    public async Task<IActionResult> Users(CancellationToken cancellationToken)
     {
       var users = await dbContext
         .Users
@@ -37,7 +39,7 @@ namespace TodoList.Identity.API.Controllers
             !.Select(l => l.LoginProvider)
             .ToList()
         })
-        .ToListAsync();
+        .ToListAsync(cancellationToken);
 
       return View(new UsersViewModel
       {
@@ -56,6 +58,27 @@ namespace TodoList.Identity.API.Controllers
           })
           .ToList()
       });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteUserAsync(int? id, CancellationToken cancellationToken)
+    {
+      if (id.HasValue)
+      {
+        User userToDelete = await dbContext
+          .Users
+          .Where(u => u.Id == id && !u.UserRoles!.Any(ur => ur.Role!.Name == adminRole))
+          .SingleOrDefaultAsync(cancellationToken);
+
+        if (userToDelete != default)
+        {
+          dbContext.Remove(userToDelete);
+
+          await dbContext.SaveChangesAsync(cancellationToken);
+        }
+      }
+
+      return Redirect("/admin/users");
     }
   }
 }

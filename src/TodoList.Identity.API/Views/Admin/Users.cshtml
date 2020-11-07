@@ -27,9 +27,9 @@
           <td>@user.IsLoggedInViaLinkedin</td>
           <td>@user.IsEmailConfirmed</td>
           <td>
-            <a class="item-button">
-              <img src="/img/delete.png" />
-            </a>
+            <form id="@user.Id" action="/admin/users/delete/@user.Id" method="POST">
+              <a class="item-button" onclick="document.getElementById('@user.Id').submit();"><img class="delete-btn" src="/img/delete.png" /></a>
+            </form>
           </td>
         </tr>
       }
