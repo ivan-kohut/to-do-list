@@ -1,16 +1,16 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Data
 {
   public static class Config
   {
-    public static IdentityUser<int> Admin =>
-      new IdentityUser<int>
+    public static User Admin =>
+      new User
       {
         UserName = "admin",
         NormalizedUserName = "ADMIN",
@@ -22,11 +22,11 @@ namespace TodoList.Identity.API.Data
         LockoutEnabled = true
       };
 
-    public static IEnumerable<IdentityRole<int>> Roles =>
+    public static IEnumerable<Role> Roles =>
       new[]
       {
-        new IdentityRole<int> { Name = "admin", NormalizedName = "ADMIN" },
-        new IdentityRole<int> { Name = "user", NormalizedName = "USER" }
+        new Role { Name = "admin", NormalizedName = "ADMIN" },
+        new Role { Name = "user", NormalizedName = "USER" }
       };
 
     public static IEnumerable<ApiScope> ApiScopes =>

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Data.Seed
 {
@@ -15,9 +15,9 @@ namespace TodoList.Identity.API.Data.Seed
 
       if (!await context.Roles.AnyAsync())
       {
-        IEnumerable<IdentityRole<int>> roles = Config.Roles;
+        IEnumerable<Role> roles = Config.Roles;
 
-        foreach (IdentityRole<int> role in roles)
+        foreach (Role role in roles)
         {
           context.Roles.Add(role);
         }
@@ -26,15 +26,15 @@ namespace TodoList.Identity.API.Data.Seed
 
         if (!await context.Users.AnyAsync())
         {
-          IdentityUser<int> admin = Config.Admin;
+          User admin = Config.Admin;
 
           context.Users.Add(admin);
 
           await context.SaveChangesAsync();
 
-          foreach (IdentityRole<int> role in roles)
+          foreach (Role role in roles)
           {
-            context.UserRoles.Add(new IdentityUserRole<int>
+            context.UserRoles.Add(new UserRole
             {
               UserId = admin.Id,
               RoleId = role.Id

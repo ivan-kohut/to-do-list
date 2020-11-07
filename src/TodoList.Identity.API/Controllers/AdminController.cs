@@ -1,0 +1,61 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using TodoList.Identity.API.Data;
+using TodoList.Identity.API.ViewModels;
+
+namespace TodoList.Identity.API.Controllers
+{
+  [Authorize(Roles = adminRole)]
+  public class AdminController : Controller
+  {
+    private const string adminRole = "admin";
+
+    private readonly AppDbContext dbContext;
+
+    public AdminController(AppDbContext dbContext)
+    {
+      this.dbContext = dbContext;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Users()
+    {
+      var users = await dbContext
+        .Users
+        .Where(u => !u.UserRoles!.Any(ur => ur.Role!.Name == adminRole))
+        .Select(u => new
+        {
+          u.Id,
+          Name = u.UserName,
+          u.Email,
+          IsRegisteredInSystem = u.PasswordHash != null,
+          IsEmailConfirmed = u.EmailConfirmed,
+          LoginProviders = u.UserLogins
+            !.Select(l => l.LoginProvider)
+            .ToList()
+        })
+        .ToListAsync();
+
+      return View(new UsersViewModel
+      {
+        Users = users
+          .Select(u => new UserViewModel
+          {
+            Id = u.Id,
+            Name = u.Name,
+            Email = u.Email,
+            IsRegisteredInSystem = u.IsRegisteredInSystem,
+            IsLoggedInViaFacebook = u.LoginProviders.Contains("Facebook"),
+            IsLoggedInViaGoogle = u.LoginProviders.Contains("Google"),
+            IsLoggedInViaGithub = u.LoginProviders.Contains("Github"),
+            IsLoggedInViaLinkedin = u.LoginProviders.Contains("LinkedIn"),
+            IsEmailConfirmed = u.IsEmailConfirmed
+          })
+          .ToList()
+      });
+    }
+  }
+}

@@ -2,19 +2,20 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.ViewModels;
 
 namespace TodoList.Identity.API.Controllers
 {
   public class AccountController : Controller
   {
-    private readonly UserManager<IdentityUser<int>> userManager;
-    private readonly SignInManager<IdentityUser<int>> signInManager;
+    private readonly UserManager<User> userManager;
+    private readonly SignInManager<User> signInManager;
     private readonly IIdentityServerInteractionService interaction;
 
     public AccountController(
-      UserManager<IdentityUser<int>> userManager,
-      SignInManager<IdentityUser<int>> signInManager,
+      UserManager<User> userManager,
+      SignInManager<User> signInManager,
       IIdentityServerInteractionService interaction)
     {
       this.userManager = userManager;
@@ -31,7 +32,7 @@ namespace TodoList.Identity.API.Controllers
     {
       if (ModelState.IsValid)
       {
-        IdentityUser<int> user = await userManager.FindByEmailAsync(model.Email);
+        User user = await userManager.FindByEmailAsync(model.Email);
 
         if (user == null)
         {

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using TodoList.Identity.API.Data;
+using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API
 {
@@ -30,7 +31,7 @@ namespace TodoList.Identity.API
         .AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
       services
-        .AddIdentity<IdentityUser<int>, IdentityRole<int>>()
+        .AddIdentity<User, Role>()
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
@@ -46,7 +47,7 @@ namespace TodoList.Identity.API
         {
           options.ConfigureDbContext = b => b.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
         })
-        .AddAspNetIdentity<IdentityUser<int>>()
+        .AddAspNetIdentity<User>()
         .AddDeveloperSigningCredential();
     }
 
@@ -64,6 +65,7 @@ namespace TodoList.Identity.API
 
       app.UseRouting();
       app.UseIdentityServer();
+      app.UseAuthorization();
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapDefaultControllerRoute();

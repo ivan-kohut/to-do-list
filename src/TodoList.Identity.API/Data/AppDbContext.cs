@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Data
 {
-  public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<int>, int>
+  public class AppDbContext : IdentityDbContext<User, Role, int, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
   {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -13,6 +14,8 @@ namespace TodoList.Identity.API.Data
     protected override void OnModelCreating(ModelBuilder builder)
     {
       base.OnModelCreating(builder);
+
+      builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
   }
 }
