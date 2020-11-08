@@ -16,7 +16,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace Controllers
@@ -43,38 +42,6 @@ namespace Controllers
       this.userLoginService = userLoginService;
       this.userManager = userManager;
       this.jwtOptions = jwtOptions.Value;
-    }
-
-    /// <response code="403">If user does not have role "admin"</response>
-    [HttpGet]
-    [ProducesResponseType(401)]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<UserListApiModel>>> GetAllAsync([FromServices] IUserService userService) =>
-      (await userService.GetAllAsync())
-        .Select(u => new UserListApiModel
-        {
-          Id = u.Id,
-          Name = u.Name,
-          Email = u.Email,
-          IsRegisteredInSystem = u.IsRegisteredInSystem,
-          IsLoggedInViaFacebook = u.LoginProviders.Contains("Facebook"),
-          IsLoggedInViaGoogle = u.LoginProviders.Contains("Google"),
-          IsLoggedInViaGithub = u.LoginProviders.Contains("Github"),
-          IsLoggedInViaLinkedin = u.LoginProviders.Contains("LinkedIn"),
-          IsEmailConfirmed = u.IsEmailConfirmed
-        })
-        .ToList();
-
-    /// <response code="403">If user does not have role "admin"</response> 
-    /// <response code="404">If user is not found by id</response> 
-    [HttpDelete("{id}")]
-    [ProducesResponseType(401)]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> DeleteAsync(int id, [FromServices] IUserService userService)
-    {
-      await userService.DeleteAsync(id);
-
-      return Ok();
     }
 
     /// <response code="400">Email is not confirmed or two-factor code is invalid or password is not valid</response> 
@@ -282,83 +249,6 @@ namespace Controllers
       return Json(await GenerateTokenAsync("LinkedIn", linkedInUserIdModel.Id, userEmail));
     }
 
-    [HttpPost]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateUserAsync(UserCreateModel userCreateModel, [FromServices] IEmailService emailService)
-    {
-      User user = await userManager.FindByEmailAsync(userCreateModel.Email);
-
-      if (user != null && user.PasswordHash != null)
-      {
-        return BadRequest(new { errors = new[] { $"User with email '{userCreateModel.Email}' exists already" } });
-      }
-      else if (user == null)
-      {
-        user = new User { UserName = userCreateModel.Name, Email = userCreateModel.Email };
-
-        IdentityResult identityCreateResult = await userManager.CreateAsync(user, userCreateModel.Password);
-
-        if (identityCreateResult.Succeeded)
-        {
-          await userRoleService.CreateAsync(user.Id, "user");
-        }
-        else
-        {
-          return BadRequest(new { errors = GenerateErrorMessages(identityCreateResult) });
-        }
-      }
-      else
-      {
-        user.UserName = userCreateModel.Name;
-
-        foreach (IUserValidator<User> userValidator in userManager.UserValidators)
-        {
-          IdentityResult identityValidateResult = await userValidator.ValidateAsync(userManager, user);
-
-          if (!identityValidateResult.Succeeded)
-          {
-            return BadRequest(new { errors = GenerateErrorMessages(identityValidateResult) });
-          }
-        }
-
-        IdentityResult identityUpdateResult = await userManager.AddPasswordAsync(user, userCreateModel.Password);
-
-        if (!identityUpdateResult.Succeeded)
-        {
-          return BadRequest(new { errors = GenerateErrorMessages(identityUpdateResult) });
-        }
-      }
-
-      await emailService.SendEmailAsync(user.Email, "Confirm your email", await GenerateEmailConfirmationMessageAsync(user));
-
-      return Ok();
-    }
-
-    [ProducesResponseType(400)]
-    [HttpGet("{id}/email/confirm")]
-    public async Task<IActionResult> ConfirmEmailAsync(int id, string code)
-    {
-      if (string.IsNullOrWhiteSpace(code))
-      {
-        return BadRequest();
-      }
-
-      User user = await userManager.FindByIdAsync(id.ToString());
-
-      if (user == null || user.EmailConfirmed)
-      {
-        return BadRequest();
-      }
-      else if ((await userManager.ConfirmEmailAsync(user, code)).Succeeded)
-      {
-        return Ok("Your email is confirmed");
-      }
-      else
-      {
-        return BadRequest();
-      }
-    }
-
     /// <response code="404">If user is not found by email</response> 
     [HttpPost(Urls.PasswordRecovery)]
     public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel, [FromServices] IEmailService emailService)
@@ -526,18 +416,6 @@ namespace Controllers
         expires: DateTime.UtcNow.AddMonths(1),
         signingCredentials: new SigningCredentials(jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256)
       ));
-    }
-
-    private async Task<string> GenerateEmailConfirmationMessageAsync(User user)
-    {
-      string callbackUrl = Url.Action(
-        "ConfirmEmail",
-        "Users",
-        new { id = user.Id, code = await userManager.GenerateEmailConfirmationTokenAsync(user) },
-        protocol: HttpContext.Request.Scheme
-      );
-
-      return $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
     }
 
     private string GeneratePasswordRecoveryMessage(string password) =>
