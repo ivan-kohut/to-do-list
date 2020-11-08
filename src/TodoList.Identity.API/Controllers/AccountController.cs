@@ -50,9 +50,7 @@ namespace TodoList.Identity.API.Controllers
         }
         else
         {
-          return interaction.IsValidReturnUrl(model.ReturnUrl)
-            ? Redirect(model.ReturnUrl)
-            : Redirect("/");
+          return Redirect(interaction.IsValidReturnUrl(model.ReturnUrl) ? model.ReturnUrl : "/");
         }
       }
 
@@ -84,7 +82,7 @@ namespace TodoList.Identity.API.Controllers
 
           if (!identityCreateResult.Succeeded)
           {
-            return ReturnViewWithErrors(identityCreateResult, model.ReturnUrl);
+            return ViewWithErrors(identityCreateResult, model.ReturnUrl);
           }
 
           await userManager.AddToRoleAsync(user, "user");
@@ -99,7 +97,7 @@ namespace TodoList.Identity.API.Controllers
 
             if (!identityValidateResult.Succeeded)
             {
-              return ReturnViewWithErrors(identityValidateResult, model.ReturnUrl);
+              return ViewWithErrors(identityValidateResult, model.ReturnUrl);
             }
           }
 
@@ -107,29 +105,43 @@ namespace TodoList.Identity.API.Controllers
 
           if (!identityUpdateResult.Succeeded)
           {
-            return ReturnViewWithErrors(identityUpdateResult, model.ReturnUrl);
+            return ViewWithErrors(identityUpdateResult, model.ReturnUrl);
           }
         }
 
         await emailService.SendEmailAsync(user.Email!, "Confirm your email", await GenerateEmailConfirmationMessageAsync(user, model.ReturnUrl));
 
-        return Redirect("/Account/RegistrationSuccess");
+        return RedirectToAction(nameof(RegisterSuccess));
       }
 
       return View(new RegisterViewModel { ReturnUrl = model.ReturnUrl });
     }
 
     [HttpGet]
-    public IActionResult RegistrationSuccess()
-    {
-      return View();
-    }
+    public IActionResult RegisterSuccess() => View();
 
     [HttpGet]
     public async Task<IActionResult> ConfirmEmail(int? id, string? code, string? returnUrl)
     {
-      return View();
+      if (!id.HasValue || string.IsNullOrWhiteSpace(code))
+      {
+        return Redirect("/");
+      }
+
+      User user = await userManager.FindByIdAsync(id.ToString());
+
+      if (user == null || user.EmailConfirmed || !(await userManager.ConfirmEmailAsync(user, code)).Succeeded)
+      {
+        return Redirect("/");
+      }
+      else
+      {
+        return RedirectToAction(nameof(ConfirmEmailSuccess), new { returnUrl });
+      }
     }
+
+    [HttpGet]
+    public IActionResult ConfirmEmailSuccess(string? returnUrl) => View(model: returnUrl);
 
     [HttpGet]
     public IActionResult Logout(string? logoutId) => View(new LogoutViewModel { LogoutId = logoutId });
@@ -146,7 +158,7 @@ namespace TodoList.Identity.API.Controllers
       return Redirect((await interaction.GetLogoutContextAsync(model.LogoutId))?.PostLogoutRedirectUri ?? "/");
     }
 
-    private IActionResult ReturnViewWithErrors(IdentityResult identityResult, string? returnUrl)
+    private IActionResult ViewWithErrors(IdentityResult identityResult, string? returnUrl)
     {
       identityResult
         .Errors
