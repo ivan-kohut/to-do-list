@@ -48,6 +48,6 @@ a {
   display: none;
 }
 
-.field-validation-error {
+.validation.validation-summary-errors li, .field-validation-error {
   color: #f65a5b;
 }

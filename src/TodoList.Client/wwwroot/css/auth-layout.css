@@ -3,20 +3,14 @@
   margin-right: 50px;
 }
 
-.login {
-  color: black;
-  margin: 25px;
-  text-decoration: none;
-}
-
-.signup {
-  display: inline-block;
-  color: #fff;
-  background-color: #6400e4;
-  width: 88px;
-  height: 33px;
-  text-align: center;
-  padding-top: 12px;
-  margin: 25px;
-  text-decoration: none;
-}
+  .login-and-signup .login {
+    display: inline-block;
+    color: #fff;
+    background-color: #6400e4;
+    width: 88px;
+    height: 33px;
+    text-align: center;
+    padding-top: 12px;
+    margin: 25px;
+    text-decoration: none;
+  }

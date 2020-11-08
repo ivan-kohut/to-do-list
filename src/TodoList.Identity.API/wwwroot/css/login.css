@@ -14,3 +14,18 @@
 .password-recovery {
   margin-bottom: 10px;
 }
+
+.login-and-signup {
+  text-align: right;
+}
+
+.signup {
+  display: inline-block;
+  color: #fff;
+  background-color: #6400e4;
+  width: 88px;
+  height: 33px;
+  text-align: center;
+  padding-top: 12px;
+  text-decoration: none;
+}

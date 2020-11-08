@@ -4,6 +4,12 @@
   string baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
 }
 
+<div>
+  <div class="login-and-signup">
+    <a class="signup" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Sign up</a>
+  </div>
+</div>
+
 <form asp-route="Login">
   <input type="hidden" asp-for="ReturnUrl" />
 

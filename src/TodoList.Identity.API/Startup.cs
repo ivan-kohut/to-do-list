@@ -8,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using TodoList.Identity.API.Data;
 using TodoList.Identity.API.Data.Entities;
+using TodoList.Identity.API.Options;
+using TodoList.Identity.API.Services;
 
 namespace TodoList.Identity.API
 {
@@ -51,6 +53,10 @@ namespace TodoList.Identity.API
         })
         .AddAspNetIdentity<User>()
         .AddDeveloperSigningCredential();
+
+      services.Configure<SendGridOptions>(configuration.GetSection("SendGrid"));
+
+      services.AddSingleton<IEmailService, EmailService>();
 
       if (webHostEnvironment.IsDevelopment())
       {
