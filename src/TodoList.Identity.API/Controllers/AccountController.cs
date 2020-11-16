@@ -44,6 +44,10 @@ namespace TodoList.Identity.API.Controllers
         {
           ModelState.AddModelError(nameof(LoginViewModel.Email), "The User is not found.");
         }
+        else if (!user.EmailConfirmed)
+        {
+          ModelState.AddModelError(nameof(LoginViewModel.Email), "The Email is not confirmed.");
+        }
         else if (!(await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true)).Succeeded)
         {
           ModelState.AddModelError(nameof(LoginViewModel.Password), "The Password is invalid.");
