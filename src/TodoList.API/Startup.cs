@@ -82,7 +82,7 @@ namespace WebApplication
         {
           Version = "v1",
           Title = "Todo List",
-          Description = "Simple Todo List API developed using C#, ASP.NET Core 3.1 and EF Core 3.1"
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 5.0 and EF Core 5.0"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
