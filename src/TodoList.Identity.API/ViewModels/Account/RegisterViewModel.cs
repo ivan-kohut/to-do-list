@@ -2,7 +2,7 @@
 
 namespace TodoList.Identity.API.ViewModels
 {
-  public class RegisterViewModel
+  public class RegisterViewModel : ViewModelBase
   {
     [Required]
     public string? Name { get; set; }
@@ -17,7 +17,5 @@ namespace TodoList.Identity.API.ViewModels
     [Required]
     [Compare(nameof(Password))]
     public string? ConfirmPassword { get; set; }
-
-    public string? ReturnUrl { get; set; }
   }
 }

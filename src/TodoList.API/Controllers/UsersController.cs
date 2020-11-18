@@ -44,66 +44,6 @@ namespace Controllers
       this.jwtOptions = jwtOptions.Value;
     }
 
-    /// <response code="400">Email is not confirmed or two-factor code is invalid or password is not valid</response> 
-    /// <response code="427">If two-factor code is missing</response> 
-    /// <response code="404">If user is not found by email</response> 
-    [HttpPost(Urls.Login)]
-    public async Task<IActionResult> LoginAsync(UserLoginModel userLoginModel)
-    {
-      IActionResult actionResult;
-
-      User user = await userManager.FindByEmailAsync(userLoginModel.Email);
-
-      if (user == null)
-      {
-        actionResult = NotFound(new { errors = new[] { $"User with email '{userLoginModel.Email}' is not found" } });
-      }
-      else if (await userManager.CheckPasswordAsync(user, userLoginModel.Password))
-      {
-        if (!user.EmailConfirmed)
-        {
-          actionResult = BadRequest(new { errors = new[] { "Email is not confirmed. Please, go to your email account" } });
-        }
-        else
-        {
-          if (user.TwoFactorEnabled)
-          {
-            if (string.IsNullOrWhiteSpace(userLoginModel.TwoFactorToken))
-            {
-              actionResult = StatusCode(427, new { errors = new[] { "Enter authentication code" } });
-            }
-            else
-            {
-              bool isTwoFactorTokenValid = await userManager.VerifyTwoFactorTokenAsync(
-                user,
-                userManager.Options.Tokens.AuthenticatorTokenProvider,
-                userLoginModel.TwoFactorToken
-              );
-
-              if (isTwoFactorTokenValid)
-              {
-                actionResult = Json(await GenerateTokenAsync(user));
-              }
-              else
-              {
-                actionResult = BadRequest(new { errors = new[] { "Verification code is invalid." } });
-              }
-            }
-          }
-          else
-          {
-            actionResult = Json(await GenerateTokenAsync(user));
-          }
-        }
-      }
-      else
-      {
-        actionResult = BadRequest(new { errors = new[] { "User password is not valid" } });
-      }
-
-      return actionResult;
-    }
-
     [ProducesResponseType(400)]
     [HttpPost(Urls.LoginByFacebook)]
     public async Task<IActionResult> LoginByFacebookAsync(

@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.Services;
 using TodoList.Identity.API.ViewModels;
+
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace TodoList.Identity.API.Controllers
 {
@@ -44,17 +47,30 @@ namespace TodoList.Identity.API.Controllers
         {
           ModelState.AddModelError(nameof(LoginViewModel.Email), "The User is not found.");
         }
+        else if (!await userManager.CheckPasswordAsync(user, model.Password))
+        {
+          ModelState.AddModelError(nameof(LoginViewModel.Password), "The Password is invalid.");
+        }
         else if (!user.EmailConfirmed)
         {
           ModelState.AddModelError(nameof(LoginViewModel.Email), "The Email is not confirmed.");
         }
-        else if (!(await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true)).Succeeded)
-        {
-          ModelState.AddModelError(nameof(LoginViewModel.Password), "The Password is invalid.");
-        }
         else
         {
-          return Redirect(interaction.IsValidReturnUrl(model.ReturnUrl) ? model.ReturnUrl : "/");
+          SignInResult signInResult = await signInManager.PasswordSignInAsync(user, model.Password, isPersistent: false, lockoutOnFailure: true);
+
+          if (signInResult.Succeeded)
+          {
+            return RedirectTo(model.ReturnUrl);
+          }
+          else if (signInResult.RequiresTwoFactor)
+          {
+            return RedirectToAction(nameof(LoginWith2fa), new { model.ReturnUrl });
+          }
+          else
+          {
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+          }
         }
       }
 
@@ -148,6 +164,30 @@ namespace TodoList.Identity.API.Controllers
     public IActionResult ConfirmEmailSuccess(string? returnUrl) => View(model: returnUrl);
 
     [HttpGet]
+    [Authorize(AuthenticationSchemes = "Identity.TwoFactorUserId")]
+    public IActionResult LoginWith2fa(string? returnUrl) => View(new LoginWith2faViewModel { ReturnUrl = returnUrl });
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(AuthenticationSchemes = "Identity.TwoFactorUserId")]
+    public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        if (!(await signInManager.TwoFactorAuthenticatorSignInAsync(model.TwoFactorToken, isPersistent: false, rememberClient: false)).Succeeded)
+        {
+          ModelState.AddModelError(nameof(LoginWith2faViewModel.TwoFactorToken), "Invalid authenticator code.");
+        }
+        else
+        {
+          return RedirectTo(model.ReturnUrl);
+        }
+      }
+
+      return View(new LoginWith2faViewModel { ReturnUrl = model.ReturnUrl });
+    }
+
+    [HttpGet]
     public IActionResult Logout(string? logoutId) => View(new LogoutViewModel { LogoutId = logoutId });
 
     [HttpPost]
@@ -184,5 +224,7 @@ namespace TodoList.Identity.API.Controllers
 
       return $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
     }
+
+    private IActionResult RedirectTo(string? returnUrl) => Redirect(interaction.IsValidReturnUrl(returnUrl) ? returnUrl : "/");
   }
 }

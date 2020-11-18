@@ -2,7 +2,7 @@
 
 namespace TodoList.Identity.API.ViewModels
 {
-  public class LoginViewModel
+  public class LoginViewModel : ViewModelBase
   {
     [Required]
     [EmailAddress]
@@ -10,7 +10,5 @@ namespace TodoList.Identity.API.ViewModels
 
     [Required]
     public string? Password { get; set; }
-
-    public string? ReturnUrl { get; set; }
   }
 }
