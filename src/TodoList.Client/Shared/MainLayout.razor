@@ -4,6 +4,10 @@
 @inject NavigationManager NavigationManager
 @inject SignOutSessionStateManager SignOutManager
 
+@{ 
+  string identityUrl = Configuration["IdentityUrl"];
+}
+
 <AuthorizeView>
   <Authorized>
     <div class="user-menu">
@@ -19,10 +23,10 @@
         <div class="dropdown-content">
           <AuthorizeView Roles="admin">
             <Authorized Context="adminContext">
-              <a href="@($"{Configuration["IdentityUrl"]}/admin/users")">Users</a>
+              <a href="@($"{identityUrl}/admin/users")">Users</a>
             </Authorized>
           </AuthorizeView>
-          <a href="account">Settings</a>
+          <a href="@($"{identityUrl}/settings/manage")">Settings</a>
           <a @onclick="OnLogout">Log out</a>
         </div>
       </div>

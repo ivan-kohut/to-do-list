@@ -1,0 +1,35 @@
+﻿@model Enable2faViewModel
+
+<div class="field">
+  Please use your authentication app (such as Google Authenticator) to scan this QR code
+</div>
+
+<div id="qrCode"></div>
+
+<form asp-route="Enable2fa">
+  <input type="hidden" asp-for="AuthenticatorUri" />
+
+  <div class="field">
+    <label class="display-block" asp-for="Code">Please enter the code that you see on your authentication app</label>
+    <input class="input-text" asp-for="Code" type="text" />
+    <span asp-validation-for="Code"></span>
+  </div>
+
+  <partial name="_Button" model="@("Turn on")" />
+</form>
+
+@section Styles {
+  <link href="/css/2fa.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+  <script src="/js/qrcode.js"></script>
+  <script type="text/javascript">
+    new QRCode(document.getElementById("qrCode"),
+    {
+        text: "@Model.AuthenticatorUri",
+        width: 150,
+        height: 150
+    });
+  </script>
+}
