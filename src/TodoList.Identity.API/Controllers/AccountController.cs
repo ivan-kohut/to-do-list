@@ -74,7 +74,7 @@ namespace TodoList.Identity.API.Controllers
         }
       }
 
-      return View(new LoginViewModel { ReturnUrl = model.ReturnUrl });
+      return View(model);
     }
 
     [HttpGet]
@@ -92,7 +92,7 @@ namespace TodoList.Identity.API.Controllers
         {
           ModelState.AddModelError(nameof(LoginViewModel.Email), $"The User with the email already exists");
 
-          return View(new RegisterViewModel { ReturnUrl = model.ReturnUrl });
+          return View(model);
         }
         else if (user == null)
         {
@@ -102,7 +102,7 @@ namespace TodoList.Identity.API.Controllers
 
           if (!identityCreateResult.Succeeded)
           {
-            return ViewWithErrors(identityCreateResult, model.ReturnUrl);
+            return ViewWithErrors(identityCreateResult, model);
           }
 
           await userManager.AddToRoleAsync(user, "user");
@@ -117,7 +117,7 @@ namespace TodoList.Identity.API.Controllers
 
             if (!identityValidateResult.Succeeded)
             {
-              return ViewWithErrors(identityValidateResult, model.ReturnUrl);
+              return ViewWithErrors(identityValidateResult, model);
             }
           }
 
@@ -125,7 +125,7 @@ namespace TodoList.Identity.API.Controllers
 
           if (!identityUpdateResult.Succeeded)
           {
-            return ViewWithErrors(identityUpdateResult, model.ReturnUrl);
+            return ViewWithErrors(identityUpdateResult, model);
           }
         }
 
@@ -134,7 +134,7 @@ namespace TodoList.Identity.API.Controllers
         return RedirectToAction(nameof(RegisterSuccess));
       }
 
-      return View(new RegisterViewModel { ReturnUrl = model.ReturnUrl });
+      return View(model);
     }
 
     [HttpGet]
@@ -150,14 +150,9 @@ namespace TodoList.Identity.API.Controllers
 
       User user = await userManager.FindByIdAsync(id.ToString());
 
-      if (user == null || user.EmailConfirmed || !(await userManager.ConfirmEmailAsync(user, code)).Succeeded)
-      {
-        return Redirect("/");
-      }
-      else
-      {
-        return RedirectToAction(nameof(ConfirmEmailSuccess), new { returnUrl });
-      }
+      return user == null || user.EmailConfirmed || !(await userManager.ConfirmEmailAsync(user, code)).Succeeded
+        ? Redirect("/")
+        : RedirectToAction(nameof(ConfirmEmailSuccess), new { returnUrl });
     }
 
     [HttpGet]
@@ -184,8 +179,67 @@ namespace TodoList.Identity.API.Controllers
         }
       }
 
-      return View(new LoginWith2faViewModel { ReturnUrl = model.ReturnUrl });
+      return View(model);
     }
+
+    [HttpGet]
+    public IActionResult ForgotPassword(string? returnUrl) => View(new ForgotPasswordViewModel { ReturnUrl = returnUrl });
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        User user = await userManager.FindByEmailAsync(model.Email);
+
+        if (user != null && user.EmailConfirmed)
+        {
+          await emailService.SendEmailAsync(user.Email, "Reset password", await GeneratePasswordResetMessageAsync(user, model.ReturnUrl));
+        }
+
+        return RedirectToAction(nameof(ForgotPasswordSuccess));
+      }
+
+      return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult ForgotPasswordSuccess() => View();
+
+    [HttpGet]
+    public IActionResult ResetPassword(int? id, string? code, string? returnUrl) => View(new ResetPasswordViewModel { Id = id, Code = code, ReturnUrl = returnUrl });
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        if (!model.Id.HasValue || string.IsNullOrWhiteSpace(model.Code))
+        {
+          return Redirect("/");
+        }
+
+        User user = await userManager.FindByIdAsync(model.Id.ToString());
+
+        if (user == null)
+        {
+          return Redirect("/");
+        }
+
+        IdentityResult identityResetPasswordResult = await userManager.ResetPasswordAsync(user, model.Code, model.Password);
+
+        return identityResetPasswordResult.Succeeded
+          ? RedirectToAction(nameof(ResetPasswordSuccess), new { model.ReturnUrl })
+          : ViewWithErrors(identityResetPasswordResult, model);
+      }
+
+      return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult ResetPasswordSuccess(string? returnUrl) => View(model: returnUrl);
 
     [HttpGet]
     public IActionResult Logout(string? logoutId) => View(new LogoutViewModel { LogoutId = logoutId });
@@ -202,15 +256,15 @@ namespace TodoList.Identity.API.Controllers
       return Redirect((await interaction.GetLogoutContextAsync(model.LogoutId))?.PostLogoutRedirectUri ?? "/");
     }
 
-    private IActionResult ViewWithErrors(IdentityResult identityResult, string? returnUrl)
+    private IActionResult ViewWithErrors<T>(IdentityResult identityResult, T model)
     {
       identityResult
         .Errors
         .Select(e => e.Description)
         .ToList()
-        .ForEach(e => ModelState.AddModelError(string.Empty, e));
+        .ForEach(d => ModelState.AddModelError(string.Empty, d));
 
-      return View(new RegisterViewModel { ReturnUrl = returnUrl });
+      return View(model);
     }
 
     private async Task<string> GenerateEmailConfirmationMessageAsync(User user, string? returnUrl)
@@ -223,6 +277,18 @@ namespace TodoList.Identity.API.Controllers
       );
 
       return $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
+    }
+
+    private async Task<string> GeneratePasswordResetMessageAsync(User user, string? returnUrl)
+    {
+      string callbackUrl = Url.Action(
+        nameof(ResetPassword),
+        "Account",
+        new { id = user.Id, code = await userManager.GeneratePasswordResetTokenAsync(user), returnUrl },
+        protocol: HttpContext.Request.Scheme
+      );
+
+      return $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
     }
 
     private IActionResult RedirectTo(string? returnUrl) => Redirect(interaction.IsValidReturnUrl(returnUrl) ? returnUrl : "/");

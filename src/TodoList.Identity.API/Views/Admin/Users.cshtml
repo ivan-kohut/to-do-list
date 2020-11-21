@@ -27,7 +27,7 @@
           <td>@user.IsLoggedInViaLinkedin</td>
           <td>@user.IsEmailConfirmed</td>
           <td>
-            <form id="@user.Id" action="/admin/users/delete/@user.Id" method="POST">
+            <form id="@user.Id" asp-antiforgery="true" action="/admin/users/delete/@user.Id" method="POST">
               <a class="item-button" onclick="document.getElementById('@user.Id').submit();"><img class="delete-btn" src="/img/delete.png" /></a>
             </form>
           </td>

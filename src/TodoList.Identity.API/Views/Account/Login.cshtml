@@ -26,7 +26,7 @@
   </div>
 
   <div class="password-recovery">
-    <a href="password-recovery">Recover password</a>
+    <a asp-action="ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Recover password</a>
   </div>
 
   <partial name="_Button" model="@("Log in")" />

@@ -61,6 +61,7 @@ namespace TodoList.Identity.API.Controllers
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteUserAsync(int? id, CancellationToken cancellationToken)
     {
       if (id.HasValue)

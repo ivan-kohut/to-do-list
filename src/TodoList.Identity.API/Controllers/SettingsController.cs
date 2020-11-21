@@ -62,7 +62,7 @@ namespace TodoList.Identity.API.Controllers
         }
       }
 
-      return View(new Enable2faViewModel { AuthenticatorUri = model.AuthenticatorUri });
+      return View(model);
     }
 
     [HttpPost]
@@ -106,7 +106,7 @@ namespace TodoList.Identity.API.Controllers
         }
       }
 
-      return View(new ChangePasswordViewModel());
+      return View(model);
     }
   }
 }

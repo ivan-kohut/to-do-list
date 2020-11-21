@@ -25,8 +25,6 @@ namespace Controllers
   [Route(Urls.Users)]
   public class UsersController : Controller
   {
-    private const string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
     private readonly IUserRoleService userRoleService;
     private readonly IUserLoginService userLoginService;
     private readonly UserManager<User> userManager;
@@ -188,27 +186,6 @@ namespace Controllers
       return Json(await GenerateTokenAsync("LinkedIn", linkedInUserIdModel.Id, userEmail));
     }
 
-    /// <response code="404">If user is not found by email</response> 
-    [HttpPost(Urls.PasswordRecovery)]
-    public async Task<IActionResult> RecoverPassword(UserForgotPasswordModel userForgotPasswordModel, [FromServices] IEmailService emailService)
-    {
-      User user = await userManager.FindByEmailAsync(userForgotPasswordModel.Email);
-
-      if (user == null)
-      {
-        return NotFound(new { errors = new[] { $"User with email '{userForgotPasswordModel.Email}' is not found" } });
-      }
-
-      string randomPassword = GenerateRandomPassword();
-
-      user.PasswordHash = userManager.PasswordHasher.HashPassword(user, randomPassword);
-
-      await userManager.UpdateAsync(user);
-      await emailService.SendEmailAsync(user.Email, "Password recovery", GeneratePasswordRecoveryMessage(randomPassword));
-
-      return Ok();
-    }
-
     private async Task<string> GenerateTokenAsync(string loginProvider, string userInfoResponse)
     {
       UserExternalLoginData userExternalLoginData = JsonConvert.DeserializeObject<UserExternalLoginData>(userInfoResponse);
@@ -250,21 +227,6 @@ namespace Controllers
         expires: DateTime.UtcNow.AddMonths(1),
         signingCredentials: new SigningCredentials(jwtOptions.SecurityKey, SecurityAlgorithms.HmacSha256)
       ));
-    }
-
-    private string GeneratePasswordRecoveryMessage(string password) =>
-      $"The '{password}' is your new random password for login. Please change it in your account for security.";
-
-    private string GenerateRandomPassword()
-    {
-      Random random = new Random();
-
-      return new string(
-        Enumerable
-          .Repeat(symbols, 10)
-          .Select(s => s[random.Next(s.Length)])
-          .ToArray()
-      );
     }
   }
 }
