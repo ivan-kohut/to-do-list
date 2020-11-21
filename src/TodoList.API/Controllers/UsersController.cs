@@ -1,6 +1,5 @@
 ﻿using API.Models;
 using Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -210,29 +209,6 @@ namespace Controllers
       return Ok();
     }
 
-    /// <response code="403">If user does not have role "admin" or "user"</response> 
-    [Authorize(Roles = "admin,user")]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [HttpPut(Urls.ChangePassword)]
-    public async Task<IActionResult> ChangePassword(UserChangePasswordModel userChangePasswordModel)
-    {
-      User user = await userManager.GetUserAsync(User);
-
-      IdentityResult identityChangePasswordResult = await userManager.ChangePasswordAsync(
-        user, userChangePasswordModel.OldPassword, userChangePasswordModel.NewPassword
-      );
-
-      if (identityChangePasswordResult.Succeeded)
-      {
-        return Ok();
-      }
-      else
-      {
-        return BadRequest(new { errors = GenerateErrorMessages(identityChangePasswordResult) });
-      }
-    }
-
     private async Task<string> GenerateTokenAsync(string loginProvider, string userInfoResponse)
     {
       UserExternalLoginData userExternalLoginData = JsonConvert.DeserializeObject<UserExternalLoginData>(userInfoResponse);
@@ -290,11 +266,5 @@ namespace Controllers
           .ToArray()
       );
     }
-
-    private IEnumerable<string> GenerateErrorMessages(IdentityResult identityResult) =>
-      identityResult
-        .Errors
-        .Select(e => e.Description)
-        .ToList();
   }
 }

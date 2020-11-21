@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.ViewModels;
@@ -77,6 +78,35 @@ namespace TodoList.Identity.API.Controllers
       }
 
       return RedirectToAction(nameof(Manage));
+    }
+
+    [HttpGet]
+    public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+      if (ModelState.IsValid)
+      {
+        User user = await userManager.GetUserAsync(User);
+
+        IdentityResult identityChangePasswordResult = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+        if (identityChangePasswordResult.Succeeded)
+        {
+          return RedirectToAction(nameof(Manage));
+        }
+        else
+        {
+          identityChangePasswordResult.Errors
+            .Select(e => e.Description)
+            .ToList()
+            .ForEach(d => ModelState.AddModelError(string.Empty, d));
+        }
+      }
+
+      return View(new ChangePasswordViewModel());
     }
   }
 }
