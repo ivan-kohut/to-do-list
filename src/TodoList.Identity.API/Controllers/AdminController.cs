@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using TodoList.Identity.API.Consts;
 using TodoList.Identity.API.Data;
 using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.ViewModels;
@@ -50,10 +51,10 @@ namespace TodoList.Identity.API.Controllers
             Name = u.Name,
             Email = u.Email,
             IsRegisteredInSystem = u.IsRegisteredInSystem,
-            IsLoggedInViaFacebook = u.LoginProviders.Contains("Facebook"),
-            IsLoggedInViaGoogle = u.LoginProviders.Contains("Google"),
-            IsLoggedInViaGithub = u.LoginProviders.Contains("Github"),
-            IsLoggedInViaLinkedin = u.LoginProviders.Contains("LinkedIn"),
+            IsLoggedInViaFacebook = u.LoginProviders.Contains(ExternalProviderNames.Facebook),
+            IsLoggedInViaGoogle = u.LoginProviders.Contains(ExternalProviderNames.Google),
+            IsLoggedInViaGithub = u.LoginProviders.Contains(ExternalProviderNames.GitHub),
+            IsLoggedInViaLinkedin = u.LoginProviders.Contains(ExternalProviderNames.LinkedIn),
             IsEmailConfirmed = u.IsEmailConfirmed
           })
           .ToList()

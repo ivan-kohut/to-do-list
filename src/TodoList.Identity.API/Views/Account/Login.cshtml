@@ -1,9 +1,5 @@
 ﻿@model LoginViewModel
 
-@{
-  string baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
-}
-
 <div>
   <div class="login-and-signup">
     <a class="signup" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Sign up</a>
@@ -36,18 +32,12 @@
   Log in with
 </div>
 <div class="login-social">
-  <a class="login-social-link" href="https://www.facebook.com/v3.2/dialog/oauth?response_type=code&client_id=2183212631898223&redirect_uri=@(baseUrl)/facebook-callback">
-    <img src="/img/facebook.png" />
-  </a>
-  <a class="login-social-link" href="https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=895102170629-q6uh1oqvltjau4v9p4lqsor155dlvdcl.apps.googleusercontent.com&redirect_uri=@(baseUrl)/google-callback&scope=email">
-    <img src="/img/google.png" />
-  </a>
-  <a class="login-social-link" href="https://github.com/login/oauth/authorize?client_id=f39f5854ebe1640ebac6&redirect_uri=@(baseUrl)/github-callback&scope=user:email">
-    <img src="/img/github.png" />
-  </a>
-  <a class="login-social-link" href="https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=778xsexk4ogstv&redirect_uri=@(baseUrl)/linkedin-callback&scope=r_liteprofile%20r_emailaddress%20w_member_social">
-    <img src="/img/linkedin.png" />
-  </a>
+  @foreach (var externalProvider in new string[] { ExternalProviderNames.Facebook, ExternalProviderNames.Google, ExternalProviderNames.GitHub, ExternalProviderNames.LinkedIn })
+  {
+    <a class="login-social-link" asp-controller="External" asp-action="Challenge" asp-route-scheme="@externalProvider" asp-route-returnUrl="@Model.ReturnUrl">
+      <img src="/img/@(externalProvider.ToLower()).png" />
+    </a>
+  }
 </div>
 
 @section Styles {

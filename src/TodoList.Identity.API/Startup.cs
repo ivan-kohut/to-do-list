@@ -1,3 +1,4 @@
+using IdentityServer4;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +54,32 @@ namespace TodoList.Identity.API
         })
         .AddAspNetIdentity<User>()
         .AddDeveloperSigningCredential();
+
+      services.AddAuthentication()
+        .AddFacebook(o =>
+        {
+          o.AppId = configuration["Facebook:AppId"];
+          o.AppSecret = configuration["Facebook:AppSecret"];
+          o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        })
+        .AddGoogle(o =>
+        {
+          o.ClientId = configuration["Google:ClientId"];
+          o.ClientSecret = configuration["Google:ClientSecret"];
+          o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        })
+        .AddGitHub(o =>
+        {
+          o.ClientId = configuration["Github:ClientId"];
+          o.ClientSecret = configuration["Github:ClientSecret"];
+          o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        })
+        .AddLinkedIn(o =>
+        {
+          o.ClientId = configuration["LinkedIn:ClientId"];
+          o.ClientSecret = configuration["LinkedIn:ClientSecret"];
+          o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        });
 
       services.Configure<SendGridOptions>(configuration.GetSection("SendGrid"));
 
