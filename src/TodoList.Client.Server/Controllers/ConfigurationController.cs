@@ -8,14 +8,7 @@ namespace TodoList.Client.Server.Controllers
   [Route("[controller]")]
   public class ConfigurationController : ControllerBase
   {
-    private readonly AppOptions appOptions;
-
-    public ConfigurationController(IOptions<AppOptions> appOptions)
-    {
-      this.appOptions = appOptions.Value;
-    }
-
     [HttpGet]
-    public IActionResult GetAppOptions() => Ok(appOptions);
+    public IActionResult GetAppOptions([FromServices] IOptions<AppOptions> appOptions) => Ok(appOptions.Value);
   }
 }

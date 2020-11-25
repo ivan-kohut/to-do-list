@@ -44,16 +44,21 @@ namespace TodoList.Client.Components
 
     protected async Task UpdateItemStatusAsync(ChangeEventArgs e, ItemApiModel item)
     {
-      item.IsDone = (bool)e.Value;
+      item.IsDone = e.Value is bool isDone && isDone;
 
       await UpdateItemAsync(item);
     }
 
     protected async Task UpdateItemTextAsync(ChangeEventArgs e, ItemApiModel item)
     {
-      item.Text = (string)e.Value;
+      string? text = e.Value as string;
 
-      await UpdateItemAsync(item);
+      if (!string.IsNullOrWhiteSpace(text))
+      {
+        item.Text = text;
+
+        await UpdateItemAsync(item);
+      }
     }
 
     protected async Task DeleteItemAsync(ItemApiModel item)
