@@ -1,20 +1,16 @@
 ﻿using Controllers.Services;
 using Delegates;
-using Entities;
 using Extensions;
 using Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Options;
 using Repositories;
 using Services;
 using StackExchange.Profiling;
@@ -23,7 +19,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace WebApplication
 {
@@ -45,20 +40,12 @@ namespace WebApplication
       services
         .AddDbContext<AppDbContext>(o => o.UseSqlServer(configuration.GetConnectionString(ConnectionStringName)));
 
-      services
-        .AddIdentity<User, Role>()
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
-
       if (webHostEnvironment.IsDevelopment())
       {
         services
           .AddMiniProfiler(o => o.RouteBasePath = "/profiler")
           .AddEntityFramework();
       }
-
-      services
-        .AddHttpClient();
 
       services
         .Configure<ApiBehaviorOptions>(o => o.SuppressModelStateInvalidFilter = true);
@@ -108,17 +95,7 @@ namespace WebApplication
         .AddControllers(o => o.Filters.Add(typeof(ModelStateInvalidFilter)))
         .AddApplicationPart(typeof(Startup).Assembly);
 
-      services.Configure<JwtOptions>(o => o.SecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"])));
-      services.Configure<FacebookOptions>(configuration.GetSection("Facebook"));
-      services.Configure<GoogleOptions>(configuration.GetSection("Google"));
-      services.Configure<GithubOptions>(configuration.GetSection("Github"));
-      services.Configure<LinkedInOptions>(configuration.GetSection("LinkedIn"));
-
       services.AddScoped<IItemRepository, ItemRepository>();
-      services.AddScoped<IUserRepository, UserRepository>();
-      services.AddScoped<IRoleRepository, RoleRepository>();
-      services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-      services.AddScoped<IUserLoginRepository, UserLoginRepository>();
       services.AddScoped<ITransactionManager, TransactionManager>();
 
       services.AddScoped<ItemService>();
@@ -133,11 +110,6 @@ namespace WebApplication
           _ => null
         };
       });
-
-      services.AddScoped<IUserService, UserService>();
-      services.AddScoped<IUserRoleService, UserRoleService>();
-      services.AddScoped<IUserLoginService, UserLoginService>();
-      services.AddSingleton<IEmailService>(p => new EmailService(configuration["SendGrid:ApiKey"]));
     }
 
     public void Configure(IApplicationBuilder app)

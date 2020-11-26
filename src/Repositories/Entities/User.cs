@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Entities
 {
-  public class User : IdentityUser<int>
+  public class User
   {
-    public ICollection<UserRole> UserRoles { get; set; } = null!;
-    public ICollection<UserLogin> UserLogins { get; set; } = null!;
-    public ICollection<UserToken> UserTokens { get; set; } = null!;
-    public ICollection<UserClaim> UserClaims { get; set; } = null!;
+    public int Id { get; set; }
+
     public ICollection<Item> Items { get; set; } = null!;
   }
 }

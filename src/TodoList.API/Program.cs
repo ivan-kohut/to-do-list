@@ -26,9 +26,7 @@ namespace WebApplication
 
         using IServiceScope scope = host.Services.CreateScope();
 
-        IWebHostEnvironment webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-
-        if (webHostEnvironment.IsDevelopment())
+        if (scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
         {
           await scope.ServiceProvider
             .GetRequiredService<AppDbContext>()
