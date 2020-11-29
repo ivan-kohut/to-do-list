@@ -1,7 +1,7 @@
-﻿using Controllers.Tests.Extensions;
+﻿using API.Models;
+using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
-using API.Models;
 using Newtonsoft.Json;
 using Repositories;
 using System.Net.Http;
@@ -43,23 +43,6 @@ namespace Controllers.Tests
         IsDone = itemToSave.Status == ItemStatus.Done,
         Text = itemToSave.Text,
         Priority = itemToSave.Priority
-      };
-    }
-
-    protected async Task<UserListApiModel> SaveUserAsync(User userToSave)
-    {
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
-
-      appDbContext.Add(userToSave);
-
-      await appDbContext.SaveChangesAsync();
-
-      return new UserListApiModel
-      {
-        Id = userToSave.Id,
-        Name = userToSave.UserName,
-        Email = userToSave.Email,
-        IsEmailConfirmed = userToSave.EmailConfirmed
       };
     }
   }
