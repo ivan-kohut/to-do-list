@@ -25,6 +25,8 @@ namespace Repositories
         .HasMaxLength(255);
 
       builder.Property(e => e.Priority);
+
+      builder.ToTable("Items");
     }
   }
 }
