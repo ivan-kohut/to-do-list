@@ -96,6 +96,7 @@ namespace WebApplication
         .AddApplicationPart(typeof(Startup).Assembly);
 
       services.AddScoped<IItemRepository, ItemRepository>();
+      services.AddScoped<IUserRepository, UserRepository>();
       services.AddScoped<ITransactionManager, TransactionManager>();
 
       services.AddScoped<ItemService>();

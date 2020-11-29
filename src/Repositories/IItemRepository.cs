@@ -6,10 +6,10 @@ namespace Repositories
 {
   public interface IItemRepository
   {
-    Task<Item?> GetByIdAndUserIdAsync(int id, int userId);
-    Task<int?> GetMaxItemPriorityAsync(int userId);
-    IQueryable<Item> All(int userId);
-    Task CreateAsync(Item item);
+    Task<Item?> GetByIdAndIdentityIdAsync(int id, int identityId);
+    Task<int?> GetMaxItemPriorityAsync(int identityId);
+    IQueryable<Item> All(int identityId);
+    void Create(Item item);
     void Delete(Item item);
   }
 }

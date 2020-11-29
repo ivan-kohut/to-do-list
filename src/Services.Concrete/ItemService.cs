@@ -11,40 +11,50 @@ namespace Services
   public class ItemService : IItemService
   {
     private readonly IItemRepository itemRepository;
+    private readonly IUserRepository userRepository;
     private readonly ITransactionManager transactionManager;
 
-    public ItemService(IItemRepository itemRepository, ITransactionManager transactionManager)
+    public ItemService(
+      IItemRepository itemRepository,
+      IUserRepository userRepository,
+      ITransactionManager transactionManager)
     {
       this.itemRepository = itemRepository;
+      this.userRepository = userRepository;
       this.transactionManager = transactionManager;
     }
 
-    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int userId) => 
+    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int identityId) =>
       await itemRepository
-        .All(userId)
+        .All(identityId)
         .Select(i => new ItemDTO
         {
           Id = i.Id,
           IsDone = i.Status == ItemStatus.Done,
-          UserId = i.UserId,
           Text = i.Text,
           Priority = i.Priority
         })
         .ToListAsync();
 
-    public async Task<ItemDTO> SaveAsync(ItemDTO itemDTO)
+    public async Task<ItemDTO> SaveAsync(int identityId, ItemDTO itemDTO)
     {
-      int? maxPriority = await itemRepository.GetMaxItemPriorityAsync(itemDTO.UserId);
+      User? currentUser = await userRepository.GetUserAsync(identityId);
+
+      if (currentUser == null)
+      {
+        throw new EntityNotFoundException($"User with identity id {identityId} is not found");
+      }
 
       Item item = new Item
       {
-        UserId = itemDTO.UserId,
+        UserId = currentUser.Id,
         Text = itemDTO.Text,
         Status = ItemStatus.Todo,
-        Priority = (maxPriority ?? 0) + 1
+        Priority = (await itemRepository.GetMaxItemPriorityAsync(identityId) ?? 0) + 1
       };
 
-      await itemRepository.CreateAsync(item);
+      itemRepository.Create(item);
+
       await transactionManager.SaveChangesAsync();
 
       itemDTO.Id = item.Id;
@@ -54,9 +64,9 @@ namespace Services
       return itemDTO;
     }
 
-    public async Task UpdateAsync(int userId, ItemDTO item)
+    public async Task UpdateAsync(int identityId, ItemDTO item)
     {
-      Item? itemDb = await itemRepository.GetByIdAndUserIdAsync(item.Id, userId);
+      Item? itemDb = await itemRepository.GetByIdAndIdentityIdAsync(item.Id, identityId);
 
       if (itemDb == null)
       {
@@ -70,9 +80,9 @@ namespace Services
       await transactionManager.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id, int userId)
+    public async Task DeleteAsync(int id, int identityId)
     {
-      Item? item = await itemRepository.GetByIdAndUserIdAsync(id, userId);
+      Item? item = await itemRepository.GetByIdAndIdentityIdAsync(id, identityId);
 
       if (item == null)
       {

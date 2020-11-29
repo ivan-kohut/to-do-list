@@ -8,6 +8,8 @@ namespace Repositories
   {
     public DbSet<Item> Items { get; set; } = null!;
 
+    public DbSet<User> Users { get; set; } = null!;
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }

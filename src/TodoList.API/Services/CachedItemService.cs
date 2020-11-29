@@ -18,42 +18,42 @@ namespace Controllers.Services
       this.memoryCache = memoryCache;
     }
 
-    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int userId)
+    public async Task<IEnumerable<ItemDTO>> GetAllAsync(int identityId)
     {
-      if (!memoryCache.TryGetValue(userId, out IEnumerable<ItemDTO> userItems))
+      if (!memoryCache.TryGetValue(identityId, out IEnumerable<ItemDTO> userItems))
       {
-        userItems = await itemService.GetAllAsync(userId);
+        userItems = await itemService.GetAllAsync(identityId);
 
         MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
           .SetSlidingExpiration(TimeSpan.FromMinutes(1));
 
-        memoryCache.Set(userId, userItems, cacheEntryOptions);
+        memoryCache.Set(identityId, userItems, cacheEntryOptions);
       }
 
       return userItems;
     }
 
-    public async Task<ItemDTO> SaveAsync(ItemDTO item)
+    public async Task<ItemDTO> SaveAsync(int identityId, ItemDTO item)
     {
-      ItemDTO savedItem = await itemService.SaveAsync(item);
+      ItemDTO savedItem = await itemService.SaveAsync(identityId, item);
 
-      memoryCache.Remove(item.UserId);
+      memoryCache.Remove(identityId);
 
       return savedItem;
     }
 
-    public async Task UpdateAsync(int userId, ItemDTO item)
+    public async Task UpdateAsync(int identityId, ItemDTO item)
     {
-      await itemService.UpdateAsync(userId, item);
+      await itemService.UpdateAsync(identityId, item);
 
-      memoryCache.Remove(userId);
+      memoryCache.Remove(identityId);
     }
 
-    public async Task DeleteAsync(int id, int userId)
+    public async Task DeleteAsync(int id, int identityId)
     {
-      await itemService.DeleteAsync(id, userId);
+      await itemService.DeleteAsync(id, identityId);
 
-      memoryCache.Remove(userId);
+      memoryCache.Remove(identityId);
     }
   }
 }

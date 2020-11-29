@@ -29,7 +29,7 @@ namespace Controllers
     /// <response code="403">If user does not have role "user"</response> 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync() =>
-      (await itemService.GetAllAsync(User.GetAuthorizedUserId()))
+      (await itemService.GetAllAsync(User.GetIdentityId()))
         .Select(i => new ItemApiModel
         {
           Id = i.Id,
@@ -44,7 +44,7 @@ namespace Controllers
     [ProducesResponseType(400)]
     public async Task<ActionResult<ItemApiModel>> SaveAsync(ItemCreateApiModel item)
     {
-      ItemDTO result = await itemService.SaveAsync(new ItemDTO { UserId = User.GetAuthorizedUserId(), Text = item.Text });
+      ItemDTO result = await itemService.SaveAsync(User.GetIdentityId(), new ItemDTO { Text = item.Text });
 
       return new ItemApiModel
       {
@@ -66,7 +66,7 @@ namespace Controllers
         return BadRequest();
       }
 
-      await itemService.UpdateAsync(User.GetAuthorizedUserId(), new ItemDTO
+      await itemService.UpdateAsync(User.GetIdentityId(), new ItemDTO
       {
         Id = item.Id,
         IsDone = item.IsDone,
@@ -82,7 +82,7 @@ namespace Controllers
     [HttpDelete(Urls.DeleteItem)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-      await itemService.DeleteAsync(id, User.GetAuthorizedUserId());
+      await itemService.DeleteAsync(id, User.GetIdentityId());
 
       return Ok();
     }
