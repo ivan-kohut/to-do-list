@@ -13,9 +13,10 @@ namespace Services.Tests
 {
   public class ItemServiceTest
   {
-    private const int userId = 10;
+    private const int identityId = 10;
 
     private readonly Mock<IItemRepository> mockItemRepository;
+    private readonly Mock<IUserRepository> mockUserRepository;
     private readonly Mock<ITransactionManager> mockTransactionManager;
 
     private readonly IItemService itemService;
@@ -23,9 +24,10 @@ namespace Services.Tests
     public ItemServiceTest()
     {
       this.mockItemRepository = new Mock<IItemRepository>(MockBehavior.Strict);
+      this.mockUserRepository = new Mock<IUserRepository>(MockBehavior.Strict);
       this.mockTransactionManager = new Mock<ITransactionManager>(MockBehavior.Strict);
 
-      this.itemService = new ItemService(mockItemRepository.Object, mockTransactionManager.Object);
+      this.itemService = new ItemService(mockItemRepository.Object, mockUserRepository.Object, mockTransactionManager.Object);
     }
 
     public class GetAllAsync : ItemServiceTest
@@ -34,13 +36,13 @@ namespace Services.Tests
       public async Task When_ItemsDoNotExist_Expect_EmptyList()
       {
         mockItemRepository
-          .Setup(r => r.All(userId))
+          .Setup(r => r.All(identityId))
           .Returns(Enumerable.Empty<Item>().AsQueryable().BuildMock().Object);
 
         // Act
-        Assert.Empty(await itemService.GetAllAsync(userId));
+        Assert.Empty(await itemService.GetAllAsync(identityId));
 
-        mockItemRepository.Verify(r => r.All(userId), Times.Once());
+        mockItemRepository.Verify(r => r.All(identityId), Times.Once());
       }
 
       [Fact]
@@ -49,7 +51,7 @@ namespace Services.Tests
         Item firstItem = new Item
         {
           Id = 1,
-          UserId = userId,
+          UserId = 25,
           Text = "firstText",
           Priority = 1,
           Status = ItemStatus.Todo
@@ -58,21 +60,20 @@ namespace Services.Tests
         Item secondItem = new Item
         {
           Id = 2,
-          UserId = userId,
+          UserId = 25,
           Text = "secondText",
           Priority = 2,
           Status = ItemStatus.Done
         };
 
         mockItemRepository
-          .Setup(r => r.All(userId))
+          .Setup(r => r.All(identityId))
           .Returns(new List<Item> { firstItem, secondItem }.AsQueryable().BuildMock().Object);
 
         IEnumerable<ItemDTO> expected = new List<ItemDTO>
         {
           new ItemDTO {
             Id = firstItem.Id,
-            UserId = firstItem.UserId,
             IsDone = firstItem.Status == ItemStatus.Done,
             Text = firstItem.Text,
             Priority = firstItem.Priority
@@ -80,7 +81,6 @@ namespace Services.Tests
 
           new ItemDTO {
             Id = secondItem.Id,
-            UserId = secondItem.UserId,
             IsDone = secondItem.Status == ItemStatus.Done,
             Text = secondItem.Text,
             Priority = secondItem.Priority
@@ -88,32 +88,61 @@ namespace Services.Tests
         };
 
         // Act
-        IEnumerable<ItemDTO> actual = await itemService.GetAllAsync(userId);
+        IEnumerable<ItemDTO> actual = await itemService.GetAllAsync(identityId);
 
         actual.ShouldBeEquivalentTo(expected);
 
-        mockItemRepository.Verify(r => r.All(userId), Times.Once());
+        mockItemRepository.Verify(r => r.All(identityId), Times.Once());
       }
     }
 
     public class SaveAsync : ItemServiceTest
     {
       [Fact]
+      public async Task When_UserDoesNotExist_Expect_EntityNotFoundException()
+      {
+        User? user = null;
+
+        mockUserRepository
+          .Setup(r => r.GetUserAsync(identityId))
+          .ReturnsAsync(user);
+
+        // Act
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.SaveAsync(identityId, new ItemDTO()));
+
+        mockUserRepository.Verify(r => r.GetUserAsync(identityId), Times.Once);
+      }
+
+      [Fact]
       public async Task Expect_Saved()
       {
         int generatedItemId = 10;
         int maxPriority = 1;
 
-        ItemDTO itemToSave = new ItemDTO { UserId = userId, Text = "itemText" };
+        User user = new User
+        {
+          Id = 25,
+          IdentityId = identityId
+        };
+
+        mockUserRepository
+          .Setup(r => r.GetUserAsync(identityId))
+          .ReturnsAsync(user);
+
+        ItemDTO itemToSave = new ItemDTO { Text = "itemText" };
 
         mockItemRepository
-          .Setup(r => r.GetMaxItemPriorityAsync(userId))
+          .Setup(r => r.GetMaxItemPriorityAsync(identityId))
           .ReturnsAsync(maxPriority);
 
         mockItemRepository
-          .Setup(r => r.CreateAsync(It.IsAny<Item>()))
-          .Callback<Item>(i => i.Id = generatedItemId)
-          .Returns(Task.CompletedTask);
+          .Setup(r => r.Create(It.IsAny<Item>()))
+          .Callback<Item>(i =>
+          {
+            Assert.Equal(user.Id, i.UserId);
+
+            i.Id = generatedItemId;
+          });
 
         mockTransactionManager
           .Setup(m => m.SaveChangesAsync())
@@ -122,19 +151,19 @@ namespace Services.Tests
         ItemDTO expected = new ItemDTO
         {
           Id = generatedItemId,
-          UserId = itemToSave.UserId,
           IsDone = false,
           Text = itemToSave.Text,
           Priority = maxPriority + 1
         };
 
         // Act
-        ItemDTO actual = await itemService.SaveAsync(itemToSave);
+        ItemDTO actual = await itemService.SaveAsync(identityId, itemToSave);
 
         actual.ShouldBeEquivalentTo(expected);
 
-        mockItemRepository.Verify(r => r.GetMaxItemPriorityAsync(userId), Times.Once());
-        mockItemRepository.Verify(r => r.CreateAsync(It.IsAny<Item>()), Times.Once());
+        mockUserRepository.Verify(r => r.GetUserAsync(identityId), Times.Once());
+        mockItemRepository.Verify(r => r.GetMaxItemPriorityAsync(identityId), Times.Once());
+        mockItemRepository.Verify(r => r.Create(It.IsAny<Item>()), Times.Once());
         mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
       }
     }
@@ -149,15 +178,15 @@ namespace Services.Tests
         Item? notFoundItem = null;
 
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId))
+          .Setup(r => r.GetByIdAndIdentityIdAsync(itemToUpdateId, identityId))
           .ReturnsAsync(notFoundItem);
 
         ItemDTO itemToUpdate = new ItemDTO { Id = itemToUpdateId };
 
         // Act
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdateAsync(userId, itemToUpdate));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdateAsync(identityId, itemToUpdate));
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId), Times.Once());
+        mockItemRepository.Verify(r => r.GetByIdAndIdentityIdAsync(itemToUpdateId, identityId), Times.Once());
       }
 
       [Fact]
@@ -168,14 +197,13 @@ namespace Services.Tests
         Item foundItem = new Item
         {
           Id = itemToUpdateId,
-          UserId = userId,
           Status = ItemStatus.Todo,
           Text = "itemText",
           Priority = 5
         };
 
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId))
+          .Setup(r => r.GetByIdAndIdentityIdAsync(itemToUpdateId, identityId))
           .ReturnsAsync(foundItem);
 
         mockTransactionManager
@@ -191,13 +219,13 @@ namespace Services.Tests
         };
 
         // Act
-        await itemService.UpdateAsync(userId, itemToUpdate);
+        await itemService.UpdateAsync(identityId, itemToUpdate);
 
         Assert.Equal(ItemStatus.Done, foundItem.Status);
         Assert.Equal(itemToUpdate.Text, foundItem.Text);
         Assert.Equal(itemToUpdate.Priority, foundItem.Priority);
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToUpdateId, userId), Times.Once());
+        mockItemRepository.Verify(r => r.GetByIdAndIdentityIdAsync(itemToUpdateId, identityId), Times.Once());
 
         mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());
       }
@@ -213,13 +241,13 @@ namespace Services.Tests
         Item? notFoundItem = null;
 
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId))
+          .Setup(r => r.GetByIdAndIdentityIdAsync(itemToDeleteId, identityId))
           .ReturnsAsync(notFoundItem);
 
         // Act
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.DeleteAsync(itemToDeleteId, userId));
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.DeleteAsync(itemToDeleteId, identityId));
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId), Times.Once());
+        mockItemRepository.Verify(r => r.GetByIdAndIdentityIdAsync(itemToDeleteId, identityId), Times.Once());
       }
 
       [Fact]
@@ -230,7 +258,7 @@ namespace Services.Tests
         Item foundItem = new Item { Id = itemToDeleteId, Text = "itemText", Priority = 1 };
 
         mockItemRepository
-          .Setup(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId))
+          .Setup(r => r.GetByIdAndIdentityIdAsync(itemToDeleteId, identityId))
           .ReturnsAsync(foundItem);
 
         mockItemRepository
@@ -242,9 +270,9 @@ namespace Services.Tests
           .Returns(Task.CompletedTask);
 
         // Act
-        await itemService.DeleteAsync(itemToDeleteId, userId);
+        await itemService.DeleteAsync(itemToDeleteId, identityId);
 
-        mockItemRepository.Verify(r => r.GetByIdAndUserIdAsync(itemToDeleteId, userId), Times.Once());
+        mockItemRepository.Verify(r => r.GetByIdAndIdentityIdAsync(itemToDeleteId, identityId), Times.Once());
         mockItemRepository.Verify(r => r.Delete(foundItem), Times.Once());
 
         mockTransactionManager.Verify(m => m.SaveChangesAsync(), Times.Once());

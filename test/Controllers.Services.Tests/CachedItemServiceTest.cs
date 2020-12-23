@@ -12,7 +12,7 @@ namespace Controllers.Services.Tests
 {
   public class CachedItemServiceTest : IDisposable
   {
-    private const int userId = 1;
+    private const int identityId = 1;
 
     private readonly Mock<ItemServiceResolver> mockItemServiceResolver;
     private readonly Mock<IItemService> mockItemService;
@@ -39,42 +39,42 @@ namespace Controllers.Services.Tests
       public async Task When_ItemsDoNotExistInCache_Expect_CachedAndReturned()
       {
         IEnumerable<ItemDTO> expectedUserItems = new[] {
-          new ItemDTO { Id = 1, UserId = userId },
-          new ItemDTO { Id = 2, UserId = userId }
+          new ItemDTO { Id = 1 },
+          new ItemDTO { Id = 2 }
         };
 
         mockItemService
-          .Setup(s => s.GetAllAsync(userId))
+          .Setup(s => s.GetAllAsync(identityId))
           .ReturnsAsync(expectedUserItems);
 
-        Assert.Null(mockMemoryCache.Get(userId));
+        Assert.Null(mockMemoryCache.Get(identityId));
 
         // Act
-        IEnumerable<ItemDTO> actualUserItems = await cachedItemService.GetAllAsync(userId);
-        IEnumerable<ItemDTO> userItemsFromCache = (IEnumerable<ItemDTO>)mockMemoryCache.Get(userId);
+        IEnumerable<ItemDTO> actualUserItems = await cachedItemService.GetAllAsync(identityId);
+        IEnumerable<ItemDTO> userItemsFromCache = (IEnumerable<ItemDTO>)mockMemoryCache.Get(identityId);
 
         actualUserItems.ShouldBeEquivalentTo(expectedUserItems);
         userItemsFromCache.ShouldBeEquivalentTo(expectedUserItems);
 
-        mockItemService.Verify(s => s.GetAllAsync(userId), Times.Once());
+        mockItemService.Verify(s => s.GetAllAsync(identityId), Times.Once());
       }
 
       [Fact]
       public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
       {
         IEnumerable<ItemDTO> expectedUserItems = new[] {
-          new ItemDTO { Id = 1, UserId = userId },
-          new ItemDTO { Id = 2, UserId = userId }
+          new ItemDTO { Id = 1 },
+          new ItemDTO { Id = 2 }
         };
 
-        mockMemoryCache.Set(userId, expectedUserItems);
+        mockMemoryCache.Set(identityId, expectedUserItems);
 
         // Act
-        IEnumerable<ItemDTO> actualUserItems = await cachedItemService.GetAllAsync(userId);
+        IEnumerable<ItemDTO> actualUserItems = await cachedItemService.GetAllAsync(identityId);
 
         actualUserItems.ShouldBeEquivalentTo(expectedUserItems);
 
-        mockItemService.Verify(s => s.GetAllAsync(userId), Times.Never());
+        mockItemService.Verify(s => s.GetAllAsync(identityId), Times.Never());
       }
     }
 
@@ -83,24 +83,24 @@ namespace Controllers.Services.Tests
       [Fact]
       public async Task When_ItemIsSaved_Expect_CacheIsDropped()
       {
-        ItemDTO itemToSave = new ItemDTO { UserId = userId, Text = "test-text" };
-        ItemDTO expectedSavedItem = new ItemDTO { Id = 1, UserId = userId, Text = "test-text", Priority = 1, IsDone = false };
+        ItemDTO itemToSave = new ItemDTO { Text = "test-text" };
+        ItemDTO expectedSavedItem = new ItemDTO { Id = 1, Text = "test-text", Priority = 1, IsDone = false };
 
         mockItemService
-          .Setup(s => s.SaveAsync(itemToSave))
+          .Setup(s => s.SaveAsync(identityId, itemToSave))
           .ReturnsAsync(expectedSavedItem);
 
-        mockMemoryCache.Set(userId, new ItemDTO[] { });
+        mockMemoryCache.Set(identityId, Array.Empty<ItemDTO>());
 
-        Assert.NotNull(mockMemoryCache.Get(userId));
+        Assert.NotNull(mockMemoryCache.Get(identityId));
 
         // Act
-        ItemDTO actualSavedItem = await cachedItemService.SaveAsync(itemToSave);
+        ItemDTO actualSavedItem = await cachedItemService.SaveAsync(identityId, itemToSave);
 
         actualSavedItem.ShouldBeEquivalentTo(expectedSavedItem);
-        Assert.Null(mockMemoryCache.Get(userId));
+        Assert.Null(mockMemoryCache.Get(identityId));
 
-        mockItemService.Verify(s => s.SaveAsync(itemToSave), Times.Once());
+        mockItemService.Verify(s => s.SaveAsync(identityId, itemToSave), Times.Once());
       }
     }
 
@@ -109,22 +109,22 @@ namespace Controllers.Services.Tests
       [Fact]
       public async Task When_ItemIsUpdated_Expect_CacheIsDropped()
       {
-        ItemDTO itemToUpdate = new ItemDTO { UserId = userId };
+        ItemDTO itemToUpdate = new ItemDTO { Id = 25 };
 
         mockItemService
-          .Setup(s => s.UpdateAsync(userId, itemToUpdate))
+          .Setup(s => s.UpdateAsync(identityId, itemToUpdate))
           .Returns(Task.CompletedTask);
 
-        mockMemoryCache.Set(userId, new ItemDTO[] { });
+        mockMemoryCache.Set(identityId, Array.Empty<ItemDTO>());
 
-        Assert.NotNull(mockMemoryCache.Get(userId));
+        Assert.NotNull(mockMemoryCache.Get(identityId));
 
         // Act
-        await cachedItemService.UpdateAsync(userId, itemToUpdate);
+        await cachedItemService.UpdateAsync(identityId, itemToUpdate);
 
-        Assert.Null(mockMemoryCache.Get(userId));
+        Assert.Null(mockMemoryCache.Get(identityId));
 
-        mockItemService.Verify(s => s.UpdateAsync(userId, itemToUpdate), Times.Once());
+        mockItemService.Verify(s => s.UpdateAsync(identityId, itemToUpdate), Times.Once());
       }
     }
 
@@ -136,19 +136,19 @@ namespace Controllers.Services.Tests
         int itemToDeleteId = 2;
 
         mockItemService
-          .Setup(s => s.DeleteAsync(itemToDeleteId, userId))
+          .Setup(s => s.DeleteAsync(itemToDeleteId, identityId))
           .Returns(Task.CompletedTask);
 
-        mockMemoryCache.Set(userId, new ItemDTO[] { });
+        mockMemoryCache.Set(identityId, Array.Empty<ItemDTO>());
 
-        Assert.NotNull(mockMemoryCache.Get(userId));
+        Assert.NotNull(mockMemoryCache.Get(identityId));
 
         // Act
-        await cachedItemService.DeleteAsync(itemToDeleteId, userId);
+        await cachedItemService.DeleteAsync(itemToDeleteId, identityId);
 
-        Assert.Null(mockMemoryCache.Get(userId));
+        Assert.Null(mockMemoryCache.Get(identityId));
 
-        mockItemService.Verify(s => s.DeleteAsync(itemToDeleteId, userId), Times.Once());
+        mockItemService.Verify(s => s.DeleteAsync(itemToDeleteId, identityId), Times.Once());
       }
     }
 
