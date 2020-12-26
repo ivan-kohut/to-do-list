@@ -100,7 +100,7 @@ namespace Controllers.Tests
 
       public override void Dispose()
       {
-        Server.GetService<IMemoryCache>().Remove(UserId);
+        Server.GetService<IMemoryCache>().Remove(IdentityId);
         base.Dispose();
       }
     }
@@ -121,6 +121,26 @@ namespace Controllers.Tests
       }
 
       [Fact]
+      public async Task When_UserIsNotFound_Expect_NotFound()
+      {
+        int newIdentityId = 99;
+
+        await UpdateIdentityIdAsync(IdentityId, newIdentityId);
+
+        try
+        {
+          // Act
+          HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "itemText" });
+
+          Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        finally
+        {
+          await UpdateIdentityIdAsync(newIdentityId, IdentityId);
+        }
+      }
+
+      [Fact]
       public async Task When_InputModelIsValid_Expect_Saved()
       {
         ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
@@ -132,7 +152,7 @@ namespace Controllers.Tests
 
         ItemApiModel itemSaved = await DeserializeResponseBodyAsync<ItemApiModel>(response);
 
-        Assert.NotEqual(0, itemSaved.Id);
+        Assert.NotEqual(default, itemSaved.Id);
         Assert.Equal(itemToSave.Text, itemSaved.Text);
         Assert.Equal(1, itemSaved.Priority);
         Assert.False(itemSaved.IsDone);
@@ -250,21 +270,34 @@ namespace Controllers.Tests
 
     public virtual void Dispose()
     {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
-      {
-        appDbContext.Rollback<Item>();
-
-        appDbContext.SaveChanges();
-      }
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+      
+      appDbContext.Rollback<Item>();
+      appDbContext.SaveChanges();
     }
 
     private async Task<IEnumerable<Item>> GetAllItemsAsync()
     {
-      using (AppDbContext appDbContext = Server.GetService<AppDbContext>())
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+      
+      return await appDbContext
+        .Items
+        .ToListAsync();
+    }
+
+    private async Task UpdateIdentityIdAsync(int fromIdentityId, int toIdentityId)
+    {
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+
+      User user = await appDbContext
+        .Users
+        .SingleOrDefaultAsync(u => u.IdentityId == fromIdentityId);
+
+      if (user != default)
       {
-        return await appDbContext
-          .Items
-          .ToListAsync();
+        user.IdentityId = toIdentityId;
+
+        await appDbContext.SaveChangesAsync();
       }
     }
   }

@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore;
+﻿using Controllers.Tests.Extensions;
+using Entities;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
+using Repositories;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text;
 using Xunit;
 
 namespace Controllers.Tests.Fixtures
@@ -22,7 +22,7 @@ namespace Controllers.Tests.Fixtures
   {
     public TestServer Server { get; }
     public HttpClient Client { get; }
-    public int UserId { get; }
+    public User User { get; }
 
     public TestServerFixture()
     {
@@ -39,26 +39,15 @@ namespace Controllers.Tests.Fixtures
       Server = new TestServer(webHostBuilder);
       Client = Server.CreateClient();
 
-      object user = new
-      {
-        email = "admin@admin.admin",
-        password = "abcABC123."
-      };
+      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
 
-      using HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
-      
-      string userToken = JsonConvert.DeserializeObject<string>(
-        Client.PostAsync("/api/v1/users/login", httpContent).Result.Content.ReadAsStringAsync().Result
-      );
+      User = appDbContext.Users
+        .AsNoTracking()
+        .SingleAsync(u => u.IdentityId == 1)
+        .GetAwaiter()
+        .GetResult();
 
-      UserId = int.Parse(
-        (new JwtSecurityTokenHandler().ReadToken(userToken) as JwtSecurityToken)!
-          .Claims
-          .Single(c => c.Type == ClaimTypes.NameIdentifier)
-          .Value
-      );
-
-      Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userToken);
+      Server.GetService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
     }
 
     public void Dispose()

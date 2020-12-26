@@ -6,8 +6,13 @@ namespace Controllers.Tests
 {
   public abstract class ControllerTestBase : TestBase
   {
+    protected int UserId { get; }
+    protected int IdentityId { get; }
+
     protected ControllerTestBase(TestServerFixture testServerFixture) : base(testServerFixture)
     {
+      this.UserId = testServerFixture.User.Id;
+      this.IdentityId = testServerFixture.User.IdentityId;
     }
 
     protected async Task<HttpResponseMessage> GetAsync(string url)

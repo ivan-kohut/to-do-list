@@ -133,9 +133,16 @@ namespace WebApplication
       app.UseRouting();
       app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? new string[] { }).AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
+
+      ConfigureAuth(app);
+
+      app.UseEndpoints(endpoints => endpoints.MapControllers());
+    }
+
+    protected virtual void ConfigureAuth(IApplicationBuilder app)
+    {
       app.UseAuthentication();
       app.UseAuthorization();
-      app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
   }
 }
