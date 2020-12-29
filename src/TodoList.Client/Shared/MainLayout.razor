@@ -8,40 +8,42 @@
   string identityUrl = Configuration["IdentityUrl"];
 }
 
-<AuthorizeView>
-  <Authorized>
-    <div class="user-menu">
-      @if (NavigationManager.BaseUri != NavigationManager.Uri)
-      {
-        <div class="index-page-link">
-          <a href="">index page</a>
-        </div>
-      }
-      <div class="dropdown">
-        @context.User.Identity?.Name
-        <div class="show-menu"></div>
-        <div class="dropdown-content">
-          <AuthorizeView Roles="admin">
-            <Authorized Context="adminContext">
-              <a href="@($"{identityUrl}/admin/users")">Users</a>
-            </Authorized>
-          </AuthorizeView>
-          <a href="@($"{identityUrl}/settings/manage")">Settings</a>
-          <a @onclick="OnLogout">Log out</a>
+<div class="page">
+  <AuthorizeView>
+    <Authorized>
+      <div class="user-menu">
+        @if (NavigationManager.BaseUri != NavigationManager.Uri)
+        {
+          <div class="index-page-link">
+            <a href="">index page</a>
+          </div>
+        }
+        <div class="dropdown">
+          @context.User.Identity?.Name
+          <div class="show-menu"></div>
+          <div class="dropdown-content">
+            <AuthorizeView Roles="admin">
+              <Authorized Context="adminContext">
+                <a href="@($"{identityUrl}/admin/users")">Users</a>
+              </Authorized>
+            </AuthorizeView>
+            <a href="@($"{identityUrl}/settings/manage")">Settings</a>
+            <a @onclick="OnLogout">Log out</a>
+          </div>
         </div>
       </div>
-    </div>
-  </Authorized>
-  <NotAuthorized>
-    <div>
-      <div class="login-and-signup">
-        <a class="login" href="authentication/login">Log in</a>
+    </Authorized>
+    <NotAuthorized>
+      <div>
+        <div class="login-and-signup">
+          <a class="login" href="authentication/login">Log in</a>
+        </div>
       </div>
-    </div>
-  </NotAuthorized>
-</AuthorizeView>
+    </NotAuthorized>
+  </AuthorizeView>
 
-@Body
+  @Body
+</div>
 
 @code {
 
