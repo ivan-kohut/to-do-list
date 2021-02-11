@@ -12,16 +12,27 @@ services:
   items-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=8090
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
-      - Cors__Origins=http://localhost:8081
-      - IdentityUrl=http://localhost:8082
+      - Cors__Origins=${TODOLIST_BASE_URL}:8091
+      - IdentityUrl=${TODOLIST_BASE_URL}:8092
     ports:
       - 8080:80
+      - 8090:443
+    volumes:
+      - ~/.aspnetcore/https:/https
   identity-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=8092
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
-      - BlazorWasmClientUrl=http://localhost:8081
+      - BlazorWasmClientUrl=${TODOLIST_BASE_URL}:8091
       - SendGrid__ApiKey=${TODOLIST_SENDGRID_APIKEY}
       - LinkedIn__ClientSecret=${TODOLIST_LINKEDIN_CLIENTSECRET}
       - LinkedIn__ClientId=${TODOLIST_LINKEDIN_CLIENTID}
@@ -33,13 +44,23 @@ services:
       - Facebook__AppId=${TODOLIST_FACEBOOK_APPID}
     ports:
       - 8082:80
+      - 8092:443
+    volumes:
+      - ~/.aspnetcore/https:/https
   blazor-wasm:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - IdentityUrl=http://localhost:8082
-      - ItemsUrl=http://localhost:8080
+      - ASPNETCORE_HTTPS_PORT=8091
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
+      - IdentityUrl=${TODOLIST_BASE_URL}:8092
+      - ItemsUrl=${TODOLIST_BASE_URL}:8090
     ports:
       - 8081:80
+      - 8091:443
+    volumes:
+      - ~/.aspnetcore/https:/https
 
 volumes:
   mssql-data-volume:
