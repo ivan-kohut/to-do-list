@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.0" />
     <PackageReference Include="AspNet.Security.OAuth.LinkedIn" Version="5.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
   </ItemGroup>
 
 </Project>

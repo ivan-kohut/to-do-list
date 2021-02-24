@@ -82,8 +82,10 @@ namespace TodoList.Identity.API
         });
 
       services.Configure<SendGridOptions>(configuration.GetSection("SendGrid"));
+      services.Configure<EventBusOptions>(configuration.GetSection("EventBus"));
 
       services.AddSingleton<IEmailService, EmailService>();
+      services.AddSingleton<IEventBusService, RabbitMQEventBusService>();
 
       if (webHostEnvironment.IsDevelopment())
       {

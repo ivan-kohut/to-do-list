@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using TodoList.Identity.API.Data.Entities;
+using TodoList.Identity.API.Events;
 using TodoList.Identity.API.Services;
 using TodoList.Identity.API.ViewModels;
 
@@ -18,17 +19,20 @@ namespace TodoList.Identity.API.Controllers
     private readonly UserManager<User> userManager;
     private readonly SignInManager<User> signInManager;
     private readonly IEmailService emailService;
+    private readonly IEventBusService eventBusService;
     private readonly IIdentityServerInteractionService interaction;
 
     public AccountController(
       UserManager<User> userManager,
       SignInManager<User> signInManager,
       IEmailService emailService,
+      IEventBusService eventBusService,
       IIdentityServerInteractionService interaction)
     {
       this.userManager = userManager;
       this.signInManager = signInManager;
       this.emailService = emailService;
+      this.eventBusService = eventBusService;
       this.interaction = interaction;
     }
 
@@ -106,6 +110,8 @@ namespace TodoList.Identity.API.Controllers
           }
 
           await userManager.AddToRoleAsync(user, "user");
+
+          eventBusService.Publish(new UserCreatedIntegrationEvent(user.Id));
         }
         else
         {

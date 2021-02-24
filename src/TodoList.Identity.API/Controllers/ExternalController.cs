@@ -9,6 +9,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using TodoList.Identity.API.Data;
 using TodoList.Identity.API.Data.Entities;
+using TodoList.Identity.API.Events;
+using TodoList.Identity.API.Services;
 
 namespace TodoList.Identity.API.Controllers
 {
@@ -17,6 +19,7 @@ namespace TodoList.Identity.API.Controllers
     private readonly AppDbContext dbContext;
     private readonly UserManager<User> userManager;
     private readonly SignInManager<User> signInManager;
+    private readonly IEventBusService eventBusService;
     private readonly IAuthenticationSchemeProvider schemeProvider;
     private readonly IIdentityServerInteractionService interaction;
 
@@ -24,12 +27,14 @@ namespace TodoList.Identity.API.Controllers
       AppDbContext dbContext,
       UserManager<User> userManager,
       SignInManager<User> signInManager,
+      IEventBusService eventBusService,
       IAuthenticationSchemeProvider schemeProvider,
       IIdentityServerInteractionService interaction)
     {
       this.dbContext = dbContext;
       this.userManager = userManager;
       this.signInManager = signInManager;
+      this.eventBusService = eventBusService;
       this.schemeProvider = schemeProvider;
       this.interaction = interaction;
     }
@@ -74,6 +79,8 @@ namespace TodoList.Identity.API.Controllers
         await userManager.CreateAsync(user);
         await userManager.AddToRoleAsync(user, "user");
         await userManager.AddLoginAsync(user, new UserLoginInfo(externalLoginProvider, externalId, externalLoginProvider));
+
+        eventBusService.Publish(new UserCreatedIntegrationEvent(user.Id));
       }
       else if (!dbContext.UserLogins.Any(ul => ul.LoginProvider == externalLoginProvider && ul.ProviderKey == externalId))
       {
