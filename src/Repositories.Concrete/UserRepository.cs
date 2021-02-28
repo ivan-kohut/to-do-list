@@ -17,5 +17,7 @@ namespace Repositories
       await dbContext
         .Users
         .SingleOrDefaultAsync(u => u.IdentityId == identityId);
+
+    public void Create(User user) => dbContext.Add(user);
   }
 }

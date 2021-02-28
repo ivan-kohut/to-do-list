@@ -1,4 +1,5 @@
-﻿using Controllers.Services;
+﻿using BackgroundServices;
+using Controllers.Services;
 using Delegates;
 using Extensions;
 using Filters;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Options;
 using Repositories;
 using Services;
 using StackExchange.Profiling;
@@ -99,6 +101,8 @@ namespace WebApplication
       services.AddScoped<IUserRepository, UserRepository>();
       services.AddScoped<ITransactionManager, TransactionManager>();
 
+      services.AddScoped<IUserService, UserService>();
+
       services.AddScoped<ItemService>();
       services.AddScoped<CachedItemService>();
 
@@ -111,6 +115,10 @@ namespace WebApplication
           _ => null
         };
       });
+
+      services.AddHostedService<EventBusHostedService>();
+
+      services.Configure<EventBusOptions>(configuration.GetSection("EventBus"));
     }
 
     public void Configure(IApplicationBuilder app)

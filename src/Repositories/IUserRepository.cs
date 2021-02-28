@@ -6,5 +6,6 @@ namespace Repositories
   public interface IUserRepository
   {
     Task<User?> GetUserAsync(int identityId);
+    void Create(User user);
   }
 }
