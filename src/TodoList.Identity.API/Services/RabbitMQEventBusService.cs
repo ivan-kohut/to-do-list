@@ -16,7 +16,15 @@ namespace TodoList.Identity.API.Services
     public RabbitMQEventBusService(IOptions<EventBusOptions> eventBusOptions)
     {
       this.brokerName = eventBusOptions.Value.BrokerName;
-      this.connection = new ConnectionFactory { HostName = eventBusOptions.Value.Connection }.CreateConnection();
+
+      ConnectionFactory connectionFactory = new ConnectionFactory
+      {
+        HostName = eventBusOptions.Value.Connection,
+        UserName = eventBusOptions.Value.UserName,
+        Password = eventBusOptions.Value.Password
+      };
+
+      this.connection = connectionFactory.CreateConnection();
     }
 
     public void Publish(IIntegrationEvent integrationEvent)
@@ -30,10 +38,7 @@ namespace TodoList.Identity.API.Services
 
     public void Dispose()
     {
-      if (connection != null)
-      {
-        connection.Dispose();
-      }
+      connection?.Dispose();
     }
   }
 }

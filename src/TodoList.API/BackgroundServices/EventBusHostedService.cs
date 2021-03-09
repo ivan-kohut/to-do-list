@@ -23,7 +23,15 @@ namespace BackgroundServices
 
     public EventBusHostedService(IServiceProvider serviceProvider, IOptions<EventBusOptions> eventBusOptions)
     {
-      this.connection = new ConnectionFactory { HostName = eventBusOptions.Value.Connection, DispatchConsumersAsync = true }.CreateConnection();
+      ConnectionFactory connectionFactory = new ConnectionFactory
+      {
+        HostName = eventBusOptions.Value.Connection,
+        UserName = eventBusOptions.Value.UserName,
+        Password = eventBusOptions.Value.Password,
+        DispatchConsumersAsync = true
+      };
+
+      this.connection = connectionFactory.CreateConnection();
       this.channel = connection.CreateModel();
       this.serviceProvider = serviceProvider;
       this.eventBusOptions = eventBusOptions.Value;
@@ -53,15 +61,8 @@ namespace BackgroundServices
 
     public void Dispose()
     {
-      if (channel != null)
-      {
-        channel.Dispose();
-      }
-
-      if (connection != null)
-      {
-        connection.Dispose();
-      }
+      channel?.Dispose();
+      connection?.Dispose();
     }
 
     private async Task HandleIntegrationEvent(object sender, BasicDeliverEventArgs args)
