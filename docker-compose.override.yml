@@ -9,6 +9,10 @@ services:
       - 1433:1433
     volumes:
       - mssql-data-volume:/var/opt/mssql
+  rabbitmq:
+    ports:
+      - 15672:15672
+      - 5672:5672
   items-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -17,6 +21,11 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - EventBus__Connection=rabbitmq
+      - EventBus__UserName=${TODOLIST_EVENTBUS_USERNAME}
+      - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
+      - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
+      - EventBus__ClientName=Items
       - Cors__Origins=${TODOLIST_BASE_URL}:8091
       - IdentityUrl=${TODOLIST_BASE_URL}:8092
     ports:
@@ -32,6 +41,10 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - EventBus__Connection=rabbitmq
+      - EventBus__UserName=${TODOLIST_EVENTBUS_USERNAME}
+      - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
+      - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
       - BlazorWasmClientUrl=${TODOLIST_BASE_URL}:8091
       - SendGrid__ApiKey=${TODOLIST_SENDGRID_APIKEY}
       - LinkedIn__ClientSecret=${TODOLIST_LINKEDIN_CLIENTSECRET}
