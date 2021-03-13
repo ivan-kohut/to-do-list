@@ -116,7 +116,7 @@ namespace WebApplication
         };
       });
 
-      services.AddHostedService<EventBusHostedService>();
+      AddHostedServices(services);
 
       services.Configure<EventBusOptions>(configuration.GetSection("EventBus"));
     }
@@ -151,6 +151,11 @@ namespace WebApplication
     {
       app.UseAuthentication();
       app.UseAuthorization();
+    }
+
+    protected virtual void AddHostedServices(IServiceCollection services)
+    {
+      services.AddHostedService<EventBusHostedService>();
     }
   }
 }
