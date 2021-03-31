@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
-WORKDIR /app
+WORKDIR /usr/local/share/ca-certificates
+COPY certificates/todolist.crt .
+RUN update-ca-certificates
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src

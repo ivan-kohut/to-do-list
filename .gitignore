@@ -7,3 +7,4 @@ Logs/
 PublishProfiles/
 *.csproj.user
 tempkey.jwk
+certificates
