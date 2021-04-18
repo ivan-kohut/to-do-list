@@ -35,7 +35,7 @@ namespace BackgroundServices
     {
       RetryPolicy retryPolicy = Policy
         .Handle<BrokerUnreachableException>()
-        .WaitAndRetry(eventBusOptions.RetryCount!.Value, retryNumber => TimeSpan.FromSeconds(Math.Pow(2, retryNumber)), (exception, sleepDuration) => Console.WriteLine(sleepDuration));
+        .WaitAndRetry(eventBusOptions.RetryCount!.Value, retryNumber => TimeSpan.FromSeconds(Math.Pow(2, retryNumber)), (exception, sleepDuration) => Console.WriteLine($"RabbitMQ connection retry, sleep duration: {sleepDuration}"));
 
       ConnectionFactory connectionFactory = new()
       {
