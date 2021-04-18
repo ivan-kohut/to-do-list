@@ -26,6 +26,7 @@ services:
       - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
       - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
       - EventBus__ClientName=Items
+      - EventBus__RetryCount=5
       - Cors__Origins=${TODOLIST_BASE_URL}:8091
       - IdentityUrl=${TODOLIST_BASE_URL}:8092
     ports:

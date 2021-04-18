@@ -7,5 +7,6 @@
     public string Password { get; set; } = null!;
     public string BrokerName { get; set; } = null!;
     public string ClientName { get; set; } = null!;
+    public int? RetryCount { get; set; } = null!;
   }
 }
