@@ -2,6 +2,7 @@
 using Controllers.Tests.Extensions;
 using Controllers.Tests.Fixtures;
 using Entities;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Repositories;
 using System.Net.Http;
@@ -28,7 +29,9 @@ namespace Controllers.Tests
 
     protected async Task<ItemApiModel> SaveItemAsync(Item itemToSave)
     {
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+      using IServiceScope scope = Server.CreateScope();
+
+      AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
       appDbContext.Add(itemToSave);
 

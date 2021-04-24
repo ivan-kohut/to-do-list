@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -50,7 +51,9 @@ namespace Controllers.Tests.Fixtures
 
       retryPolicy.ExecuteAsync(async () =>
       {
-        using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+        using IServiceScope scope = Server.CreateScope();
+
+        AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         await appDbContext.Database.MigrateAsync();
 
@@ -61,7 +64,7 @@ namespace Controllers.Tests.Fixtures
 
       User = user!;
 
-      Server.GetService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
+      Server.Services.GetRequiredService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
     }
 
     public void Dispose()

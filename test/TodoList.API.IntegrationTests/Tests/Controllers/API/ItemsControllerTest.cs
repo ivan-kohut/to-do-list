@@ -5,6 +5,7 @@ using Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Repositories;
 using System;
 using System.Collections.Generic;
@@ -100,7 +101,7 @@ namespace Controllers.Tests
 
       public override void Dispose()
       {
-        Server.GetService<IMemoryCache>().Remove(IdentityId);
+        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
         base.Dispose();
       }
     }
@@ -270,16 +271,20 @@ namespace Controllers.Tests
 
     public virtual void Dispose()
     {
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
-      
+      using IServiceScope scope = Server.CreateScope();
+
+      AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
       appDbContext.Rollback<Item>();
       appDbContext.SaveChanges();
     }
 
     private async Task<IEnumerable<Item>> GetAllItemsAsync()
     {
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
-      
+      using IServiceScope scope = Server.CreateScope();
+
+      AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
       return await appDbContext
         .Items
         .ToListAsync();
@@ -287,7 +292,9 @@ namespace Controllers.Tests
 
     private async Task UpdateIdentityIdAsync(int fromIdentityId, int toIdentityId)
     {
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+      using IServiceScope scope = Server.CreateScope();
+
+      AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
       User user = await appDbContext
         .Users

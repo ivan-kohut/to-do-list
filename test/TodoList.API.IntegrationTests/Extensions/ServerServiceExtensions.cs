@@ -5,9 +5,9 @@ namespace Controllers.Tests.Extensions
 {
   public static class ServerServiceExtensions
   {
-    public static T GetService<T>(this TestServer server) where T : notnull
+    public static IServiceScope CreateScope(this TestServer server)
     {
-      return server.Host.Services.CreateScope().ServiceProvider.GetRequiredService<T>();
+      return server.Host.Services.CreateScope();
     }
   }
 }
