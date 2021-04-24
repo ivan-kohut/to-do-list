@@ -4,9 +4,12 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Polly;
+using Polly.Retry;
 using Repositories;
 using System;
 using System.IO;
@@ -39,13 +42,24 @@ namespace Controllers.Tests.Fixtures
       Server = new TestServer(webHostBuilder);
       Client = Server.CreateClient();
 
-      using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+      AsyncRetryPolicy retryPolicy = Policy
+        .Handle<SqlException>()
+        .WaitAndRetryAsync(3, retryNumber => TimeSpan.FromSeconds(retryNumber * 2), (exception, sleepDuration) => Console.WriteLine($"SQL Server connection retry, sleep duration: {sleepDuration}"));
 
-      User = appDbContext.Users
-        .AsNoTracking()
-        .SingleAsync(u => u.IdentityId == 1)
-        .GetAwaiter()
-        .GetResult();
+      User? user = null;
+
+      retryPolicy.ExecuteAsync(async () =>
+      {
+        using AppDbContext appDbContext = Server.GetService<AppDbContext>();
+
+        await appDbContext.Database.MigrateAsync();
+
+        user = await appDbContext.Users
+          .AsNoTracking()
+          .SingleAsync(u => u.IdentityId == 1);
+      }).GetAwaiter().GetResult();
+
+      User = user!;
 
       Server.GetService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
     }
