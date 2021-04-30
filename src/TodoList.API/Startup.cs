@@ -139,7 +139,7 @@ namespace WebApplication
       });
 
       app.UseRouting();
-      app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? new string[] { }).AllowAnyHeader().AllowAnyMethod());
+      app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? Array.Empty<string>()).AllowAnyHeader().AllowAnyMethod());
       app.UseAppExceptionHandler();
 
       ConfigureAuth(app);

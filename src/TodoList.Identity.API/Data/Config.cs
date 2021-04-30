@@ -10,7 +10,7 @@ namespace TodoList.Identity.API.Data
   public static class Config
   {
     public static User Admin =>
-      new User
+      new()
       {
         UserName = "admin",
         NormalizedUserName = "ADMIN",

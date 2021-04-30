@@ -17,7 +17,7 @@ namespace TodoList.Identity.API.Services
 
     public async Task SendEmailAsync(string email, string subject, string message)
     {
-      SendGridMessage msg = new SendGridMessage
+      SendGridMessage msg = new()
       {
         From = new EmailAddress("todo-list@test"),
         Subject = subject,

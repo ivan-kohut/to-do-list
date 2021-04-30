@@ -48,7 +48,7 @@ namespace Services.Tests
       [Fact]
       public async Task When_ItemsExist_Expect_Returned()
       {
-        Item firstItem = new Item
+        Item firstItem = new()
         {
           Id = 1,
           UserId = 25,
@@ -57,7 +57,7 @@ namespace Services.Tests
           Status = ItemStatus.Todo
         };
 
-        Item secondItem = new Item
+        Item secondItem = new()
         {
           Id = 2,
           UserId = 25,
@@ -119,7 +119,7 @@ namespace Services.Tests
         int generatedItemId = 10;
         int maxPriority = 1;
 
-        User user = new User
+        User user = new()
         {
           Id = 25,
           IdentityId = identityId
@@ -129,7 +129,7 @@ namespace Services.Tests
           .Setup(r => r.GetUserAsync(identityId))
           .ReturnsAsync(user);
 
-        ItemDTO itemToSave = new ItemDTO { Text = "itemText" };
+        ItemDTO itemToSave = new() { Text = "itemText" };
 
         mockItemRepository
           .Setup(r => r.GetMaxItemPriorityAsync(identityId))
@@ -148,7 +148,7 @@ namespace Services.Tests
           .Setup(m => m.SaveChangesAsync())
           .Returns(Task.CompletedTask);
 
-        ItemDTO expected = new ItemDTO
+        ItemDTO expected = new()
         {
           Id = generatedItemId,
           IsDone = false,
@@ -181,7 +181,7 @@ namespace Services.Tests
           .Setup(r => r.GetByIdAndIdentityIdAsync(itemToUpdateId, identityId))
           .ReturnsAsync(notFoundItem);
 
-        ItemDTO itemToUpdate = new ItemDTO { Id = itemToUpdateId };
+        ItemDTO itemToUpdate = new() { Id = itemToUpdateId };
 
         // Act
         await Assert.ThrowsAsync<EntityNotFoundException>(() => itemService.UpdateAsync(identityId, itemToUpdate));
@@ -194,7 +194,7 @@ namespace Services.Tests
       {
         int itemToUpdateId = 1;
 
-        Item foundItem = new Item
+        Item foundItem = new()
         {
           Id = itemToUpdateId,
           Status = ItemStatus.Todo,
@@ -210,7 +210,7 @@ namespace Services.Tests
           .Setup(m => m.SaveChangesAsync())
           .Returns(Task.CompletedTask);
 
-        ItemDTO itemToUpdate = new ItemDTO
+        ItemDTO itemToUpdate = new()
         {
           Id = itemToUpdateId,
           IsDone = true,
@@ -255,7 +255,7 @@ namespace Services.Tests
       {
         int itemToDeleteId = 1;
 
-        Item foundItem = new Item { Id = itemToDeleteId, Text = "itemText", Priority = 1 };
+        Item foundItem = new() { Id = itemToDeleteId, Text = "itemText", Priority = 1 };
 
         mockItemRepository
           .Setup(r => r.GetByIdAndIdentityIdAsync(itemToDeleteId, identityId))

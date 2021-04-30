@@ -17,7 +17,7 @@ namespace TodoList.Identity.API.Services
     {
       this.brokerName = eventBusOptions.Value.BrokerName;
 
-      ConnectionFactory connectionFactory = new ConnectionFactory
+      ConnectionFactory connectionFactory = new()
       {
         HostName = eventBusOptions.Value.Connection,
         UserName = eventBusOptions.Value.UserName,

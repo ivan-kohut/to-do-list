@@ -83,8 +83,8 @@ namespace Controllers.Services.Tests
       [Fact]
       public async Task When_ItemIsSaved_Expect_CacheIsDropped()
       {
-        ItemDTO itemToSave = new ItemDTO { Text = "test-text" };
-        ItemDTO expectedSavedItem = new ItemDTO { Id = 1, Text = "test-text", Priority = 1, IsDone = false };
+        ItemDTO itemToSave = new() { Text = "test-text" };
+        ItemDTO expectedSavedItem = new() { Id = 1, Text = "test-text", Priority = 1, IsDone = false };
 
         mockItemService
           .Setup(s => s.SaveAsync(identityId, itemToSave))
@@ -109,7 +109,7 @@ namespace Controllers.Services.Tests
       [Fact]
       public async Task When_ItemIsUpdated_Expect_CacheIsDropped()
       {
-        ItemDTO itemToUpdate = new ItemDTO { Id = 25 };
+        ItemDTO itemToUpdate = new() { Id = 25 };
 
         mockItemService
           .Setup(s => s.UpdateAsync(identityId, itemToUpdate))

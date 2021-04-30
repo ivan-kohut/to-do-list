@@ -39,7 +39,7 @@ namespace TodoList.Client
 
     private async Task<ApiCallResult<T>> GenerateApiCallResultAsync<T>(HttpResponseMessage httpResponse) where T : class
     {
-      ApiCallResult<T> apiCallResult = new ApiCallResult<T>
+      ApiCallResult<T> apiCallResult = new()
       {
         IsSuccess = httpResponse.IsSuccessStatusCode,
         StatusCode = (int)httpResponse.StatusCode
@@ -61,7 +61,7 @@ namespace TodoList.Client
 
     private async Task<ApiCallResult> GenerateApiCallResultAsync(HttpResponseMessage httpResponse)
     {
-      ApiCallResult apiCallResult = new ApiCallResult
+      ApiCallResult apiCallResult = new()
       {
         IsSuccess = httpResponse.IsSuccessStatusCode,
         StatusCode = (int)httpResponse.StatusCode

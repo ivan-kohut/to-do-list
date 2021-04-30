@@ -144,7 +144,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_InputModelIsValid_Expect_Saved()
       {
-        ItemCreateApiModel itemToSave = new ItemCreateApiModel { Text = "itemText" };
+        ItemCreateApiModel itemToSave = new() { Text = "itemText" };
 
         // Act
         HttpResponseMessage response = await PostAsync(url, itemToSave);
@@ -169,7 +169,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_InputModelIsNotValid_Expect_BadRequest()
       {
-        ItemApiModel itemToUpdate = new ItemApiModel
+        ItemApiModel itemToUpdate = new()
         {
           Id = 1,
           Text = string.Empty,
@@ -185,7 +185,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_IdFromRequestPathDoesNotEqualToIdFromModel_Expect_BadRequest()
       {
-        ItemApiModel itemToUpdate = new ItemApiModel
+        ItemApiModel itemToUpdate = new()
         {
           Id = 2,
           Text = "itemText"
@@ -200,7 +200,7 @@ namespace Controllers.Tests
       [Fact]
       public async Task When_ItemIsNotFound_Expect_NotFound()
       {
-        ItemApiModel itemToUpdate = new ItemApiModel
+        ItemApiModel itemToUpdate = new()
         {
           Id = 1,
           Text = "itemText"

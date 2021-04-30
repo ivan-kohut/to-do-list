@@ -15,7 +15,7 @@ namespace Controllers.Tests.Middlewares
 
     public async Task Invoke(HttpContext httpContext)
     {
-      ClaimsIdentity identity = new ClaimsIdentity("test-auth-type");
+      ClaimsIdentity identity = new("test-auth-type");
 
       identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, 1.ToString()));
 

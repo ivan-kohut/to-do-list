@@ -45,7 +45,7 @@ namespace Services
         throw new EntityNotFoundException($"User with identity id {identityId} is not found");
       }
 
-      Item item = new Item
+      Item item = new()
       {
         UserId = currentUser.Id,
         Text = itemDTO.Text,
