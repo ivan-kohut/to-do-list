@@ -1,8 +1,9 @@
-﻿namespace TodoList.Items.Domain.Aggregates.UserAggregate
+﻿using TodoList.Items.Domain.Shared;
+
+namespace TodoList.Items.Domain.Aggregates.UserAggregate
 {
-  public class User
+  public class User : Entity, IAggregateRoot
   {
-    private int _id;
     private int _identityId;
 
     public User(int identityId)

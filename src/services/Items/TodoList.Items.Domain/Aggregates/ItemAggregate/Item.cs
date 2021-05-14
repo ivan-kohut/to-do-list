@@ -1,8 +1,9 @@
-﻿namespace TodoList.Items.Domain.Aggregates.ItemAggregate
+﻿using TodoList.Items.Domain.Shared;
+
+namespace TodoList.Items.Domain.Aggregates.ItemAggregate
 {
-  public class Item
+  public class Item : Entity, IAggregateRoot
   {
-    private int _id;
     private int _userId;
     private ItemStatus _status;
     private string _text;
