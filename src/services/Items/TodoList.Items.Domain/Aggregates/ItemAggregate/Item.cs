@@ -5,19 +5,22 @@ namespace TodoList.Items.Domain.Aggregates.ItemAggregate
 {
   public class Item : Entity, IAggregateRoot
   {
-    private int _userId;
-    private string _text;
-    private int _priority;
+    public int UserId { get; private set; }
 
-    public ItemStatus? Status { get; private set; }
+    public string Text { get; private set; }
+
+    public int Priority { get; private set; }
+
+    public ItemStatus Status { get; }
     private int _statusId;
 
     public Item(int userId, string text, int priority)
     {
-      this._userId = userId;
+      this.UserId = userId;
+      this.Text = !string.IsNullOrWhiteSpace(text) ? text : throw new ArgumentNullException(nameof(text));
+      this.Priority = priority;
+      this.Status = ItemStatus.Todo;
       this._statusId = ItemStatus.Todo.Id;
-      this._text = !string.IsNullOrWhiteSpace(text) ? text : throw new ArgumentNullException(nameof(text));
-      this._priority = priority;
     }
   }
 }

@@ -4,11 +4,11 @@ namespace TodoList.Items.Domain.Aggregates.UserAggregate
 {
   public class User : Entity, IAggregateRoot
   {
-    private int _identityId;
+    public int IdentityId { get; private set; }
 
     public User(int identityId)
     {
-      this._identityId = identityId;
+      this.IdentityId = identityId;
     }
   }
 }
