@@ -1,8 +1,14 @@
-﻿namespace TodoList.Items.Domain.Aggregates.ItemAggregate
+﻿using TodoList.Items.Domain.Shared;
+
+namespace TodoList.Items.Domain.Aggregates.ItemAggregate
 {
-  public enum ItemStatus
+  public class ItemStatus : Enumeration
   {
-    Todo = 1,
-    Done
+    public static readonly ItemStatus Todo = new(1, nameof(Todo));
+    public static readonly ItemStatus Done = new(2, nameof(Done));
+
+    protected ItemStatus(int id, string name) : base(id, name)
+    {
+    }
   }
 }
