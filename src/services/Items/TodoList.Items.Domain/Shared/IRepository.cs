@@ -1,7 +1,7 @@
 ﻿namespace TodoList.Items.Domain.Shared
 {
-  public interface IRepository<T> where T : IAggregateRoot
+  public interface IRepository<T> where T : class, IAggregateRoot
   {
-    IUnitOfWork UnitOfWork { get; }
+    void Create(T aggregateRoot);
   }
 }
