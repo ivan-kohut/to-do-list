@@ -15,7 +15,7 @@ services:
   identity-api:
     build:
       context: .
-      dockerfile: src/TodoList.Identity.API/Dockerfile
+      dockerfile: src/services/Identity/TodoList.Identity.API/Dockerfile
     depends_on:
       - db
       - rabbitmq

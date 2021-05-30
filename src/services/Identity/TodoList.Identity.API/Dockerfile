@@ -3,10 +3,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["src/TodoList.Identity.API/TodoList.Identity.API.csproj", "/src/TodoList.Identity.API/"]
-RUN dotnet restore "/src/TodoList.Identity.API/TodoList.Identity.API.csproj"
+COPY ["src/services/Identity/TodoList.Identity.API/TodoList.Identity.API.csproj", "/src/services/Identity/TodoList.Identity.API/"]
+RUN dotnet restore "/src/services/Identity/TodoList.Identity.API/TodoList.Identity.API.csproj"
 COPY src .
-WORKDIR "/src/TodoList.Identity.API"
+WORKDIR "/src/services/Identity/TodoList.Identity.API"
 RUN dotnet build "TodoList.Identity.API.csproj" -c Release -o /app/build
 
 FROM build AS publish

@@ -10,7 +10,7 @@ COPY ["src/API.Models/API.Models.csproj", "/src/API.Models/"]
 COPY ["src/Repositories.Concrete/Repositories.Concrete.csproj", "/src/Repositories.Concrete/"]
 COPY ["src/Repositories/Repositories.csproj", "/src/Repositories/"]
 COPY ["src/Services.Concrete/Services.Concrete.csproj", "/src/Services.Concrete/"]
-COPY ["src/Services/Services.csproj", "/src/Services/"]
+COPY ["src/Services.Contracts/Services.Contracts.csproj", "/src/Services.Contracts/"]
 RUN dotnet restore "/src/TodoList.API/TodoList.API.csproj"
 COPY src .
 WORKDIR "/src/TodoList.API"
