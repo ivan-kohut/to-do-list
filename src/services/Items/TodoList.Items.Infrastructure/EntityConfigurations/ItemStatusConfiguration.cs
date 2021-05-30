@@ -15,6 +15,8 @@ namespace TodoList.Items.Infrastructure.EntityConfigurations
       builder
         .Property(e => e.Name)
         .HasMaxLength(50);
+
+      builder.ToTable("ItemStatuses");
     }
   }
 }

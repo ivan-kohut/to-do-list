@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TodoList.Items.Domain.Aggregates.ItemAggregate;
+using TodoList.Items.Domain.Aggregates.UserAggregate;
 
 namespace TodoList.Items.Infrastructure.EntityConfigurations
 {
@@ -14,7 +15,18 @@ namespace TodoList.Items.Infrastructure.EntityConfigurations
 
       builder.Property(e => e.UserId);
 
-      builder.Property(e => e.Status);
+      builder
+        .HasOne<User>()
+        .WithMany();
+
+      builder
+        .Property<int>("_statusId")
+        .UsePropertyAccessMode(PropertyAccessMode.Field)
+        .HasColumnName("Status");
+
+      builder
+        .HasOne(e => e.Status)
+        .WithMany();
 
       builder
         .Property(e => e.Text)

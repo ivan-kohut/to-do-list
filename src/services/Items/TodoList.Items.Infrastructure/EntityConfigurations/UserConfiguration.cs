@@ -11,6 +11,9 @@ namespace TodoList.Items.Infrastructure.EntityConfigurations
       builder.HasKey(e => e.Id);
 
       builder.HasIndex(e => e.Id);
+
+      builder.Property(e => e.IdentityId);
+
       builder.HasIndex(e => e.IdentityId).IsUnique();
 
       builder.ToTable("Users");
