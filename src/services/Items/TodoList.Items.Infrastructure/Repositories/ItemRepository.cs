@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TodoList.Items.Domain.Aggregates.ItemAggregate;
@@ -10,6 +11,14 @@ namespace TodoList.Items.Infrastructure.Repositories
     public ItemRepository(ItemsDbContext dbContext) : base(dbContext)
     {
     }
+
+    public async Task<IEnumerable<Item>> GetAllAsync(int userId) =>
+      await dbContext
+        .Items
+        .Where(i => i.UserId == userId)
+        .OrderBy(i => i.Priority)
+        .AsNoTracking()
+        .ToListAsync();
 
     public async Task<Item?> GetByIdAndUserIdAsync(int id, int userId) =>
       await dbContext
