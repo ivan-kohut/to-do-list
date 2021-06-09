@@ -41,7 +41,7 @@ namespace TodoList.Items.API
     public void ConfigureServices(IServiceCollection services)
     {
       services
-        .AddDbContext<ItemsDbContext>(o => o.UseSqlServer(configuration.GetConnectionString(ConnectionStringName)));
+        .AddDbContext<ItemsDbContext>(o => o.UseSqlServer(configuration.GetConnectionString(ConnectionStringName), sql => sql.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name)));
 
       if (webHostEnvironment.IsDevelopment())
       {

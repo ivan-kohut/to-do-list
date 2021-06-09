@@ -26,7 +26,8 @@ namespace TodoList.Items.Infrastructure.EntityConfigurations
 
       builder
         .HasOne(e => e.Status)
-        .WithMany();
+        .WithMany()
+        .HasForeignKey("_statusId");
 
       builder
         .Property(e => e.Text)
