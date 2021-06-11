@@ -46,7 +46,9 @@ namespace TodoList.Items.API.Controllers
     [ProducesResponseType(400)]
     public async Task<ActionResult<ItemApiModel>> CreateAsync(ItemCreateApiModel item, CancellationToken cancellationToken)
     {
-      ItemDTO result = await mediator.Send(new CreateItemCommand(item.Text, User.GetIdentityId()), cancellationToken);
+      CreateItemCommand command = new(item.Text, User.GetIdentityId());
+
+      ItemDTO result = await mediator.Send(new RemoveCachedItemsCommand<CreateItemCommand, ItemDTO>(command), cancellationToken);
 
       return new ItemApiModel
       {
@@ -68,7 +70,9 @@ namespace TodoList.Items.API.Controllers
         return BadRequest();
       }
 
-      await mediator.Send(new UpdateItemCommand(item.Id, item.IsDone, item.Text, item.Priority, User.GetIdentityId()), cancellationToken);
+      UpdateItemCommand command = new(item.Id, item.IsDone, item.Text, item.Priority, User.GetIdentityId());
+
+      await mediator.Send(new RemoveCachedItemsCommand<UpdateItemCommand, Unit>(command), cancellationToken);
 
       return Ok();
     }
@@ -78,7 +82,9 @@ namespace TodoList.Items.API.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-      await mediator.Send(new DeleteItemCommand(id, User.GetIdentityId()), cancellationToken);
+      DeleteItemCommand command = new(id, User.GetIdentityId());
+
+      await mediator.Send(new RemoveCachedItemsCommand<DeleteItemCommand, Unit>(command), cancellationToken);
 
       return Ok();
     }

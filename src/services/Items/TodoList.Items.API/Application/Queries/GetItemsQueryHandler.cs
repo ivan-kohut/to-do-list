@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,28 +16,41 @@ namespace TodoList.Items.API.Application.Queries
   {
     private readonly IItemRepository itemRepository;
     private readonly IUserRepository userRepository;
+    private readonly IMemoryCache memoryCache;
 
     public GetItemsQueryHandler(
       IItemRepository itemRepository,
-      IUserRepository userRepository)
+      IUserRepository userRepository,
+      IMemoryCache memoryCache)
     {
       this.itemRepository = itemRepository;
       this.userRepository = userRepository;
+      this.memoryCache = memoryCache;
     }
 
     public async Task<IEnumerable<ItemDTO>> Handle(GetItemsQuery request, CancellationToken cancellationToken)
     {
-      User? currentUser = await userRepository.GetUserAsync(request.IdentityId);
-
-      if (currentUser is null)
+      if (!memoryCache.TryGetValue(request.IdentityId, out IEnumerable<ItemDTO> userItems))
       {
-        throw new EntityNotFoundException($"User with identity id {request.IdentityId} is not found");
+        User? currentUser = await userRepository.GetUserAsync(request.IdentityId);
+
+        if (currentUser is null)
+        {
+          throw new EntityNotFoundException($"User with identity id {request.IdentityId} is not found");
+        }
+
+        userItems = (await itemRepository
+          .GetAllAsync(currentUser.Id))
+          .Select(i => new ItemDTO(i.Id, i.IsDone, i.Text, i.Priority))
+          .ToList();
+
+        MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions()
+          .SetSlidingExpiration(TimeSpan.FromMinutes(1));
+
+        memoryCache.Set(request.IdentityId, userItems, cacheEntryOptions);
       }
 
-      return (await itemRepository
-        .GetAllAsync(currentUser.Id))
-        .Select(i => new ItemDTO(i.Id, i.IsDone, i.Text, i.Priority))
-        .ToList();
+      return userItems;
     }
   }
 }

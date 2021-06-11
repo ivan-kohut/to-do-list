@@ -6,7 +6,7 @@ namespace TodoList.Items.API.Application.Queries
 {
   public class GetItemsQuery : IRequest<IEnumerable<ItemDTO>>
   {
-    public int IdentityId { get; private set; }
+    public int IdentityId { get; }
 
     public GetItemsQuery(int identityId)
     {

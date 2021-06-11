@@ -3,16 +3,13 @@ using TodoList.Items.API.Application.Models;
 
 namespace TodoList.Items.API.Application.Commands
 {
-  public class CreateItemCommand : IRequest<ItemDTO>
+  public class CreateItemCommand : ItemCommandBase, IRequest<ItemDTO>
   {
-    public string Text { get; private set; }
+    public string Text { get; }
 
-    public int IdentityId { get; private set; }
-
-    public CreateItemCommand(string text, int identityId)
+    public CreateItemCommand(string text, int identityId) : base(identityId)
     {
       this.Text = text;
-      this.IdentityId = identityId;
     }
   }
 }

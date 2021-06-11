@@ -10,5 +10,7 @@ namespace TodoList.Items.Domain.Aggregates.UserAggregate
     {
       this.IdentityId = identityId;
     }
+
+    public void SetIdentityId(int identityId) => this.IdentityId = identityId;
   }
 }

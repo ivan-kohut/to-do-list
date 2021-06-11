@@ -11,26 +11,26 @@ namespace TodoList.Items.Domain.Aggregates.ItemAggregate
 
     public int Priority { get; private set; }
 
-    public ItemStatus Status { get; private set; }
+    public ItemStatus? Status { get; private set; }
     private int _statusId;
 
-    public Item(int userId, string text, int priority)
+    public Item(int userId, string text, int priority) : this(userId, text, priority, ItemStatus.Todo)
+    {
+    }
+
+    public Item(int userId, string text, int priority, ItemStatus status)
     {
       this.UserId = userId;
       this.Text = !string.IsNullOrWhiteSpace(text) ? text : throw new ArgumentNullException(nameof(text));
       this.Priority = priority;
-      this.Status = ItemStatus.Todo;
-      this._statusId = ItemStatus.Todo.Id;
+      this._statusId = status.Id;
     }
 
     public bool IsDone => _statusId == ItemStatus.Done.Id;
 
     public void Update(bool isDone, string text, int priority)
     {
-      ItemStatus newStatus = isDone ? ItemStatus.Done : ItemStatus.Todo;
-
-      this.Status = newStatus;
-      this._statusId = newStatus.Id;
+      this._statusId = (isDone ? ItemStatus.Done : ItemStatus.Todo).Id;
       this.Text = !string.IsNullOrWhiteSpace(text) ? text : throw new ArgumentNullException(nameof(text));
       this.Priority = priority;
     }

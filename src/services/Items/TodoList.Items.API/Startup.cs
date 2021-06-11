@@ -13,7 +13,10 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TodoList.Items.API.Application.Commands;
+using TodoList.Items.API.Application.Models;
 using TodoList.Items.API.BackgroundServices;
+using TodoList.Items.API.Extensions;
 using TodoList.Items.API.Filters;
 using TodoList.Items.API.Options;
 using TodoList.Items.API.Swagger;
@@ -100,6 +103,10 @@ namespace TodoList.Items.API
 
       services.AddMediatR(Assembly.GetExecutingAssembly());
 
+      services.AddTransient<IRequestHandler<RemoveCachedItemsCommand<CreateItemCommand, ItemDTO>, ItemDTO>, RemoveCachedItemsCommandHandler<CreateItemCommand, ItemDTO>>();
+      services.AddTransient<IRequestHandler<RemoveCachedItemsCommand<UpdateItemCommand, Unit>, Unit>, RemoveCachedItemsCommandHandler<UpdateItemCommand, Unit>>();
+      services.AddTransient<IRequestHandler<RemoveCachedItemsCommand<DeleteItemCommand, Unit>, Unit>, RemoveCachedItemsCommandHandler<DeleteItemCommand, Unit>>();
+
       services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<ItemsDbContext>());
 
       services.AddScoped<IItemRepository, ItemRepository>();
@@ -129,6 +136,7 @@ namespace TodoList.Items.API
 
       app.UseRouting();
       app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? Array.Empty<string>()).AllowAnyHeader().AllowAnyMethod());
+      app.UseAppExceptionHandler();
 
       ConfigureAuth(app);
 

@@ -4,7 +4,7 @@ namespace TodoList.Items.API.Application.Commands
 {
   public class CreateUserCommand : IRequest
   {
-    public int IdentityId { get; private set; }
+    public int IdentityId { get; }
 
     public CreateUserCommand(int identityId)
     {
