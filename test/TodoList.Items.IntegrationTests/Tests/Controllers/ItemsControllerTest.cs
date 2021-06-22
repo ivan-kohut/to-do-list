@@ -41,7 +41,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         response.EnsureSuccessStatusCode();
 
-        Assert.Empty(await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response));
+        (await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response)).Should().BeEmpty();
       }
 
       [Fact]
@@ -64,7 +64,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
-        actual.ShouldBeEquivalentTo(expected);
+        actual.Should().BeEquivalentTo(expected);
       }
 
       [Fact]
@@ -86,7 +86,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         IEnumerable<ItemApiModel> actualFromDb = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
-        actualFromDb.ShouldBeEquivalentTo(expected);
+        actualFromDb.Should().BeEquivalentTo(expected);
 
         await SaveItemAsync(new Item(UserId, "thirdItemText", 3, ItemStatus.Todo));
 
@@ -97,7 +97,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         IEnumerable<ItemApiModel> actualFromCache = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
-        actualFromCache.ShouldBeEquivalentTo(expected);
+        actualFromCache.Should().BeEquivalentTo(expected);
       }
 
       public override void Dispose()
@@ -119,7 +119,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "" });
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -134,7 +134,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
           // Act
           HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "itemText" });
 
-          Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+          response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
         }
         finally
         {
@@ -154,10 +154,15 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         ItemApiModel itemSaved = await DeserializeResponseBodyAsync<ItemApiModel>(response);
 
-        Assert.NotEqual(default, itemSaved.Id);
-        Assert.Equal(itemToSave.Text, itemSaved.Text);
-        Assert.Equal(1, itemSaved.Priority);
-        Assert.False(itemSaved.IsDone);
+        ItemApiModel expectedItem = new()
+        {
+          IsDone = false,
+          Text = itemToSave.Text,
+          Priority = 1
+        };
+
+        itemSaved.Should().BeEquivalentTo(expectedItem, o => o.Excluding(m => m.Id));
+        itemSaved.Id.Should().NotBe(default);
       }
     }
 
@@ -180,7 +185,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -195,7 +200,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{1}", itemToUpdate);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -210,7 +215,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
       }
 
       [Fact]
@@ -232,9 +237,9 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         Item itemUpdated = (await GetAllItemsAsync())
           .Single(i => i.Id == itemToUpdate.Id);
 
-        itemUpdated.Status.ShouldBeEquivalentTo(ItemStatus.Done);
-        Assert.Equal(itemToUpdate.Text, itemUpdated.Text);
-        Assert.Equal(itemToUpdate.Priority, itemUpdated.Priority);
+        itemUpdated.Status.Should().BeEquivalentTo(ItemStatus.Done);
+        itemUpdated.Text.Should().BeEquivalentTo(itemToUpdate.Text);
+        itemUpdated.Priority.Should().Be(itemToUpdate.Priority);
       }
     }
 
@@ -250,7 +255,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await DeleteAsync($"{url}/{1}");
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
       }
 
       [Fact]
@@ -266,7 +271,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         Item? itemDeleted = (await GetAllItemsAsync())
           .SingleOrDefault(i => i.Id == itemSaved.Id);
 
-        Assert.Null(itemDeleted);
+        itemDeleted.Should().BeNull();
       }
     }
 
