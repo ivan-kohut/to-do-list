@@ -56,7 +56,7 @@ namespace TodoList.Items.UnitTests.Domain.Aggregates
       // Act
       Invoking(() => { Item item = new(1, string.Empty, 2); })
         .Should()
-        .Throw<ArgumentNullException>();
+        .ThrowExactly<ArgumentNullException>();
     }
 
     [Theory]
@@ -89,7 +89,7 @@ namespace TodoList.Items.UnitTests.Domain.Aggregates
       // Act
       itemToUpdate.Invoking(i => i.Update(true, string.Empty, 12))
         .Should()
-        .Throw<ArgumentNullException>();
+        .ThrowExactly<ArgumentNullException>();
     }
   }
 }
