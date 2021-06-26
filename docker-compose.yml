@@ -8,7 +8,7 @@ services:
   items-api:
     build:
       context: .
-      dockerfile: src/TodoList.API/Dockerfile
+      dockerfile: src/services/Items/TodoList.Items.API/Dockerfile
     depends_on:
       - db
       - rabbitmq

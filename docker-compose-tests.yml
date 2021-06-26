@@ -8,12 +8,12 @@ services:
   items-api-unit-test:
     build:
       context: .
-      dockerfile: src/TodoList.API/Dockerfile
+      dockerfile: src/services/Items/TodoList.Items.API/Dockerfile
       target: unit-tests
   items-api-integration-test:
     build:
       context: .
-      dockerfile: src/TodoList.API/Dockerfile
+      dockerfile: src/services/Items/TodoList.Items.API/Dockerfile
       target: integration-tests
     depends_on:
       - db-test

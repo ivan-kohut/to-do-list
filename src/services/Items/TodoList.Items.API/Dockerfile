@@ -16,23 +16,23 @@ RUN dotnet build "TodoList.Items.API.csproj" -c Release -o /app/build
 
 FROM build as unit-tests
 WORKDIR /test
-COPY ["test/TodoList.Items.API.UnitTests/TodoList.Items.API.UnitTests.csproj", "/test/TodoList.Items.API.UnitTests/"]
-RUN dotnet restore "/test/TodoList.Items.API.UnitTests/TodoList.Items.API.UnitTests.csproj"
+COPY ["test/TodoList.Items.UnitTests/TodoList.Items.UnitTests.csproj", "/test/TodoList.Items.UnitTests/"]
+RUN dotnet restore "/test/TodoList.Items.UnitTests/TodoList.Items.UnitTests.csproj"
 COPY test .
-WORKDIR "/test/TodoList.Items.API.UnitTests"
-RUN dotnet build "TodoList.Items.API.UnitTests.csproj" -c Release -o /app/unit-tests
+WORKDIR "/test/TodoList.Items.UnitTests"
+RUN dotnet build "TodoList.Items.UnitTests.csproj" -c Release -o /app/unit-tests
 WORKDIR /app/unit-tests
-ENTRYPOINT ["dotnet", "test", "TodoList.Items.API.UnitTests.dll"]
+ENTRYPOINT ["dotnet", "test", "TodoList.Items.UnitTests.dll"]
 
 FROM build as integration-tests
 WORKDIR /test
-COPY ["test/TodoList.Items.API.IntegrationTests/TodoList.Items.API.IntegrationTests.csproj", "/test/TodoList.Items.API.IntegrationTests/"]
-RUN dotnet restore "/test/TodoList.Items.API.IntegrationTests/TodoList.Items.API.IntegrationTests.csproj"
+COPY ["test/TodoList.Items.IntegrationTests/TodoList.Items.IntegrationTests.csproj", "/test/TodoList.Items.IntegrationTests/"]
+RUN dotnet restore "/test/TodoList.Items.IntegrationTests/TodoList.Items.IntegrationTests.csproj"
 COPY test .
-WORKDIR "/test/TodoList.Items.API.IntegrationTests"
-RUN dotnet build "TodoList.Items.API.IntegrationTests.csproj" -c Release -o /app/integration-tests
+WORKDIR "/test/TodoList.Items.IntegrationTests"
+RUN dotnet build "TodoList.Items.IntegrationTests.csproj" -c Release -o /app/integration-tests
 WORKDIR /app/integration-tests
-ENTRYPOINT ["dotnet", "test", "TodoList.Items.API.IntegrationTests.dll"]
+ENTRYPOINT ["dotnet", "test", "TodoList.Items.IntegrationTests.dll"]
 
 FROM build AS publish
 RUN dotnet publish "TodoList.Items.API.csproj" -c Release -o /app/publish

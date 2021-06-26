@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["src/TodoList.Client.Server/TodoList.Client.Server.csproj", "/src/TodoList.Client.Server/"]
 COPY ["src/TodoList.Client/TodoList.Client.csproj", "/src/TodoList.Client/"]
-COPY ["src/API.Models/API.Models.csproj", "/src/API.Models/"]
+COPY ["src/services/Items/TodoList.Items.API.Models/TodoList.Items.API.Models.csproj", "/src/services/Items/TodoList.Items.API.Models/"]
 RUN dotnet restore "/src/TodoList.Client.Server/TodoList.Client.Server.csproj"
 COPY src .
 WORKDIR "/src/TodoList.Client.Server"
