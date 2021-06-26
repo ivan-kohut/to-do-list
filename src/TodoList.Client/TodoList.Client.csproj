@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\API.Models\API.Models.csproj" />
+    <ProjectReference Include="..\services\Items\TodoList.Items.API.Models\TodoList.Items.API.Models.csproj" />
   </ItemGroup>
 
 </Project>

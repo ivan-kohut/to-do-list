@@ -1,8 +1,8 @@
-﻿using API.Models;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TodoList.Items.API.Models;
 
 namespace TodoList.Client.Components
 {
@@ -65,7 +65,7 @@ namespace TodoList.Client.Components
     {
       Items.Remove(item);
 
-      await AppHttpClient.DeleteAsync(ApiUrls.DeleteItem.Replace(Urls.DeleteItem, item.Id.ToString()));
+      await AppHttpClient.DeleteAsync(ApiUrls.DeleteItem.Replace(ApiUrls.IdTemplate, item.Id.ToString()));
     }
 
     protected async Task MoveUpItemAsync(ItemApiModel item)
@@ -101,7 +101,7 @@ namespace TodoList.Client.Components
 
     private Task UpdateItemAsync(ItemApiModel item)
     {
-      return AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(Urls.UpdateItem, item.Id.ToString()), item);
+      return AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(ApiUrls.IdTemplate, item.Id.ToString()), item);
     }
   }
 }

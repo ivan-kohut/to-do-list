@@ -34,8 +34,7 @@ namespace TodoList.Items.IntegrationTests.Fixtures
     {
       string projectRootPath = Path.Combine(
         Directory.GetCurrentDirectory(),
-        "..", "..", "..", "..", "..", "src", "TodoList.API"
-      );
+        "..", "..", "..", "..", "..", "src", "services", "Items", "TodoList.Items.API");
 
       IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
         .UseContentRoot(projectRootPath)

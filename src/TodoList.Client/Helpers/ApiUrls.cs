@@ -1,12 +1,14 @@
-﻿using API.Models;
-
-namespace TodoList.Client
+﻿namespace TodoList.Client
 {
   public class ApiUrls
   {
-    public static readonly string GetItemsList = Urls.Items;
-    public static readonly string CreateItem = Urls.Items;
-    public static readonly string UpdateItem = $"{Urls.Items}/{Urls.UpdateItem}";
-    public static readonly string DeleteItem = $"{Urls.Items}/{Urls.DeleteItem}";
+    private const string BaseItemsPath = "/api/v1/items";
+
+    public const string IdTemplate = "{id}";
+
+    public static readonly string GetItemsList = BaseItemsPath;
+    public static readonly string CreateItem = BaseItemsPath;
+    public static readonly string UpdateItem = BaseItemsPath + "/" + IdTemplate;
+    public static readonly string DeleteItem = BaseItemsPath + "/" + IdTemplate;
   }
 }
