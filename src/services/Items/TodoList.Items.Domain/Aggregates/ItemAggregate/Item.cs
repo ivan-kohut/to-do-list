@@ -5,13 +5,13 @@ namespace TodoList.Items.Domain.Aggregates.ItemAggregate
 {
   public class Item : Entity, IAggregateRoot
   {
-    public int UserId { get; private set; }
+    public int UserId { get; }
 
     public string Text { get; private set; }
 
     public int Priority { get; private set; }
 
-    public ItemStatus? Status { get; private set; }
+    public ItemStatus? Status { get; }
     private int _statusId;
 
     public Item(int userId, string text, int priority) : this(userId, text, priority, ItemStatus.Todo)
