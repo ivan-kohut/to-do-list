@@ -75,6 +75,24 @@ services:
       - 8091:443
     volumes:
       - ~/.aspnetcore/https:/https
+  health-monitoring:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORT=8093
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
+      - HealthChecks-UI__HealthChecks__0__Name=items-api
+      - HealthChecks-UI__HealthChecks__0__Uri=${TODOLIST_BASE_URL}:8090/health
+      - HealthChecks-UI__HealthChecks__1__Name=blazor-wasm
+      - HealthChecks-UI__HealthChecks__1__Uri=${TODOLIST_BASE_URL}:8091/health
+      - HealthChecks-UI__HealthChecks__2__Name=identity-api
+      - HealthChecks-UI__HealthChecks__2__Uri=${TODOLIST_BASE_URL}:8092/health
+    ports:
+      - 8083:80
+      - 8093:443
+    volumes:
+      - ~/.aspnetcore/https:/https
 
 volumes:
   mssql-data-volume:

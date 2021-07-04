@@ -14,6 +14,9 @@ namespace TodoList.Identity.API.Controllers
       this.interaction = interaction;
     }
 
+    [HttpGet]
+    public IActionResult Index() => Redirect("/.well-known/openid-configuration");
+
     public async Task<IActionResult> Error(string errorId) =>
       View(new ErrorViewModel { Error = await interaction.GetErrorContextAsync(errorId) });
   }

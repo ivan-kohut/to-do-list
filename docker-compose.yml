@@ -27,3 +27,7 @@ services:
     depends_on:
       - items-api
       - identity-api
+  health-monitoring:
+    build:
+      context: .
+      dockerfile: src/webapps/Health/TodoList.Health.Monitoring/Dockerfile

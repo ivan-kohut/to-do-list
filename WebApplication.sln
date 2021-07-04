@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Client", "src\weba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Client.Server", "src\webapps\BlazorWasm\TodoList.Client.Server\TodoList.Client.Server.csproj", "{659E9A35-F5AC-48FF-933B-D7546F03E220}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Health", "Health", "{107DE484-35F6-4E54-964C-C75948F07F39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Health.Monitoring", "src\webapps\Health\TodoList.Health.Monitoring\TodoList.Health.Monitoring.csproj", "{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,10 @@ Global
 		{659E9A35-F5AC-48FF-933B-D7546F03E220}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{659E9A35-F5AC-48FF-933B-D7546F03E220}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{659E9A35-F5AC-48FF-933B-D7546F03E220}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +110,8 @@ Global
 		{4184CA92-4BDB-4D4C-9423-EE6D4A7322F8} = {5F1EE3BE-3CF0-4F86-98A1-12378BB8F13E}
 		{6D732D86-C3E3-4B78-BB54-3E1D7B9F61EB} = {4184CA92-4BDB-4D4C-9423-EE6D4A7322F8}
 		{659E9A35-F5AC-48FF-933B-D7546F03E220} = {4184CA92-4BDB-4D4C-9423-EE6D4A7322F8}
+		{107DE484-35F6-4E54-964C-C75948F07F39} = {5F1EE3BE-3CF0-4F86-98A1-12378BB8F13E}
+		{F9F42617-7DFB-4F9C-BB31-0BA1248140A9} = {107DE484-35F6-4E54-964C-C75948F07F39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF2C320D-66BF-4E26-B71D-45DF0D8802F3}
