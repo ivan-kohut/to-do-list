@@ -23,7 +23,7 @@ services:
   blazor-wasm:
     build:
       context: .
-      dockerfile: src/TodoList.Client.Server/Dockerfile
+      dockerfile: src/webapps/BlazorWasm/TodoList.Client.Server/Dockerfile
     depends_on:
       - items-api
       - identity-api

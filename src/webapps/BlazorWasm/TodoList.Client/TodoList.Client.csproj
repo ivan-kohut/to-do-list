@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\services\Items\TodoList.Items.API.Models\TodoList.Items.API.Models.csproj" />
+    <ProjectReference Include="..\..\..\services\Items\TodoList.Items.API.Models\TodoList.Items.API.Models.csproj" />
   </ItemGroup>
 
 </Project>
