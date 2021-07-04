@@ -1,10 +1,13 @@
+using HealthChecks.UI.Client;
 using IdentityServer4;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using System.Reflection;
 using TodoList.Identity.API.Data;
@@ -87,6 +90,11 @@ namespace TodoList.Identity.API
       services.AddSingleton<IEmailService, EmailService>();
       services.AddSingleton<IEventBusService, RabbitMQEventBusService>();
 
+      services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy())
+        .AddSqlServer(connectionString, name: "db")
+        .AddRabbitMQ("amqp://" + configuration["EventBus:Connection"], name: "rabbitmq");
+
       if (webHostEnvironment.IsDevelopment())
       {
         services
@@ -114,6 +122,11 @@ namespace TodoList.Identity.API
       {
         endpoints.MapControllerRoute(name: "Delete user", pattern: "admin/users/delete/{id}", defaults: new { controller = "Admin", action = "DeleteUser" });
         endpoints.MapDefaultControllerRoute();
+        endpoints.MapHealthChecks("/health", new HealthCheckOptions
+        {
+          Predicate = _ => true,
+          ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
       });
     }
   }

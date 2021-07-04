@@ -27,6 +27,9 @@
     <PackageReference Include="AspNet.Security.OAuth.LinkedIn" Version="5.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="Polly" Version="7.2.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="5.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="5.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
   </ItemGroup>
 
 </Project>

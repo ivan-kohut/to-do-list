@@ -1,11 +1,14 @@
+using HealthChecks.UI.Client;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StackExchange.Profiling;
@@ -43,8 +46,10 @@ namespace TodoList.Items.API
 
     public void ConfigureServices(IServiceCollection services)
     {
+      string connectionString = configuration.GetConnectionString(ConnectionStringName);
+
       services
-        .AddDbContext<ItemsDbContext>(o => o.UseSqlServer(configuration.GetConnectionString(ConnectionStringName), sql => sql.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name)));
+        .AddDbContext<ItemsDbContext>(o => o.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name)));
 
       if (webHostEnvironment.IsDevelopment())
       {
@@ -56,6 +61,8 @@ namespace TodoList.Items.API
       services
         .Configure<ApiBehaviorOptions>(o => o.SuppressModelStateInvalidFilter = true);
 
+      string identityUrl = configuration["IdentityUrl"];
+
       services
         .AddAuthentication(o =>
         {
@@ -64,7 +71,7 @@ namespace TodoList.Items.API
         })
         .AddJwtBearer(o =>
         {
-          o.Authority = configuration["IdentityUrl"];
+          o.Authority = identityUrl;
           o.Audience = "items";
           o.RequireHttpsMetadata = false;
         });
@@ -115,6 +122,12 @@ namespace TodoList.Items.API
       services.AddHostedService<EventBusHostedService>();
 
       services.Configure<EventBusOptions>(configuration.GetSection("EventBus"));
+
+      services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy())
+        .AddSqlServer(connectionString, name: "db")
+        .AddRabbitMQ("amqp://" + configuration["EventBus:Connection"], name: "rabbitmq")
+        .AddUrlGroup(new Uri(identityUrl + "/health"), name: "identity-api");
     }
 
     public void Configure(IApplicationBuilder app)
@@ -140,7 +153,15 @@ namespace TodoList.Items.API
 
       ConfigureAuth(app);
 
-      app.UseEndpoints(endpoints => endpoints.MapControllers());
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllers();
+        endpoints.MapHealthChecks("/health", new HealthCheckOptions
+        {
+          Predicate = _ => true,
+          ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+      });
     }
 
     protected virtual void ConfigureAuth(IApplicationBuilder app)

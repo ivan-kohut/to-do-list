@@ -12,6 +12,7 @@ services:
     depends_on:
       - db
       - rabbitmq
+      - identity-api
   identity-api:
     build:
       context: .
@@ -23,3 +24,6 @@ services:
     build:
       context: .
       dockerfile: src/TodoList.Client.Server/Dockerfile
+    depends_on:
+      - items-api
+      - identity-api
