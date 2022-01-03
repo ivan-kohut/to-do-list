@@ -82,7 +82,7 @@ namespace TodoList.Items.API
         {
           Version = "v1",
           Title = "Todo List",
-          Description = "Simple Todo List API developed using C#, ASP.NET Core 5.0 and EF Core 5.0"
+          Description = "Simple Todo List API developed using C#, ASP.NET Core 6.0 and EF Core 6.0"
         });
 
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
