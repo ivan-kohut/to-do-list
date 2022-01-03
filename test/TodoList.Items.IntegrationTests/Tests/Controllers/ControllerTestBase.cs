@@ -45,11 +45,6 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
       return await Client.DeleteAsync(url);
     }
 
-    protected async Task<T> DeserializeResponseBodyAsync<T>(HttpResponseMessage response)
-    {
-      return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
-    }
-
     protected async Task<ItemApiModel> SaveItemAsync(Item itemToSave)
     {
       using IServiceScope scope = Server.CreateScope();
@@ -67,6 +62,11 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         Text = itemToSave.Text,
         Priority = itemToSave.Priority
       };
+    }
+
+    protected static async Task<T> DeserializeResponseBodyAsync<T>(HttpResponseMessage response)
+    {
+      return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
     }
 
     private static HttpContent CreateHttpContent(object? requestBody)

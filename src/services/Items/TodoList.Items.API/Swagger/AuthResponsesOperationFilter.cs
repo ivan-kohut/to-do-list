@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +12,7 @@ namespace TodoList.Items.API.Swagger
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
       object[] customAttributes = context.MethodInfo.DeclaringType
-        ?.GetCustomAttributes(true) ?? new object[] { };
+        ?.GetCustomAttributes(true) ?? Array.Empty<object>();
 
       IEnumerable<AuthorizeAttribute> authAttributes = customAttributes
         .Union(context.MethodInfo.GetCustomAttributes(true))

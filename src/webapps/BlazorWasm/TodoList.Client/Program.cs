@@ -25,18 +25,18 @@ namespace TodoList.Client
         })
         .AddAccountClaimsPrincipalFactory<ArrayClaimsPrincipalFactory<RemoteUserAccount>>();
 
+      string itemsUrl = builder.Configuration["ItemsUrl"] ?? throw new ApplicationException("Items URL is null");
+
       builder.Services
-        .AddHttpClient("items-api", c => c.BaseAddress = new Uri(builder.Configuration["ItemsUrl"]))
+        .AddHttpClient("items-api", c => c.BaseAddress = new Uri(itemsUrl))
         .AddHttpMessageHandler(s =>
           s
-            .GetService<AuthorizationMessageHandler>()
-            ?.ConfigureHandler(authorizedUrls: new[] { builder.Configuration["ItemsUrl"] }, scopes: new[] { "items" })
-       );
+            .GetRequiredService<AuthorizationMessageHandler>()
+            .ConfigureHandler(authorizedUrls: new[] { itemsUrl }, scopes: new[] { "items" }));
 
       builder.Services
-        .AddScoped(sp => sp.GetService<IHttpClientFactory>()!.CreateClient("items-api"))
+        .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("items-api"))
         .AddScoped<IAppHttpClient, AppHttpClient>();
-
 
       builder.RootComponents.Add<App>("#app");
 

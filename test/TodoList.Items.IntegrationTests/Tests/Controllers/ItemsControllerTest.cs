@@ -27,7 +27,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
     {
     }
 
-    public class GetAllAsync : ItemsControllerTest, IDisposable
+    public class GetAllAsync : ItemsControllerTest
     {
       public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
       {
@@ -42,6 +42,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         response.EnsureSuccessStatusCode();
 
         (await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response)).Should().BeEmpty();
+
+        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
       }
 
       [Fact]
@@ -65,6 +67,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
         actual.Should().BeEquivalentTo(expected);
+
+        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
       }
 
       [Fact]
@@ -98,12 +102,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         IEnumerable<ItemApiModel> actualFromCache = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
 
         actualFromCache.Should().BeEquivalentTo(expected);
-      }
 
-      public override void Dispose()
-      {
         Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
-        base.Dispose();
       }
     }
 
@@ -275,7 +275,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
       }
     }
 
-    public virtual void Dispose()
+    public void Dispose()
     {
       using IServiceScope scope = Server.CreateScope();
 
@@ -283,6 +283,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
       itemsDbContext.Rollback<Item>();
       itemsDbContext.SaveChanges();
+
+      GC.SuppressFinalize(this);
     }
 
     private async Task<IEnumerable<Item>> GetAllItemsAsync()
@@ -303,7 +305,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
       ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-      User user = await itemsDbContext
+      User? user = await itemsDbContext
         .Users
         .SingleOrDefaultAsync(u => u.IdentityId == fromIdentityId);
 

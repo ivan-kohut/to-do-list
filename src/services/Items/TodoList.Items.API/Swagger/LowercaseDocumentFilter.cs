@@ -37,7 +37,7 @@ namespace TodoList.Items.API.Swagger
     private static string LowercaseEverythingButParameters(string key)
     {
       return string.Join(
-        '/', key.Split('/').Select(x => x.Contains("{") ? x : x.ToLower()).ToList()
+        '/', key.Split('/').Select(x => x.Contains('{') ? x : x.ToLower()).ToList()
       );
     }
   }
