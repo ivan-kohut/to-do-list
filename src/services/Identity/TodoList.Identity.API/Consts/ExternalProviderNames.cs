@@ -5,6 +5,5 @@
     public const string Facebook = "Facebook";
     public const string Google = "Google";
     public const string GitHub = "GitHub";
-    public const string LinkedIn = "LinkedIn";
   }
 }

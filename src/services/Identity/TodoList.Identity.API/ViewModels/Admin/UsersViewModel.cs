@@ -23,8 +23,6 @@ namespace TodoList.Identity.API.ViewModels
 
     public bool IsLoggedInViaGithub { get; set; }
 
-    public bool IsLoggedInViaLinkedin { get; set; }
-
     public bool IsEmailConfirmed { get; set; }
   }
 }

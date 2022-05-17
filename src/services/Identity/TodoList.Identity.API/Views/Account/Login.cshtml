@@ -32,7 +32,7 @@
   Log in with
 </div>
 <div class="login-social">
-  @foreach (var externalProvider in new string[] { ExternalProviderNames.Facebook, ExternalProviderNames.Google, ExternalProviderNames.GitHub, ExternalProviderNames.LinkedIn })
+  @foreach (var externalProvider in new string[] { ExternalProviderNames.Facebook, ExternalProviderNames.Google, ExternalProviderNames.GitHub })
   {
     <a class="login-social-link" asp-controller="External" asp-action="Challenge" asp-route-scheme="@externalProvider" asp-route-returnUrl="@Model.ReturnUrl">
       <img src="/img/@(externalProvider.ToLower()).png" />

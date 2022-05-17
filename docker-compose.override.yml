@@ -48,8 +48,6 @@ services:
       - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
       - BlazorWasmClientUrl=${TODOLIST_BASE_URL}:8091
       - SendGrid__ApiKey=${TODOLIST_SENDGRID_APIKEY}
-      - LinkedIn__ClientSecret=${TODOLIST_LINKEDIN_CLIENTSECRET}
-      - LinkedIn__ClientId=${TODOLIST_LINKEDIN_CLIENTID}
       - Google__ClientSecret=${TODOLIST_GOOGLE_CLIENTSECRET}
       - Google__ClientId=${TODOLIST_GOOGLE_CLIENTID}
       - Github__ClientSecret=${TODOLIST_GITHUB_CLIENTSECRET}

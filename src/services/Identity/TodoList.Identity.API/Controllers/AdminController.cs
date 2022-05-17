@@ -54,7 +54,6 @@ namespace TodoList.Identity.API.Controllers
             IsLoggedInViaFacebook = u.LoginProviders.Contains(ExternalProviderNames.Facebook),
             IsLoggedInViaGoogle = u.LoginProviders.Contains(ExternalProviderNames.Google),
             IsLoggedInViaGithub = u.LoginProviders.Contains(ExternalProviderNames.GitHub),
-            IsLoggedInViaLinkedin = u.LoginProviders.Contains(ExternalProviderNames.LinkedIn),
             IsEmailConfirmed = u.IsEmailConfirmed
           })
           .ToList()

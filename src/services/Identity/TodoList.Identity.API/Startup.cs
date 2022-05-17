@@ -76,12 +76,6 @@ namespace TodoList.Identity.API
           o.ClientId = configuration["Github:ClientId"];
           o.ClientSecret = configuration["Github:ClientSecret"];
           o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-        })
-        .AddLinkedIn(o =>
-        {
-          o.ClientId = configuration["LinkedIn:ClientId"];
-          o.ClientSecret = configuration["LinkedIn:ClientSecret"];
-          o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
         });
 
       services.Configure<SendGridOptions>(configuration.GetSection("SendGrid"));

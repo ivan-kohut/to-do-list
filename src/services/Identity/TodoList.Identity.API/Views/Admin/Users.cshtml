@@ -9,7 +9,6 @@
       <th>Via Facebook</th>
       <th>Via Google</th>
       <th>Via Github</th>
-      <th>Via LinkedIn</th>
       <th>Email is confirmed</th>
       <th class="red">Delete</th>
     </tr>
@@ -24,7 +23,6 @@
           <td>@user.IsLoggedInViaFacebook</td>
           <td>@user.IsLoggedInViaGoogle</td>
           <td>@user.IsLoggedInViaGithub</td>
-          <td>@user.IsLoggedInViaLinkedin</td>
           <td>@user.IsEmailConfirmed</td>
           <td>
             <form id="@user.Id" asp-antiforgery="true" action="/admin/users/delete/@user.Id" method="POST">
