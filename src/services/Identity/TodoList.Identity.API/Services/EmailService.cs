@@ -19,7 +19,7 @@ namespace TodoList.Identity.API.Services
     {
       SendGridMessage msg = new()
       {
-        From = new EmailAddress("todo-list@test"),
+        From = new EmailAddress(sendGridOptions.SenderEmail),
         Subject = subject,
         PlainTextContent = message,
         HtmlContent = message

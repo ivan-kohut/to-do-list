@@ -47,6 +47,7 @@ services:
       - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
       - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
       - BlazorWasmClientUrl=${TODOLIST_BASE_URL}:8091
+      - SendGrid__SenderEmail=${TODOLIST_SENDGRID_SENDEREMAIL}
       - SendGrid__ApiKey=${TODOLIST_SENDGRID_APIKEY}
       - Google__ClientSecret=${TODOLIST_GOOGLE_CLIENTSECRET}
       - Google__ClientId=${TODOLIST_GOOGLE_CLIENTID}
