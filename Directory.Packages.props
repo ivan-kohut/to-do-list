@@ -1,0 +1,70 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageVersion Include="xunit" Version="2.4.1" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.3" />
+    <PackageVersion Include="FluentAssertions" Version="5.10.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="6.0.0" />
+    <PackageVersion Include="Moq" Version="4.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="AspNetCore.HealthChecks.Rabbitmq" Version="6.0.1" />
+    <PackageVersion Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.1" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.2" />
+    <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="6.0.2" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="6.0.2" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="4.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
+    <PackageVersion Include="MiniProfiler.EntityFrameworkCore" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="MediatR" Version="9.0.0" />
+    <PackageVersion Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="IdentityServer4.AspNetIdentity" Version="4.1.1" />
+    <PackageVersion Include="IdentityServer4.EntityFramework" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageVersion Include="RabbitMQ.Client" Version="6.2.2" />
+    <PackageVersion Include="Polly" Version="7.2.2" />
+    <PackageVersion Include="SendGrid" Version="9.9.0" />
+    <PackageVersion Include="AspNet.Security.OAuth.GitHub" Version="6.0.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageVersion Include="System.Net.Http.Json" Version="6.0.0" />
+  </ItemGroup>
+
+</Project>

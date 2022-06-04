@@ -5,6 +5,7 @@ RUN update-ca-certificates
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+COPY Directory.Packages.props .
 COPY ["src/webapps/BlazorWasm/TodoList.Client.Server/TodoList.Client.Server.csproj", "/src/webapps/BlazorWasm/TodoList.Client.Server/"]
 COPY ["src/webapps/BlazorWasm/TodoList.Client/TodoList.Client.csproj", "/src/webapps/BlazorWasm/TodoList.Client/"]
 COPY ["src/services/Items/TodoList.Items.API.Models/TodoList.Items.API.Models.csproj", "/src/services/Items/TodoList.Items.API.Models/"]

@@ -5,6 +5,7 @@ RUN update-ca-certificates
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+COPY Directory.Packages.props .
 COPY ["src/webapps/Health/TodoList.Health.Monitoring/TodoList.Health.Monitoring.csproj", "/src/webapps/Health/TodoList.Health.Monitoring/"]
 RUN dotnet restore "/src/webapps/Health/TodoList.Health.Monitoring/TodoList.Health.Monitoring.csproj"
 COPY src .
