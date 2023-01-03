@@ -55,8 +55,7 @@ namespace TodoList.Identity.API
         {
           options.ConfigureDbContext = b => b.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
         })
-        .AddAspNetIdentity<User>()
-        .AddDeveloperSigningCredential();
+        .AddAspNetIdentity<User>();
 
       services.AddAuthentication()
         .AddFacebook(o =>
