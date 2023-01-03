@@ -1,5 +1,5 @@
+using Duende.IdentityServer;
 using HealthChecks.UI.Client;
-using IdentityServer4;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;

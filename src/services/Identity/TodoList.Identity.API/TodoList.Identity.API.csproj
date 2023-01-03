@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UseAppHost>false</UseAppHost>
     <UserSecretsId>6a52c71a-f36c-4d43-bb6a-096fc0b4da9c</UserSecretsId>
@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityServer4.AspNetIdentity" />
-    <PackageReference Include="IdentityServer4.EntityFramework" />
+    <PackageReference Include="Duende.IdentityServer.AspNetIdentity" />
+    <PackageReference Include="Duende.IdentityServer.EntityFramework" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
