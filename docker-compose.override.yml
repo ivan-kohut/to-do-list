@@ -20,7 +20,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
-      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true
       - EventBus__Connection=rabbitmq
       - EventBus__UserName=${TODOLIST_EVENTBUS_USERNAME}
       - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
@@ -41,7 +41,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
-      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true
       - EventBus__Connection=rabbitmq
       - EventBus__UserName=${TODOLIST_EVENTBUS_USERNAME}
       - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}

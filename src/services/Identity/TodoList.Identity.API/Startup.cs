@@ -1,5 +1,5 @@
+using Duende.IdentityServer;
 using HealthChecks.UI.Client;
-using IdentityServer4;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -55,8 +55,7 @@ namespace TodoList.Identity.API
         {
           options.ConfigureDbContext = b => b.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
         })
-        .AddAspNetIdentity<User>()
-        .AddDeveloperSigningCredential();
+        .AddAspNetIdentity<User>();
 
       services.AddAuthentication()
         .AddFacebook(o =>

@@ -1,4 +1,4 @@
-﻿using IdentityServer4.Services;
+﻿using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TodoList.Identity.API.ViewModels;

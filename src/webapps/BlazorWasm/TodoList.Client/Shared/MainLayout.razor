@@ -2,7 +2,6 @@
 
 @inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
-@inject SignOutSessionStateManager SignOutManager
 
 @{ 
   string identityUrl = Configuration["IdentityUrl"];
@@ -47,11 +46,9 @@
 
 @code {
 
-  private async Task OnLogout(MouseEventArgs args)
+  private void OnLogout(MouseEventArgs args)
   {
-    await SignOutManager.SetSignOutState();
-
-    NavigationManager.NavigateTo("authentication/logout");
+    NavigationManager.NavigateToLogout("authentication/logout");
   }
 
 }
