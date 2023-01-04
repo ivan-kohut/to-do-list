@@ -119,7 +119,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "" });
 
-        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -134,7 +134,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
           // Act
           HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "itemText" });
 
-          response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
+          response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
         finally
         {
@@ -185,7 +185,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
-        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -200,7 +200,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{1}", itemToUpdate);
 
-        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
       }
 
       [Fact]
@@ -215,7 +215,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
-        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
       }
 
       [Fact]
@@ -255,7 +255,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
         // Act
         HttpResponseMessage response = await DeleteAsync($"{url}/{1}");
 
-        response.StatusCode.Should().BeEquivalentTo(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
       }
 
       [Fact]
