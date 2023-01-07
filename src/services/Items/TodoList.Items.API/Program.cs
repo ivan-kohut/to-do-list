@@ -13,57 +13,59 @@ using TodoList.Items.Infrastructure;
 
 namespace TodoList.Items.API
 {
-  public class Program
-  {
-    static async Task Main(string[] args)
+    public class Program
     {
-      Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Warning()
-        .WriteTo.Console()
-        .WriteTo.Async(c => c.File(Path.Combine("Logs", "log-.txt"), rollingInterval: RollingInterval.Day))
-        .CreateLogger();
-
-      try
-      {
-        IHost host = CreateHostBuilder(args).Build();
-
-        using IServiceScope scope = host.Services.CreateScope();
-
-        if (scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+        static async Task Main(string[] args)
         {
-          AsyncRetryPolicy retryPolicy = Policy
-            .Handle<SqlException>()
-            .WaitAndRetryAsync(3, retryNumber => TimeSpan.FromSeconds(retryNumber * 2), (exception, sleepDuration) => Console.WriteLine($"SQL Server connection retry, sleep duration: {sleepDuration}"));
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Warning()
+                .WriteTo.Console()
+                .WriteTo.Async(c => c.File(Path.Combine("Logs", "log-.txt"), rollingInterval: RollingInterval.Day))
+                .CreateLogger();
 
-          await retryPolicy.ExecuteAsync(async () =>
-          {
-            await scope.ServiceProvider
-              .GetRequiredService<ItemsDbContext>()
-              .Database
-              .MigrateAsync();
-          });
+            try
+            {
+                IHost host = CreateHostBuilder(args).Build();
+
+                using IServiceScope scope = host.Services.CreateScope();
+
+                if (scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+                {
+                    AsyncRetryPolicy retryPolicy = Policy
+                        .Handle<SqlException>()
+                        .WaitAndRetryAsync(
+                            3,
+                            retryNumber => TimeSpan.FromSeconds(retryNumber * 2),
+                            (exception, sleepDuration) => Console.WriteLine($"SQL Server connection retry, sleep duration: {sleepDuration}"));
+
+                    await retryPolicy.ExecuteAsync(async () =>
+                    {
+                        await scope.ServiceProvider
+                            .GetRequiredService<ItemsDbContext>()
+                            .Database
+                            .MigrateAsync();
+                    });
+                }
+
+                await host.RunAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        await host.RunAsync();
-      }
-      catch (Exception ex)
-      {
-        Log.Fatal(ex, "Host terminated unexpectedly");
-      }
-      finally
-      {
-        Log.CloseAndFlush();
-      }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host
+                .CreateDefaultBuilder(args)
+                .UseSerilog()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
-
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host
-          .CreateDefaultBuilder(args)
-          .ConfigureWebHostDefaults(webBuilder =>
-          {
-            webBuilder
-              .UseStartup<Startup>()
-              .UseSerilog();
-          });
-  }
 }

@@ -18,303 +18,303 @@ using Xunit;
 
 namespace TodoList.Items.IntegrationTests.Tests.Controllers
 {
-  [Collection(nameof(IntegrationTestCollection))]
-  public class ItemsControllerTest : ControllerTestBase, IDisposable
-  {
-    private const string url = "/api/v1/items";
-
-    public ItemsControllerTest(TestServerFixture testServerFixture) : base(testServerFixture)
+    [Collection(nameof(IntegrationTestCollection))]
+    public class ItemsControllerTest : ControllerTestBase, IDisposable
     {
-    }
+        private const string url = "/api/v1/items";
 
-    public class GetAllAsync : ItemsControllerTest
-    {
-      public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
-      {
-      }
-
-      [Fact]
-      public async Task When_ItemsDoNotExist_Expect_EmptyList()
-      {
-        // Act
-        HttpResponseMessage response = await GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        (await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response)).Should().BeEmpty();
-
-        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
-      }
-
-      [Fact]
-      public async Task When_ItemsExist_Expect_Returned()
-      {
-        IEnumerable<Item> items = new List<Item>
+        public ItemsControllerTest(TestServerFixture testServerFixture) : base(testServerFixture)
         {
-          new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
-          new Item(UserId, "secondItemText", 1, ItemStatus.Done)
-        };
-
-        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
-          .OrderBy(i => i.Priority)
-          .ToList();
-
-        // Act
-        HttpResponseMessage response = await GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
-
-        actual.Should().BeEquivalentTo(expected);
-
-        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
-      }
-
-      [Fact]
-      public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
-      {
-        IEnumerable<Item> items = new List<Item>
-        {
-          new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
-          new Item(UserId, "secondItemText", 1, ItemStatus.Done)
-        };
-
-        IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
-          .OrderBy(i => i.Priority)
-          .ToList();
-
-        HttpResponseMessage response = await GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        IEnumerable<ItemApiModel> actualFromDb = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
-
-        actualFromDb.Should().BeEquivalentTo(expected);
-
-        await SaveItemAsync(new Item(UserId, "thirdItemText", 3, ItemStatus.Todo));
-
-        // Act
-        response = await GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        IEnumerable<ItemApiModel> actualFromCache = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
-
-        actualFromCache.Should().BeEquivalentTo(expected);
-
-        Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
-      }
-    }
-
-    public class SaveAsync : ItemsControllerTest
-    {
-      public SaveAsync(TestServerFixture testServerFixture) : base(testServerFixture)
-      {
-      }
-
-      [Fact]
-      public async Task When_InputModelIsNotValid_Expect_BadRequest()
-      {
-        // Act
-        HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "" });
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-      }
-
-      [Fact]
-      public async Task When_UserIsNotFound_Expect_NotFound()
-      {
-        int newIdentityId = 99;
-
-        await UpdateIdentityIdAsync(IdentityId, newIdentityId);
-
-        try
-        {
-          // Act
-          HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "itemText" });
-
-          response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
-        finally
+
+        public class GetAllAsync : ItemsControllerTest
         {
-          await UpdateIdentityIdAsync(newIdentityId, IdentityId);
+            public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            {
+            }
+
+            [Fact]
+            public async Task When_ItemsDoNotExist_Expect_EmptyList()
+            {
+                // Act
+                HttpResponseMessage response = await GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                (await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response)).Should().BeEmpty();
+
+                Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
+            }
+
+            [Fact]
+            public async Task When_ItemsExist_Expect_Returned()
+            {
+                IEnumerable<Item> items = new List<Item>
+                {
+                    new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
+                    new Item(UserId, "secondItemText", 1, ItemStatus.Done)
+                };
+
+                IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+                    .OrderBy(i => i.Priority)
+                    .ToList();
+
+                // Act
+                HttpResponseMessage response = await GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                IEnumerable<ItemApiModel> actual = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
+
+                actual.Should().BeEquivalentTo(expected);
+
+                Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
+            }
+
+            [Fact]
+            public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
+            {
+                IEnumerable<Item> items = new List<Item>
+                {
+                    new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
+                    new Item(UserId, "secondItemText", 1, ItemStatus.Done)
+                };
+
+                IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+                    .OrderBy(i => i.Priority)
+                    .ToList();
+
+                HttpResponseMessage response = await GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                IEnumerable<ItemApiModel> actualFromDb = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
+
+                actualFromDb.Should().BeEquivalentTo(expected);
+
+                await SaveItemAsync(new Item(UserId, "thirdItemText", 3, ItemStatus.Todo));
+
+                // Act
+                response = await GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                IEnumerable<ItemApiModel> actualFromCache = await DeserializeResponseBodyAsync<IEnumerable<ItemApiModel>>(response);
+
+                actualFromCache.Should().BeEquivalentTo(expected);
+
+                Server.Services.GetRequiredService<IMemoryCache>().Remove(IdentityId);
+            }
         }
-      }
 
-      [Fact]
-      public async Task When_InputModelIsValid_Expect_Saved()
-      {
-        ItemCreateApiModel itemToSave = new() { Text = "itemText" };
-
-        // Act
-        HttpResponseMessage response = await PostAsync(url, itemToSave);
-
-        response.EnsureSuccessStatusCode();
-
-        ItemApiModel itemSaved = await DeserializeResponseBodyAsync<ItemApiModel>(response);
-
-        ItemApiModel expectedItem = new()
+        public class SaveAsync : ItemsControllerTest
         {
-          IsDone = false,
-          Text = itemToSave.Text,
-          Priority = 1
-        };
+            public SaveAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            {
+            }
 
-        itemSaved.Should().BeEquivalentTo(expectedItem, o => o.Excluding(m => m.Id));
-        itemSaved.Id.Should().NotBe(default);
-      }
-    }
+            [Fact]
+            public async Task When_InputModelIsNotValid_Expect_BadRequest()
+            {
+                // Act
+                HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "" });
 
-    public class PutItemAsync : ItemsControllerTest
-    {
-      public PutItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
-      {
-      }
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
 
-      [Fact]
-      public async Task When_InputModelIsNotValid_Expect_BadRequest()
-      {
-        ItemApiModel itemToUpdate = new()
+            [Fact]
+            public async Task When_UserIsNotFound_Expect_NotFound()
+            {
+                int newIdentityId = 99;
+
+                await UpdateIdentityIdAsync(IdentityId, newIdentityId);
+
+                try
+                {
+                    // Act
+                    HttpResponseMessage response = await PostAsync(url, new ItemCreateApiModel { Text = "itemText" });
+
+                    response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+                }
+                finally
+                {
+                    await UpdateIdentityIdAsync(newIdentityId, IdentityId);
+                }
+            }
+
+            [Fact]
+            public async Task When_InputModelIsValid_Expect_Saved()
+            {
+                ItemCreateApiModel itemToSave = new() { Text = "itemText" };
+
+                // Act
+                HttpResponseMessage response = await PostAsync(url, itemToSave);
+
+                response.EnsureSuccessStatusCode();
+
+                ItemApiModel itemSaved = await DeserializeResponseBodyAsync<ItemApiModel>(response);
+
+                ItemApiModel expectedItem = new()
+                {
+                    IsDone = false,
+                    Text = itemToSave.Text,
+                    Priority = 1
+                };
+
+                itemSaved.Should().BeEquivalentTo(expectedItem, o => o.Excluding(m => m.Id));
+                itemSaved.Id.Should().NotBe(default);
+            }
+        }
+
+        public class PutItemAsync : ItemsControllerTest
         {
-          Id = 1,
-          Text = string.Empty,
-          Priority = 10
-        };
+            public PutItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            {
+            }
 
-        // Act
-        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+            [Fact]
+            public async Task When_InputModelIsNotValid_Expect_BadRequest()
+            {
+                ItemApiModel itemToUpdate = new()
+                {
+                    Id = 1,
+                    Text = string.Empty,
+                    Priority = 10
+                };
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-      }
+                // Act
+                HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
 
-      [Fact]
-      public async Task When_IdFromRequestPathDoesNotEqualToIdFromModel_Expect_BadRequest()
-      {
-        ItemApiModel itemToUpdate = new()
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+
+            [Fact]
+            public async Task When_IdFromRequestPathDoesNotEqualToIdFromModel_Expect_BadRequest()
+            {
+                ItemApiModel itemToUpdate = new()
+                {
+                    Id = 2,
+                    Text = "itemText"
+                };
+
+                // Act
+                HttpResponseMessage response = await PutAsync($"{url}/{1}", itemToUpdate);
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            }
+
+            [Fact]
+            public async Task When_ItemIsNotFound_Expect_NotFound()
+            {
+                ItemApiModel itemToUpdate = new()
+                {
+                    Id = 1,
+                    Text = "itemText"
+                };
+
+                // Act
+                HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+
+                response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
+
+            [Fact]
+            public async Task When_InputModelIsValid_Expect_Updated()
+            {
+                ItemApiModel itemToUpdate = await SaveItemAsync(
+                    new Item(UserId, "itemText", 10, ItemStatus.Todo)
+                );
+
+                itemToUpdate.IsDone = true;
+                itemToUpdate.Text = "newItemText";
+                itemToUpdate.Priority = 25;
+
+                // Act
+                HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+
+                response.EnsureSuccessStatusCode();
+
+                Item itemUpdated = (await GetAllItemsAsync())
+                    .Single(i => i.Id == itemToUpdate.Id);
+
+                itemUpdated.Status.Should().BeEquivalentTo(ItemStatus.Done);
+                itemUpdated.Text.Should().BeEquivalentTo(itemToUpdate.Text);
+                itemUpdated.Priority.Should().Be(itemToUpdate.Priority);
+            }
+        }
+
+        public class DeleteItemAsync : ItemsControllerTest
         {
-          Id = 2,
-          Text = "itemText"
-        };
+            public DeleteItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            {
+            }
 
-        // Act
-        HttpResponseMessage response = await PutAsync($"{url}/{1}", itemToUpdate);
+            [Fact]
+            public async Task When_ItemIsNotFound_Expect_NotFound()
+            {
+                // Act
+                HttpResponseMessage response = await DeleteAsync($"{url}/{1}");
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-      }
+                response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            }
 
-      [Fact]
-      public async Task When_ItemIsNotFound_Expect_NotFound()
-      {
-        ItemApiModel itemToUpdate = new()
+            [Fact]
+            public async Task When_ItemIsFound_Expect_Deleted()
+            {
+                ItemApiModel itemSaved = await SaveItemAsync(new Item(UserId, "itemText", 1, ItemStatus.Todo));
+
+                // Act
+                HttpResponseMessage response = await DeleteAsync($"{url}/{itemSaved.Id}");
+
+                response.EnsureSuccessStatusCode();
+
+                Item? itemDeleted = (await GetAllItemsAsync())
+                    .SingleOrDefault(i => i.Id == itemSaved.Id);
+
+                itemDeleted.Should().BeNull();
+            }
+        }
+
+        public void Dispose()
         {
-          Id = 1,
-          Text = "itemText"
-        };
+            using IServiceScope scope = Server.CreateScope();
 
-        // Act
-        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+            ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-      }
+            itemsDbContext.Rollback<Item>();
+            itemsDbContext.SaveChanges();
 
-      [Fact]
-      public async Task When_InputModelIsValid_Expect_Updated()
-      {
-        ItemApiModel itemToUpdate = await SaveItemAsync(
-          new Item(UserId, "itemText", 10, ItemStatus.Todo)
-        );
+            GC.SuppressFinalize(this);
+        }
 
-        itemToUpdate.IsDone = true;
-        itemToUpdate.Text = "newItemText";
-        itemToUpdate.Priority = 25;
+        private async Task<IEnumerable<Item>> GetAllItemsAsync()
+        {
+            using IServiceScope scope = Server.CreateScope();
 
-        // Act
-        HttpResponseMessage response = await PutAsync($"{url}/{itemToUpdate.Id}", itemToUpdate);
+            ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-        response.EnsureSuccessStatusCode();
+            return await itemsDbContext
+                .Items
+                .Include(i => i.Status)
+                .ToListAsync();
+        }
 
-        Item itemUpdated = (await GetAllItemsAsync())
-          .Single(i => i.Id == itemToUpdate.Id);
+        private async Task UpdateIdentityIdAsync(int fromIdentityId, int toIdentityId)
+        {
+            using IServiceScope scope = Server.CreateScope();
 
-        itemUpdated.Status.Should().BeEquivalentTo(ItemStatus.Done);
-        itemUpdated.Text.Should().BeEquivalentTo(itemToUpdate.Text);
-        itemUpdated.Priority.Should().Be(itemToUpdate.Priority);
-      }
+            ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
+
+            User? user = await itemsDbContext
+                .Users
+                .SingleOrDefaultAsync(u => u.IdentityId == fromIdentityId);
+
+            if (user != default)
+            {
+                user.SetIdentityId(toIdentityId);
+
+                await itemsDbContext.SaveChangesAsync();
+            }
+        }
     }
-
-    public class DeleteItemAsync : ItemsControllerTest
-    {
-      public DeleteItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
-      {
-      }
-
-      [Fact]
-      public async Task When_ItemIsNotFound_Expect_NotFound()
-      {
-        // Act
-        HttpResponseMessage response = await DeleteAsync($"{url}/{1}");
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-      }
-
-      [Fact]
-      public async Task When_ItemIsFound_Expect_Deleted()
-      {
-        ItemApiModel itemSaved = await SaveItemAsync(new Item(UserId, "itemText", 1, ItemStatus.Todo));
-
-        // Act
-        HttpResponseMessage response = await DeleteAsync($"{url}/{itemSaved.Id}");
-
-        response.EnsureSuccessStatusCode();
-
-        Item? itemDeleted = (await GetAllItemsAsync())
-          .SingleOrDefault(i => i.Id == itemSaved.Id);
-
-        itemDeleted.Should().BeNull();
-      }
-    }
-
-    public void Dispose()
-    {
-      using IServiceScope scope = Server.CreateScope();
-
-      ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
-
-      itemsDbContext.Rollback<Item>();
-      itemsDbContext.SaveChanges();
-
-      GC.SuppressFinalize(this);
-    }
-
-    private async Task<IEnumerable<Item>> GetAllItemsAsync()
-    {
-      using IServiceScope scope = Server.CreateScope();
-
-      ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
-
-      return await itemsDbContext
-        .Items
-        .Include(i => i.Status)
-        .ToListAsync();
-    }
-
-    private async Task UpdateIdentityIdAsync(int fromIdentityId, int toIdentityId)
-    {
-      using IServiceScope scope = Server.CreateScope();
-
-      ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
-
-      User? user = await itemsDbContext
-        .Users
-        .SingleOrDefaultAsync(u => u.IdentityId == fromIdentityId);
-
-      if (user != default)
-      {
-        user.SetIdentityId(toIdentityId);
-
-        await itemsDbContext.SaveChangesAsync();
-      }
-    }
-  }
 }

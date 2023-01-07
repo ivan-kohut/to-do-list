@@ -3,8 +3,8 @@ using TodoList.Items.Domain.Shared;
 
 namespace TodoList.Items.Domain.Aggregates.UserAggregate
 {
-  public interface IUserRepository : IRepository<User>
-  {
-    Task<User?> GetUserAsync(int identityId);
-  }
+    public interface IUserRepository : IRepository<User>
+    {
+        Task<User?> GetUserAsync(int identityId);
+    }
 }

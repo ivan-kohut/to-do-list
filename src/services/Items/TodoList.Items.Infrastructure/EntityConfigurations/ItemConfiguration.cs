@@ -5,37 +5,37 @@ using TodoList.Items.Domain.Aggregates.UserAggregate;
 
 namespace TodoList.Items.Infrastructure.EntityConfigurations
 {
-  public class ItemConfiguration : IEntityTypeConfiguration<Item>
-  {
-    public void Configure(EntityTypeBuilder<Item> builder)
+    public class ItemConfiguration : IEntityTypeConfiguration<Item>
     {
-      builder.HasKey(e => e.Id);
+        public void Configure(EntityTypeBuilder<Item> builder)
+        {
+            builder.HasKey(e => e.Id);
 
-      builder.HasIndex(e => e.Id);
+            builder.HasIndex(e => e.Id);
 
-      builder.Property(e => e.UserId);
+            builder.Property(e => e.UserId);
 
-      builder
-        .HasOne<User>()
-        .WithMany();
+            builder
+                .HasOne<User>()
+                .WithMany();
 
-      builder
-        .Property<int>("_statusId")
-        .UsePropertyAccessMode(PropertyAccessMode.Field)
-        .HasColumnName("Status");
+            builder
+                .Property<int>("_statusId")
+                .UsePropertyAccessMode(PropertyAccessMode.Field)
+                .HasColumnName("Status");
 
-      builder
-        .HasOne(e => e.Status)
-        .WithMany()
-        .HasForeignKey("_statusId");
+            builder
+                .HasOne(e => e.Status)
+                .WithMany()
+                .HasForeignKey("_statusId");
 
-      builder
-        .Property(e => e.Text)
-        .HasMaxLength(255);
+            builder
+                .Property(e => e.Text)
+                .HasMaxLength(255);
 
-      builder.Property(e => e.Priority);
+            builder.Property(e => e.Priority);
 
-      builder.ToTable("Items");
+            builder.ToTable("Items");
+        }
     }
-  }
 }

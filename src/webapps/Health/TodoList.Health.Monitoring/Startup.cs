@@ -5,34 +5,34 @@ using Microsoft.Extensions.Hosting;
 
 namespace TodoList.Health.Monitoring
 {
-  public class Startup
-  {
-    public void ConfigureServices(IServiceCollection services)
+    public class Startup
     {
-      services.AddControllers();
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllers();
 
-      services
-        .AddHealthChecksUI()
-        .AddInMemoryStorage();
+            services
+                .AddHealthChecksUI()
+                .AddInMemoryStorage();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseHttpsRedirection();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseHealthChecksUI(config => config.UIPath = "/health-monitoring");
+
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+            });
+        }
     }
-
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-      app.UseHttpsRedirection();
-
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-      }
-
-      app.UseHealthChecksUI(config => config.UIPath = "/health-monitoring");
-
-      app.UseRouting();
-
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapDefaultControllerRoute();
-      });
-    }
-  }
 }

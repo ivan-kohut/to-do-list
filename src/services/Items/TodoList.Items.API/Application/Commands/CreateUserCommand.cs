@@ -2,13 +2,13 @@
 
 namespace TodoList.Items.API.Application.Commands
 {
-  public class CreateUserCommand : IRequest
-  {
-    public int IdentityId { get; }
-
-    public CreateUserCommand(int identityId)
+    public class CreateUserCommand : IRequest
     {
-      this.IdentityId = identityId;
+        public int IdentityId { get; }
+
+        public CreateUserCommand(int identityId)
+        {
+            this.IdentityId = identityId;
+        }
     }
-  }
 }

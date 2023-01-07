@@ -2,10 +2,10 @@
 
 namespace TodoList.Client
 {
-  public class ApiCallResult
-  {
-    public bool IsSuccess { get; set; }
-    public int StatusCode { get; set; }
-    public IEnumerable<string>? Errors { get; set; }
-  }
+    public class ApiCallResult
+    {
+        public bool IsSuccess { get; set; }
+        public int StatusCode { get; set; }
+        public IEnumerable<string>? Errors { get; set; }
+    }
 }

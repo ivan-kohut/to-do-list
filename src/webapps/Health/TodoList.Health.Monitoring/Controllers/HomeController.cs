@@ -2,9 +2,9 @@
 
 namespace TodoList.Health.Monitoring.Controllers
 {
-  public class HomeController : ControllerBase
-  {
-    [HttpGet]
-    public IActionResult Index() => Redirect("/health-monitoring");
-  }
+    public class HomeController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult Index() => Redirect("/health-monitoring");
+    }
 }

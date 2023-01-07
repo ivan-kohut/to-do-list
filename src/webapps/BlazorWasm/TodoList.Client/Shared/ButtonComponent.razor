@@ -1,20 +1,20 @@
 ﻿<div class="align">
-  @if (IsSpinnerEnabled)
-  {
-    <div class="loader"></div>
-  }
-  <input class="submit-button" type="button" @onclick="OnClick" value="@ButtonValue" />
+    @if (IsSpinnerEnabled)
+    {
+        <div class="loader"></div>
+    }
+    <input class="submit-button" type="button" @onclick="OnClick" value="@ButtonValue" />
 </div>
 
 @code {
 
-  [Parameter]
-  public bool IsSpinnerEnabled { get; set; }
+    [Parameter]
+    public bool IsSpinnerEnabled { get; set; }
 
-  [Parameter]
-  public string ButtonValue { get; set; } = null!;
+    [Parameter]
+    public string ButtonValue { get; set; } = null!;
 
-  [Parameter]
-  public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
 
 }

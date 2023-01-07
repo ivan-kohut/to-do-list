@@ -19,59 +19,63 @@ using Xunit;
 
 namespace TodoList.Items.IntegrationTests.Fixtures
 {
-  [CollectionDefinition(nameof(IntegrationTestCollection))]
-  public class IntegrationTestCollection : ICollectionFixture<TestServerFixture> { }
+    [CollectionDefinition(nameof(IntegrationTestCollection))]
+    public class IntegrationTestCollection : ICollectionFixture<TestServerFixture> { }
 
-  public class TestServerFixture : IDisposable
-  {
-    public TestServer Server { get; }
-
-    public HttpClient Client { get; }
-
-    public User User { get; }
-
-    public TestServerFixture()
+    public class TestServerFixture : IDisposable
     {
-      string projectRootPath = Path.Combine(
-        Directory.GetCurrentDirectory(),
-        "..", "..", "..", "..", "..", "src", "services", "Items", "TodoList.Items.API");
+        public TestServer Server { get; }
 
-      IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
-        .UseContentRoot(projectRootPath)
-        .UseEnvironment(Environments.Development)
-        .UseStartup<TestStartup>();
+        public HttpClient Client { get; }
 
-      Server = new TestServer(webHostBuilder);
-      Client = Server.CreateClient();
+        public User User { get; }
 
-      AsyncRetryPolicy retryPolicy = Policy
-        .Handle<SqlException>()
-        .WaitAndRetryAsync(3, retryNumber => TimeSpan.FromSeconds(retryNumber * 2), (exception, sleepDuration) => Console.WriteLine($"SQL Server connection retry, sleep duration: {sleepDuration}"));
+        public TestServerFixture()
+        {
+            string projectRootPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "..", "..", "..", "..", "..", "src", "services", "Items", "TodoList.Items.API");
 
-      User? user = null;
+            IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder()
+                .UseContentRoot(projectRootPath)
+                .UseEnvironment(Environments.Development)
+                .UseStartup<TestStartup>();
 
-      retryPolicy.ExecuteAsync(async () =>
-      {
-        using IServiceScope scope = Server.CreateScope();
+            Server = new TestServer(webHostBuilder);
+            Client = Server.CreateClient();
 
-        ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
+            AsyncRetryPolicy retryPolicy = Policy
+                .Handle<SqlException>()
+                .WaitAndRetryAsync(
+                    3,
+                    retryNumber => TimeSpan.FromSeconds(retryNumber * 2),
+                    (exception, sleepDuration) => Console.WriteLine($"SQL Server connection retry, sleep duration: {sleepDuration}"));
 
-        await itemsDbContext.Database.MigrateAsync();
+            User? user = null;
 
-        user = await itemsDbContext.Users
-          .AsNoTracking()
-          .SingleAsync(u => u.IdentityId == 1);
-      }).GetAwaiter().GetResult();
+            retryPolicy.ExecuteAsync(async () =>
+            {
+                using IServiceScope scope = Server.CreateScope();
 
-      User = user!;
+                ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-      Server.Services.GetRequiredService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
+                await itemsDbContext.Database.MigrateAsync();
+
+                user = await itemsDbContext.Users
+                    .AsNoTracking()
+                    .SingleAsync(u => u.IdentityId == 1);
+
+            }).GetAwaiter().GetResult();
+
+            User = user!;
+
+            Server.Services.GetRequiredService<IOptions<RouteOptions>>().Value.SuppressCheckForUnhandledSecurityMetadata = true;
+        }
+
+        public void Dispose()
+        {
+            Client?.Dispose();
+            Server?.Dispose();
+        }
     }
-
-    public void Dispose()
-    {
-      Client?.Dispose();
-      Server?.Dispose();
-    }
-  }
 }

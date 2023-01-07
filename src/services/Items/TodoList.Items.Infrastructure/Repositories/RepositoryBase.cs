@@ -2,15 +2,15 @@
 
 namespace TodoList.Items.Infrastructure.Repositories
 {
-  public abstract class RepositoryBase<T> : IRepository<T> where T : class, IAggregateRoot
-  {
-    protected readonly ItemsDbContext dbContext;
-
-    protected RepositoryBase(ItemsDbContext dbContext)
+    public abstract class RepositoryBase<T> : IRepository<T> where T : class, IAggregateRoot
     {
-      this.dbContext = dbContext;
-    }
+        protected readonly ItemsDbContext dbContext;
 
-    public void Create(T aggregateRoot) => dbContext.Add(aggregateRoot);
-  }
+        protected RepositoryBase(ItemsDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+        public void Create(T aggregateRoot) => dbContext.Add(aggregateRoot);
+    }
 }

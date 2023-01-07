@@ -6,17 +6,17 @@ using TodoList.Items.IntegrationTests.Middlewares;
 
 namespace TodoList.Items.IntegrationTests
 {
-  public class TestStartup : Startup
-  {
-    protected override string ConnectionStringName { get; } = "DefaultTestConnection";
-
-    public TestStartup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment) : base(configuration, webHostEnvironment)
+    public class TestStartup : Startup
     {
-    }
+        protected override string ConnectionStringName { get; } = "DefaultTestConnection";
 
-    protected override void ConfigureAuth(IApplicationBuilder app)
-    {
-      app.UseMiddleware<AuthMiddleware>();
+        public TestStartup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment) : base(configuration, webHostEnvironment)
+        {
+        }
+
+        protected override void ConfigureAuth(IApplicationBuilder app)
+        {
+            app.UseMiddleware<AuthMiddleware>();
+        }
     }
-  }
 }

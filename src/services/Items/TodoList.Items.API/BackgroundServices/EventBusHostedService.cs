@@ -18,76 +18,76 @@ using TodoList.Items.API.Options;
 
 namespace TodoList.Items.API.BackgroundServices
 {
-  public class EventBusHostedService : IHostedService, IDisposable
-  {
-    private readonly IServiceProvider serviceProvider;
-    private readonly EventBusOptions eventBusOptions;
-
-    private IConnection? connection;
-    private IModel? channel;
-
-    public EventBusHostedService(IServiceProvider serviceProvider, IOptions<EventBusOptions> eventBusOptions)
+    public class EventBusHostedService : IHostedService, IDisposable
     {
-      this.serviceProvider = serviceProvider;
-      this.eventBusOptions = eventBusOptions.Value;
+        private readonly IServiceProvider serviceProvider;
+        private readonly EventBusOptions eventBusOptions;
+
+        private IConnection? connection;
+        private IModel? channel;
+
+        public EventBusHostedService(IServiceProvider serviceProvider, IOptions<EventBusOptions> eventBusOptions)
+        {
+            this.serviceProvider = serviceProvider;
+            this.eventBusOptions = eventBusOptions.Value;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            RetryPolicy retryPolicy = Policy
+              .Handle<BrokerUnreachableException>()
+              .WaitAndRetry(eventBusOptions.RetryCount!.Value, retryNumber => TimeSpan.FromSeconds(Math.Pow(2, retryNumber)), (exception, sleepDuration) => Console.WriteLine($"RabbitMQ connection retry, sleep duration: {sleepDuration}"));
+
+            ConnectionFactory connectionFactory = new()
+            {
+                HostName = eventBusOptions.Connection,
+                UserName = eventBusOptions.UserName,
+                Password = eventBusOptions.Password,
+                DispatchConsumersAsync = true
+            };
+
+            retryPolicy.Execute(() =>
+            {
+                connection = connectionFactory.CreateConnection();
+            });
+
+            channel = connection!.CreateModel();
+
+            channel.ExchangeDeclare(exchange: eventBusOptions.BrokerName, type: ExchangeType.Direct);
+
+            channel.QueueDeclare(queue: eventBusOptions.ClientName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+
+            channel.QueueBind(queue: eventBusOptions.ClientName, exchange: eventBusOptions.BrokerName, routingKey: nameof(UserCreatedIntegrationEvent));
+
+            AsyncEventingBasicConsumer consumer = new(channel);
+
+            consumer.Received += HandleIntegrationEvent;
+
+            channel.BasicConsume(queue: eventBusOptions.ClientName, autoAck: false, consumer: consumer);
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            channel?.Dispose();
+            connection?.Dispose();
+        }
+
+        private async Task HandleIntegrationEvent(object sender, BasicDeliverEventArgs args)
+        {
+            UserCreatedIntegrationEvent userCreatedIntegrationEvent = JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(Encoding.UTF8.GetString(args.Body.ToArray()));
+
+            using IServiceScope scope = serviceProvider.CreateScope();
+
+            await scope.ServiceProvider.GetRequiredService<IMediator>().Send(new CreateUserCommand(userCreatedIntegrationEvent.UserId));
+
+            channel!.BasicAck(deliveryTag: args.DeliveryTag, multiple: false);
+        }
     }
-
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-      RetryPolicy retryPolicy = Policy
-        .Handle<BrokerUnreachableException>()
-        .WaitAndRetry(eventBusOptions.RetryCount!.Value, retryNumber => TimeSpan.FromSeconds(Math.Pow(2, retryNumber)), (exception, sleepDuration) => Console.WriteLine($"RabbitMQ connection retry, sleep duration: {sleepDuration}"));
-
-      ConnectionFactory connectionFactory = new()
-      {
-        HostName = eventBusOptions.Connection,
-        UserName = eventBusOptions.UserName,
-        Password = eventBusOptions.Password,
-        DispatchConsumersAsync = true
-      };
-
-      retryPolicy.Execute(() =>
-      {
-        connection = connectionFactory.CreateConnection();
-      });
-
-      channel = connection!.CreateModel();
-
-      channel.ExchangeDeclare(exchange: eventBusOptions.BrokerName, type: ExchangeType.Direct);
-
-      channel.QueueDeclare(queue: eventBusOptions.ClientName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-
-      channel.QueueBind(queue: eventBusOptions.ClientName, exchange: eventBusOptions.BrokerName, routingKey: nameof(UserCreatedIntegrationEvent));
-
-      AsyncEventingBasicConsumer consumer = new(channel);
-
-      consumer.Received += HandleIntegrationEvent;
-
-      channel.BasicConsume(queue: eventBusOptions.ClientName, autoAck: false, consumer: consumer);
-
-      return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-      return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-      channel?.Dispose();
-      connection?.Dispose();
-    }
-
-    private async Task HandleIntegrationEvent(object sender, BasicDeliverEventArgs args)
-    {
-      UserCreatedIntegrationEvent userCreatedIntegrationEvent = JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(Encoding.UTF8.GetString(args.Body.ToArray()));
-
-      using IServiceScope scope = serviceProvider.CreateScope();
-
-      await scope.ServiceProvider.GetRequiredService<IMediator>().Send(new CreateUserCommand(userCreatedIntegrationEvent.UserId));
-
-      channel!.BasicAck(deliveryTag: args.DeliveryTag, multiple: false);
-    }
-  }
 }

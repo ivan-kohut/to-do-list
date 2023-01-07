@@ -4,16 +4,16 @@ using TodoList.Items.IntegrationTests.Fixtures;
 
 namespace TodoList.Items.IntegrationTests.Tests
 {
-  public abstract class TestBase
-  {
-    protected TestServer Server { get; }
-
-    protected HttpClient Client { get; }
-
-    protected TestBase(TestServerFixture testServerFixture)
+    public abstract class TestBase
     {
-      this.Server = testServerFixture.Server;
-      this.Client = testServerFixture.Client;
+        protected TestServer Server { get; }
+
+        protected HttpClient Client { get; }
+
+        protected TestBase(TestServerFixture testServerFixture)
+        {
+            this.Server = testServerFixture.Server;
+            this.Client = testServerFixture.Client;
+        }
     }
-  }
 }

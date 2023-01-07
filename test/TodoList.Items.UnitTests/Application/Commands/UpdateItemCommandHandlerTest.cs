@@ -12,86 +12,86 @@ using Xunit;
 
 namespace TodoList.Items.UnitTests.Application.Commands
 {
-  public class UpdateItemCommandHandlerTest
-  {
-    private readonly Mock<IUnitOfWork> mockUnitOfWork;
-    private readonly Mock<IItemRepository> mockItemRepository;
-    private readonly Mock<IUserRepository> mockUserRepository;
-
-    private readonly UpdateItemCommand command;
-    private readonly IRequestHandler<UpdateItemCommand> handler;
-
-    public UpdateItemCommandHandlerTest()
+    public class UpdateItemCommandHandlerTest
     {
-      this.mockUnitOfWork = new Mock<IUnitOfWork>(MockBehavior.Strict);
-      this.mockItemRepository = new Mock<IItemRepository>(MockBehavior.Strict);
-      this.mockUserRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+        private readonly Mock<IUnitOfWork> mockUnitOfWork;
+        private readonly Mock<IItemRepository> mockItemRepository;
+        private readonly Mock<IUserRepository> mockUserRepository;
 
-      this.command = new UpdateItemCommand(5, true, "test_text", 17, 10);
+        private readonly UpdateItemCommand command;
+        private readonly IRequestHandler<UpdateItemCommand> handler;
 
-      this.handler = new UpdateItemCommandHandler(
-        mockUnitOfWork.Object,
-        mockItemRepository.Object,
-        mockUserRepository.Object);
+        public UpdateItemCommandHandlerTest()
+        {
+            this.mockUnitOfWork = new Mock<IUnitOfWork>(MockBehavior.Strict);
+            this.mockItemRepository = new Mock<IItemRepository>(MockBehavior.Strict);
+            this.mockUserRepository = new Mock<IUserRepository>(MockBehavior.Strict);
+
+            this.command = new UpdateItemCommand(5, true, "test_text", 17, 10);
+
+            this.handler = new UpdateItemCommandHandler(
+                mockUnitOfWork.Object,
+                mockItemRepository.Object,
+                mockUserRepository.Object);
+        }
+
+        [Fact]
+        public async Task When_UserIsNull_Expect_EntityNotFoundException()
+        {
+            mockUserRepository
+                .Setup(r => r.GetUserAsync(command.IdentityId))
+                .ReturnsAsync((User?)null);
+
+            // Act
+            Func<Task> act = async () => await handler.Handle(command, default);
+
+            await act.Should().ThrowExactlyAsync<EntityNotFoundException>();
+        }
+
+        [Fact]
+        public async Task When_ItemIsNull_Expect_EntityNotFoundException()
+        {
+            User user = new(command.IdentityId);
+
+            mockUserRepository
+                .Setup(r => r.GetUserAsync(command.IdentityId))
+                .ReturnsAsync(user);
+
+            mockItemRepository
+                .Setup(r => r.GetByIdAndUserIdAsync(command.ItemId, user.Id))
+                .ReturnsAsync((Item?)null);
+
+            // Act
+            Func<Task> act = async () => await handler.Handle(command, default);
+
+            await act.Should().ThrowExactlyAsync<EntityNotFoundException>();
+        }
+
+        [Fact]
+        public async Task Expect_Updated()
+        {
+            User user = new(command.IdentityId);
+
+            mockUserRepository
+                .Setup(r => r.GetUserAsync(command.IdentityId))
+                .ReturnsAsync(user);
+
+            Item item = new(user.Id, "init_text", 1);
+
+            mockItemRepository
+                .Setup(r => r.GetByIdAndUserIdAsync(command.ItemId, user.Id))
+                .ReturnsAsync(item);
+
+            mockUnitOfWork
+                .Setup(u => u.SaveChangesAsync(default))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await handler.Handle(command, default);
+
+            Item expectedItem = new(user.Id, command.Text, command.Priority, ItemStatus.Done);
+
+            item.Should().BeEquivalentTo(expectedItem);
+        }
     }
-
-    [Fact]
-    public async Task When_UserIsNull_Expect_EntityNotFoundException()
-    {
-      mockUserRepository
-        .Setup(r => r.GetUserAsync(command.IdentityId))
-        .ReturnsAsync((User?)null);
-
-      // Act
-      Func<Task> act = async () => await handler.Handle(command, default);
-
-      await act.Should().ThrowExactlyAsync<EntityNotFoundException>();
-    }
-
-    [Fact]
-    public async Task When_ItemIsNull_Expect_EntityNotFoundException()
-    {
-      User user = new(command.IdentityId);
-
-      mockUserRepository
-        .Setup(r => r.GetUserAsync(command.IdentityId))
-        .ReturnsAsync(user);
-
-      mockItemRepository
-        .Setup(r => r.GetByIdAndUserIdAsync(command.ItemId, user.Id))
-        .ReturnsAsync((Item?)null);
-
-      // Act
-      Func<Task> act = async () => await handler.Handle(command, default);
-
-      await act.Should().ThrowExactlyAsync<EntityNotFoundException>();
-    }
-
-    [Fact]
-    public async Task Expect_Updated()
-    {
-      User user = new(command.IdentityId);
-
-      mockUserRepository
-        .Setup(r => r.GetUserAsync(command.IdentityId))
-        .ReturnsAsync(user);
-
-      Item item = new(user.Id, "init_text", 1);
-
-      mockItemRepository
-        .Setup(r => r.GetByIdAndUserIdAsync(command.ItemId, user.Id))
-        .ReturnsAsync(item);
-
-      mockUnitOfWork
-        .Setup(u => u.SaveChangesAsync(default))
-        .Returns(Task.CompletedTask);
-
-      // Act
-      await handler.Handle(command, default);
-
-      Item expectedItem = new(user.Id, command.Text, command.Priority, ItemStatus.Done);
-
-      item.Should().BeEquivalentTo(expectedItem);
-    }
-  }
 }

@@ -3,19 +3,19 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client.Components
 {
-  public abstract class LoadingSpinnerComponentBase : ComponentBase
-  {
-    protected bool IsSpinnerEnabled { get; private set; }
-
-    protected async Task OnEventAsync()
+    public abstract class LoadingSpinnerComponentBase : ComponentBase
     {
-      IsSpinnerEnabled = true;
+        protected bool IsSpinnerEnabled { get; private set; }
 
-      await HandleEventAsync();
+        protected async Task OnEventAsync()
+        {
+            IsSpinnerEnabled = true;
 
-      IsSpinnerEnabled = false;
+            await HandleEventAsync();
+
+            IsSpinnerEnabled = false;
+        }
+
+        protected abstract Task HandleEventAsync();
     }
-
-    protected abstract Task HandleEventAsync();
-  }
 }

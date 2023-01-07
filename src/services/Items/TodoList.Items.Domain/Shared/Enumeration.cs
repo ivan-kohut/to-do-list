@@ -1,17 +1,17 @@
 ﻿namespace TodoList.Items.Domain.Shared
 {
-  public abstract class Enumeration
-  {
-    public int Id { get; }
-
-    public string Name { get; }
-
-    protected Enumeration(int id, string name)
+    public abstract class Enumeration
     {
-      this.Id = id;
-      this.Name = name;
-    }
+        public int Id { get; }
 
-    public override string ToString() => Name;
-  }
+        public string Name { get; }
+
+        protected Enumeration(int id, string name)
+        {
+            this.Id = id;
+            this.Name = name;
+        }
+
+        public override string ToString() => Name;
+    }
 }

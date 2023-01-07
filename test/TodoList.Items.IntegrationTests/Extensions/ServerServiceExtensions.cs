@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TodoList.Items.IntegrationTests.Extensions
 {
-  public static class ServerServiceExtensions
-  {
-    public static IServiceScope CreateScope(this TestServer server)
+    public static class ServerServiceExtensions
     {
-      return server.Host.Services.CreateScope();
+        public static IServiceScope CreateScope(this TestServer server)
+        {
+            return server.Host.Services.CreateScope();
+        }
     }
-  }
 }

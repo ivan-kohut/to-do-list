@@ -4,19 +4,19 @@ using TodoList.Items.Domain.Aggregates.ItemAggregate;
 
 namespace TodoList.Items.Infrastructure.EntityConfigurations
 {
-  public class ItemStatusConfiguration : IEntityTypeConfiguration<ItemStatus>
-  {
-    public void Configure(EntityTypeBuilder<ItemStatus> builder)
+    public class ItemStatusConfiguration : IEntityTypeConfiguration<ItemStatus>
     {
-      builder.HasKey(e => e.Id);
+        public void Configure(EntityTypeBuilder<ItemStatus> builder)
+        {
+            builder.HasKey(e => e.Id);
 
-      builder.HasIndex(e => e.Id);
+            builder.HasIndex(e => e.Id);
 
-      builder
-        .Property(e => e.Name)
-        .HasMaxLength(50);
+            builder
+                .Property(e => e.Name)
+                .HasMaxLength(50);
 
-      builder.ToTable("ItemStatuses");
+            builder.ToTable("ItemStatuses");
+        }
     }
-  }
 }

@@ -7,35 +7,35 @@ using System.Linq;
 
 namespace TodoList.Items.API.Swagger
 {
-  public class AuthResponsesOperationFilter : IOperationFilter
-  {
-    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    public class AuthResponsesOperationFilter : IOperationFilter
     {
-      object[] customAttributes = context.MethodInfo.DeclaringType
-        ?.GetCustomAttributes(true) ?? Array.Empty<object>();
-
-      IEnumerable<AuthorizeAttribute> authAttributes = customAttributes
-        .Union(context.MethodInfo.GetCustomAttributes(true))
-        .OfType<AuthorizeAttribute>();
-
-      IEnumerable<AllowAnonymousAttribute> anonymousScopes = customAttributes
-        .Union(context.MethodInfo.GetCustomAttributes(true))
-        .OfType<AllowAnonymousAttribute>()
-        .Distinct();
-
-      if (authAttributes.Any() && !anonymousScopes.Any())
-      {
-        operation.Security.Add(new OpenApiSecurityRequirement
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-          {
-            new OpenApiSecurityScheme
+            object[] customAttributes = context.MethodInfo.DeclaringType
+                ?.GetCustomAttributes(true) ?? Array.Empty<object>();
+
+            IEnumerable<AuthorizeAttribute> authAttributes = customAttributes
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<AuthorizeAttribute>();
+
+            IEnumerable<AllowAnonymousAttribute> anonymousScopes = customAttributes
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<AllowAnonymousAttribute>()
+                .Distinct();
+
+            if (authAttributes.Any() && !anonymousScopes.Any())
             {
-              Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            new List<string>()
-          }
-        });
-      }
+                operation.Security.Add(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new List<string>()
+                    }
+                });
+            }
+        }
     }
-  }
 }
