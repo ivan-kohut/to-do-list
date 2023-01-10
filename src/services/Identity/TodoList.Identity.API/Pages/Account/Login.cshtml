@@ -1,0 +1,48 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.LoginPageModel
+
+<div>
+    <div class="login-and-signup">
+        @*// TO DO*@
+        <a asp-page="Register" asp-route-returnUrl="@Model.Input.ReturnUrl" class="signup">Sign up</a>
+    </div>
+</div>
+
+<form method="post">
+    <input asp-for="Input.ReturnUrl" type="hidden" />
+
+    <div class="field">
+        <label asp-for="Input.Email" class="display-block">Email</label>
+        <input asp-for="Input.Email" class="input-text" type="text" />
+        <span asp-validation-for="Input.Email"></span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Input.Password" class="display-block">Password</label>
+        <input asp-for="Input.Password" class="input-text" type="password" />
+        <span asp-validation-for="Input.Password"></span>
+    </div>
+
+    <div class="password-recovery">
+        <a asp-page="ForgotPassword" asp-route-returnUrl="@Model.Input.ReturnUrl">Recover password</a>
+    </div>
+
+    <partial name="_Button" model="@("Log in")" />
+</form>
+
+<div class="login-with">
+    Log in with
+</div>
+<div class="login-social">
+    @foreach (var externalProvider in new string[] { ExternalProviderNames.Facebook, ExternalProviderNames.Google, ExternalProviderNames.GitHub })
+    {
+        @*// TO DO*@
+        <a class="login-social-link" asp-controller="External" asp-action="Challenge" asp-route-scheme="@externalProvider" asp-route-returnUrl="@Model.Input.ReturnUrl">
+            <img src="/img/@(externalProvider.ToLower()).png" />
+        </a>
+    }
+</div>
+
+@section Styles {
+    <link href="/css/login.css" rel="stylesheet" type="text/css" />
+}

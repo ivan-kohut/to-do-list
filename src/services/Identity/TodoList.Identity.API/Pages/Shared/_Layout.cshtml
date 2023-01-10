@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Identity</title>
+    <link href="/css/spinner.css" rel="stylesheet" type="text/css" />
+    <link href="/css/shared.css" rel="stylesheet" type="text/css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="main">
+        @RenderBody()
+    </div>
+    <script src="/js/spinner.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+<mini-profiler />
