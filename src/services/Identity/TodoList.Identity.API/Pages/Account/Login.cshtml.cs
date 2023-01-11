@@ -27,16 +27,18 @@ namespace TodoList.Identity.API.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel Input { get; set; } = null!;
+
+        public string? ReturnUrl { get; set; }
 
         public IActionResult OnGet(string? returnUrl)
         {
-            Input = new InputModel { ReturnUrl = returnUrl };
+            ReturnUrl = returnUrl;
 
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string? returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -44,16 +46,15 @@ namespace TodoList.Identity.API.Pages.Account
 
                 if (user == null)
                 {
-                    // TO DO
-                    ModelState.AddModelError("Input." + nameof(InputModel.Email), "The User is not found.");
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Email)}", "The User is not found.");
                 }
                 else if (!await userManager.CheckPasswordAsync(user, Input.Password!))
                 {
-                    ModelState.AddModelError(nameof(InputModel.Password), "The Password is invalid.");
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Password)}", "The Password is invalid.");
                 }
                 else if (!user.EmailConfirmed)
                 {
-                    ModelState.AddModelError(nameof(InputModel.Email), "The Email is not confirmed.");
+                    ModelState.AddModelError($"{nameof(Input)}.{nameof(Input.Email)}", "The Email is not confirmed.");
                 }
                 else
                 {
@@ -61,12 +62,11 @@ namespace TodoList.Identity.API.Pages.Account
 
                     if (signInResult.Succeeded)
                     {
-                        return Redirect(interaction.IsValidReturnUrl(Input.ReturnUrl) ? Input.ReturnUrl! : "/");
+                        return Redirect(interaction.IsValidReturnUrl(returnUrl) ? returnUrl! : "/");
                     }
                     else if (signInResult.RequiresTwoFactor)
                     {
-                        // TO DO
-                        return RedirectToPage("LoginWith2fa", new { Input.ReturnUrl });
+                        return RedirectToPage("LoginWith2fa", new { returnUrl });
                     }
                     else
                     {
@@ -74,6 +74,8 @@ namespace TodoList.Identity.API.Pages.Account
                     }
                 }
             }
+
+            ReturnUrl = returnUrl;
 
             return Page();
         }
@@ -86,8 +88,6 @@ namespace TodoList.Identity.API.Pages.Account
 
             [Required]
             public string? Password { get; set; }
-
-            public string? ReturnUrl { get; set; }
         }
     }
 }

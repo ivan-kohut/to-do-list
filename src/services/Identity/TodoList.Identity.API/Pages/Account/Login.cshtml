@@ -3,14 +3,11 @@
 
 <div>
     <div class="login-and-signup">
-        @*// TO DO*@
-        <a asp-page="Register" asp-route-returnUrl="@Model.Input.ReturnUrl" class="signup">Sign up</a>
+        <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl" class="signup">Sign up</a>
     </div>
 </div>
 
 <form method="post">
-    <input asp-for="Input.ReturnUrl" type="hidden" />
-
     <div class="field">
         <label asp-for="Input.Email" class="display-block">Email</label>
         <input asp-for="Input.Email" class="input-text" type="text" />
@@ -24,7 +21,7 @@
     </div>
 
     <div class="password-recovery">
-        <a asp-page="ForgotPassword" asp-route-returnUrl="@Model.Input.ReturnUrl">Recover password</a>
+        <a asp-page="ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Recover password</a>
     </div>
 
     <partial name="_Button" model="@("Log in")" />
@@ -36,8 +33,7 @@
 <div class="login-social">
     @foreach (var externalProvider in new string[] { ExternalProviderNames.Facebook, ExternalProviderNames.Google, ExternalProviderNames.GitHub })
     {
-        @*// TO DO*@
-        <a class="login-social-link" asp-controller="External" asp-action="Challenge" asp-route-scheme="@externalProvider" asp-route-returnUrl="@Model.Input.ReturnUrl">
+        <a asp-page="ExternalLogin" asp-route-scheme="@externalProvider" asp-route-returnUrl="@Model.ReturnUrl" class="login-social-link">
             <img src="/img/@(externalProvider.ToLower()).png" />
         </a>
     }
