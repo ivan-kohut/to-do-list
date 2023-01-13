@@ -86,7 +86,6 @@ namespace TodoList.Identity.API.Pages.Account
 
                 await emailService.SendEmailAsync(user.Email!, "Confirm your email", await GenerateEmailConfirmationMessageAsync(user, returnUrl));
 
-                // TO DO
                 return RedirectToPage("RegisterSuccess");
             }
 
