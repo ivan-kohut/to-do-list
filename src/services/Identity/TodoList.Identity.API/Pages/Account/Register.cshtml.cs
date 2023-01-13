@@ -102,7 +102,6 @@ namespace TodoList.Identity.API.Pages.Account
 
         private async Task<string> GenerateEmailConfirmationMessageAsync(User user, string? returnUrl)
         {
-            // TO DO
             string callbackUrl = Url.Page(
                 "ConfirmEmail",
                 pageHandler: null,
