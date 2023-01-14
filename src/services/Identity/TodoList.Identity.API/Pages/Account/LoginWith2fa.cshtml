@@ -1,0 +1,12 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.LoginWith2faPageModel
+
+<form method="post">
+    <div class="field">
+        <label asp-for="Input.TwoFactorToken" class="display-block">Authenticator code</label>
+        <input asp-for="Input.TwoFactorToken" type="text" class="input-text" />
+        <span asp-validation-for="Input.TwoFactorToken"></span>
+    </div>
+
+    <partial name="_Button" model="@("Log in")" />
+</form>
