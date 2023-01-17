@@ -1,0 +1,20 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.Manage.IndexPageModel
+
+<ul>
+    <li>
+        <a asp-page="ChangePassword">Change password</a>
+    </li>
+    <li>
+        @if (Model.IsTwoFactorAuthenticationEnabled)
+        {
+            <form id="disable-2fa" asp-page="Disable2fa">
+                <a onclick="document.getElementById('disable-2fa').submit();" style="cursor: pointer; color: rgb(85, 26, 139);">Turn off two-factor authentication</a>
+            </form>
+        }
+        else
+        {
+            <a asp-page="Enable2fa">Turn on two-factor authentication</a>
+        }
+    </li>
+</ul>
