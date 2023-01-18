@@ -1,0 +1,36 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.Manage.Enable2faPageModel
+
+<div class="field">
+    Please use your authentication app (such as Google Authenticator) to scan this QR code
+</div>
+
+<div id="qrCode"></div>
+
+<form method="post">
+    <input asp-for="Input.AuthenticatorUri" type="hidden" />
+
+    <div class="field">
+        <label asp-for="Input.Code" class="display-block">Please enter the code that you see on your authentication app</label>
+        <input asp-for="Input.Code" type="text" class="input-text" />
+        <span asp-validation-for="Input.Code"></span>
+    </div>
+
+    <partial name="_Button" model="@("Turn on")" />
+</form>
+
+@section Styles {
+    <link href="/css/2fa.css" rel="stylesheet" type="text/css" />
+}
+
+@section Scripts {
+    <script src="/js/qrcode.js"></script>
+    <script type="text/javascript">
+        new QRCode(document.getElementById("qrCode"),
+            {
+                text: "@Model.Input.AuthenticatorUri",
+                width: 150,
+                height: 150
+            });
+    </script>
+}
