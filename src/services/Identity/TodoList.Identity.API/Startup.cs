@@ -15,6 +15,7 @@ using TodoList.Identity.API.Data;
 using TodoList.Identity.API.Data.Entities;
 using TodoList.Identity.API.Options;
 using TodoList.Identity.API.Services;
+using TodoList.Identity.API.Services.Interfaces;
 
 namespace TodoList.Identity.API
 {
@@ -84,6 +85,7 @@ namespace TodoList.Identity.API
 
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<IEventBusService, RabbitMQEventBusService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddHealthChecks()
                 .AddCheck("self", () => HealthCheckResult.Healthy())

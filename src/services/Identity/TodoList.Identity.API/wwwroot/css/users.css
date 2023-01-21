@@ -1,33 +1,34 @@
 ﻿.main {
-  width: auto !important;
+    width: auto !important;
 }
 
 .users-main {
-  clear: right;
+    clear: right;
 }
 
 table, th, td {
-  border: 1px solid black;
+    border: 1px solid black;
 }
 
 td {
-  text-align: center;
+    text-align: center;
 }
 
 table {
-  border-collapse: collapse;
-  margin-bottom: 15px;
+    border-collapse: collapse;
+    margin-bottom: 15px;
 }
 
 .red {
-  background-color: red;
-  color: white;
+    background-color: red;
+    color: white;
 }
 
 .users-main th, .users-main td {
-  width: 200px;
+    width: 200px;
+    height: 28px;
 }
 
 .delete-btn {
-  cursor: pointer;
+    cursor: pointer;
 }
