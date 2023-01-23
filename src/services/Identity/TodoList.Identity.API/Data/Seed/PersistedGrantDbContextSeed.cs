@@ -4,13 +4,11 @@ using System.Threading.Tasks;
 
 namespace TodoList.Identity.API.Data.Seed
 {
-  public static class PersistedGrantDbContextSeed
-  {
-    public static async Task InitializeAsync(this PersistedGrantDbContext context)
+    public static class PersistedGrantDbContextSeed
     {
-      await context
-        .Database
-        .MigrateAsync();
+        public static async Task InitializeAsync(this PersistedGrantDbContext context)
+        {
+            await context.Database.MigrateAsync();
+        }
     }
-  }
 }

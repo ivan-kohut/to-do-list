@@ -2,8 +2,8 @@
 
 namespace TodoList.Identity.API.Data.Entities
 {
-  public class UserLogin : IdentityUserLogin<int>
-  {
-    public User? User { get; set; }
-  }
+    public class UserLogin : IdentityUserLogin<int>
+    {
+        public User? User { get; set; }
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace TodoList.Identity.API.Services
 {
-  public interface IEventBusService
-  {
-    void Publish(IIntegrationEvent integrationEvent);
-  }
+    public interface IEventBusService
+    {
+        void Publish(IIntegrationEvent integrationEvent);
+    }
 }
