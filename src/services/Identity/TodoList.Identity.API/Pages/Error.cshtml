@@ -1,0 +1,33 @@
+﻿@page
+@model TodoList.Identity.API.Pages.ErrorPageModel
+
+<div class="error-page">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="alert alert-danger">
+                @if (Model.ErrorMessage?.Error != null)
+                {
+                    <div class="lead">
+                        <h1>Error</h1>
+                    </div>
+                    <div>
+                        Sorry, there was an error<strong><em>: @Model.ErrorMessage.Error</em></strong>
+                    </div>
+
+                    <br>
+                    if (Model.ErrorMessage.ErrorDescription != null)
+                    {
+                        <div>@Model.ErrorMessage.ErrorDescription</div>
+                    }
+                }
+                else
+                {
+                    <div class="lead">
+                        <h1>Ooops</h1>
+                    </div>
+                    <div>Can't obtain error details</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

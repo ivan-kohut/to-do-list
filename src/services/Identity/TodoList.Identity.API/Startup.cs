@@ -49,7 +49,7 @@ namespace TodoList.Identity.API
             string? migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
             services
-                .AddIdentityServer()
+                .AddIdentityServer(options => options.UserInteraction.ErrorUrl = "/Error")
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = b => b.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
