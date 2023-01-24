@@ -1,0 +1,32 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.RegisterPageModel
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="validation"></div>
+
+    <div class="field">
+        <label asp-for="Input.Name" class="display-block">Name</label>
+        <input asp-for="Input.Name" class="input-text" type="text" />
+        <span asp-validation-for="Input.Name"></span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Input.Email" class="display-block">Email</label>
+        <input asp-for="Input.Email" class="input-text" type="text" />
+        <span asp-validation-for="Input.Email"></span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Input.Password" class="display-block">Password</label>
+        <input asp-for="Input.Password" class="input-text" type="password" />
+        <span asp-validation-for="Input.Password"></span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Input.ConfirmPassword" class="display-block">Retype password</label>
+        <input asp-for="Input.ConfirmPassword" class="input-text" type="password" />
+        <span asp-validation-for="Input.ConfirmPassword"></span>
+    </div>
+
+    <partial name="_Button" model="@("Sign up")" />
+</form>

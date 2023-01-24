@@ -1,0 +1,47 @@
+﻿@page "{handler?}"
+@model TodoList.Identity.API.Pages.Admin.Users.IndexPageModel
+
+<div class="users-main">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>In system</th>
+            <th>Via Facebook</th>
+            <th>Via Google</th>
+            <th>Via Github</th>
+            <th>Email is confirmed</th>
+            <th class="red">Delete</th>
+        </tr>
+        @if (Model.Users != null)
+        {
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.IsRegisteredInSystem</td>
+                    <td>@user.IsLoggedInViaFacebook</td>
+                    <td>@user.IsLoggedInViaGoogle</td>
+                    <td>@user.IsLoggedInViaGithub</td>
+                    <td>@user.IsEmailConfirmed</td>
+                    <td>
+                        @if (!user.IsAdmin)
+                        {
+                            <form id="@user.Id" asp-page-handler="Delete" asp-route-id="@user.Id" method="post">
+                                <a class="item-button" onclick="document.getElementById('@user.Id').submit();"><img class="delete-btn" src="/img/delete.png" /></a>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+    <div>
+        Count: @(Model.Users?.Count() ?? 0)
+    </div>
+</div>
+
+@section Styles {
+    <link href="/css/users.css" rel="stylesheet" type="text/css" />
+}

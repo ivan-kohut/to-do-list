@@ -1,0 +1,12 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.Manage.Disable2faPageModel
+
+<div class="center-text-align">
+    <p>Are you sure you want to disable 2FA?</p>
+
+    <form method="post">
+        <partial name="_Button" model="@("Yes")" />
+    </form>
+
+    <a asp-page="Index">Cancel</a>
+</div>

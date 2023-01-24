@@ -4,16 +4,16 @@ using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Data.EntityTypeConfigurations
 {
-  public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
-  {
-    public void Configure(EntityTypeBuilder<UserClaim> builder)
+    public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
     {
-      builder.HasKey(e => e.Id);
+        public void Configure(EntityTypeBuilder<UserClaim> builder)
+        {
+            builder.HasKey(e => e.Id);
 
-      builder
-        .HasOne(e => e.User)
-        .WithMany(e => e!.UserClaims)
-        .HasForeignKey(e => e.UserId);
+            builder
+                .HasOne(e => e.User)
+                .WithMany(e => e!.UserClaims)
+                .HasForeignKey(e => e.UserId);
+        }
     }
-  }
 }

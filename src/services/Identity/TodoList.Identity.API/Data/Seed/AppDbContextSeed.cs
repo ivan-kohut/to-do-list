@@ -5,45 +5,43 @@ using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Data.Seed
 {
-  public static class AppDbContextSeed
-  {
-    public static async Task InitializeAsync(this AppDbContext context)
+    public static class AppDbContextSeed
     {
-      await context
-        .Database
-        .MigrateAsync();
-
-      if (!await context.Roles.AnyAsync())
-      {
-        IEnumerable<Role> roles = Config.Roles;
-
-        foreach (Role role in roles)
+        public static async Task InitializeAsync(this AppDbContext context)
         {
-          context.Roles.Add(role);
-        }
+            await context.Database.MigrateAsync();
 
-        await context.SaveChangesAsync();
-
-        if (!await context.Users.AnyAsync())
-        {
-          User admin = Config.Admin;
-
-          context.Users.Add(admin);
-
-          await context.SaveChangesAsync();
-
-          foreach (Role role in roles)
-          {
-            context.UserRoles.Add(new UserRole
+            if (!await context.Roles.AnyAsync())
             {
-              UserId = admin.Id,
-              RoleId = role.Id
-            });
-          }
+                IEnumerable<Role> roles = Config.Roles;
 
-          await context.SaveChangesAsync();
+                foreach (Role role in roles)
+                {
+                    context.Roles.Add(role);
+                }
+
+                await context.SaveChangesAsync();
+
+                if (!await context.Users.AnyAsync())
+                {
+                    User admin = Config.Admin;
+
+                    context.Users.Add(admin);
+
+                    await context.SaveChangesAsync();
+
+                    foreach (Role role in roles)
+                    {
+                        context.UserRoles.Add(new UserRole
+                        {
+                            UserId = admin.Id,
+                            RoleId = role.Id
+                        });
+                    }
+
+                    await context.SaveChangesAsync();
+                }
+            }
         }
-      }
     }
-  }
 }

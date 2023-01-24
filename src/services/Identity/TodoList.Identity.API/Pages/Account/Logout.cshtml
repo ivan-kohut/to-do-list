@@ -1,0 +1,17 @@
+﻿@page
+@model TodoList.Identity.API.Pages.Account.LogoutPageModel
+
+<div class="logout-page">
+    <div class="lead">
+        <h1>Logout</h1>
+        <p>Would you like to logout?</p>
+    </div>
+
+    <form method="post">
+        <partial name="_Button" model="@("Yes")" />
+    </form>
+</div>
+
+@section Styles {
+    <link href="/css/logout.css" rel="stylesheet" type="text/css" />
+}
