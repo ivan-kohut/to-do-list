@@ -12,8 +12,7 @@ using TodoList.Items.API.Models;
 using TodoList.Items.Domain.Aggregates.ItemAggregate;
 using TodoList.Items.Domain.Aggregates.UserAggregate;
 using TodoList.Items.Infrastructure;
-using TodoList.Items.IntegrationTests.Extensions;
-using TodoList.Items.IntegrationTests.Fixtures;
+using TodoList.Items.IntegrationTests.Infrastructure;
 using Xunit;
 
 namespace TodoList.Items.IntegrationTests.Tests.Controllers
@@ -23,13 +22,13 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
     {
         private const string url = "/api/v1/items";
 
-        public ItemsControllerTest(TestServerFixture testServerFixture) : base(testServerFixture)
+        public ItemsControllerTest(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
         {
         }
 
         public class GetAllAsync : ItemsControllerTest
         {
-            public GetAllAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            public GetAllAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
             {
             }
 
@@ -109,7 +108,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         public class SaveAsync : ItemsControllerTest
         {
-            public SaveAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            public SaveAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
             {
             }
 
@@ -168,7 +167,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         public class PutItemAsync : ItemsControllerTest
         {
-            public PutItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            public PutItemAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
             {
             }
 
@@ -245,7 +244,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         public class DeleteItemAsync : ItemsControllerTest
         {
-            public DeleteItemAsync(TestServerFixture testServerFixture) : base(testServerFixture)
+            public DeleteItemAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
             {
             }
 
@@ -277,11 +276,13 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         public void Dispose()
         {
-            using IServiceScope scope = Server.CreateScope();
+            using IServiceScope scope = Server.Services.CreateScope();
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-            itemsDbContext.Rollback<Item>();
+            DbSet<Item> entities = itemsDbContext.Set<Item>();
+            entities.RemoveRange(entities);
+
             itemsDbContext.SaveChanges();
 
             GC.SuppressFinalize(this);
@@ -289,7 +290,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         private async Task<IEnumerable<Item>> GetAllItemsAsync()
         {
-            using IServiceScope scope = Server.CreateScope();
+            using IServiceScope scope = Server.Services.CreateScope();
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
@@ -301,7 +302,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         private async Task UpdateIdentityIdAsync(int fromIdentityId, int toIdentityId)
         {
-            using IServiceScope scope = Server.CreateScope();
+            using IServiceScope scope = Server.Services.CreateScope();
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 

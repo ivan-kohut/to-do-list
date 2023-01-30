@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using TodoList.Items.API.Models;
 using TodoList.Items.Domain.Aggregates.ItemAggregate;
 using TodoList.Items.Infrastructure;
-using TodoList.Items.IntegrationTests.Extensions;
-using TodoList.Items.IntegrationTests.Fixtures;
+using TodoList.Items.IntegrationTests.Infrastructure;
 
 namespace TodoList.Items.IntegrationTests.Tests.Controllers
 {
@@ -18,10 +17,10 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         protected int IdentityId { get; }
 
-        protected ControllerTestBase(TestServerFixture testServerFixture) : base(testServerFixture)
+        protected ControllerTestBase(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
         {
-            this.UserId = testServerFixture.User.Id;
-            this.IdentityId = testServerFixture.User.IdentityId;
+            this.UserId = applicationFactory.User.Id;
+            this.IdentityId = applicationFactory.User.IdentityId;
         }
 
         protected async Task<HttpResponseMessage> GetAsync(string url)
@@ -48,7 +47,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         protected async Task<ItemApiModel> SaveItemAsync(Item itemToSave)
         {
-            using IServiceScope scope = Server.CreateScope();
+            using IServiceScope scope = Server.Services.CreateScope();
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 

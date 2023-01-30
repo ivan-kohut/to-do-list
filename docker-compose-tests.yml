@@ -3,8 +3,6 @@ version: '3.4'
 services:
   db-test:
     image: mcr.microsoft.com/mssql/server:2019-latest
-  rabbitmq-test:
-    image: rabbitmq:3-management
   items-api-unit-test:
     build:
       context: .
@@ -17,4 +15,3 @@ services:
       target: integration-tests
     depends_on:
       - db-test
-      - rabbitmq-test

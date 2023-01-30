@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using System.Net.Http;
-using TodoList.Items.IntegrationTests.Fixtures;
+using TodoList.Items.IntegrationTests.Infrastructure;
 
 namespace TodoList.Items.IntegrationTests.Tests
 {
@@ -10,10 +10,10 @@ namespace TodoList.Items.IntegrationTests.Tests
 
         protected HttpClient Client { get; }
 
-        protected TestBase(TestServerFixture testServerFixture)
+        protected TestBase(ItemsWebApplicationFactory applicationFactory)
         {
-            this.Server = testServerFixture.Server;
-            this.Client = testServerFixture.Client;
+            this.Server = applicationFactory.Server;
+            this.Client = applicationFactory.CreateClient();
         }
     }
 }

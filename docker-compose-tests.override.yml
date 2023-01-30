@@ -7,17 +7,7 @@ services:
       - SA_PASSWORD=${TODOLIST_DB_PASSWORD}
     ports:
       - 1433:1433
-  rabbitmq-test:
-    ports:
-      - 15672:15672
-      - 5672:5672
   items-api-integration-test:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultTestConnection=Data Source=db-test;Initial Catalog=TodoList.ItemsDb.Test;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true
-      - EventBus__Connection=rabbitmq-test
-      - EventBus__UserName=${TODOLIST_EVENTBUS_USERNAME}
-      - EventBus__Password=${TODOLIST_EVENTBUS_PASSWORD}
-      - EventBus__BrokerName=${TODOLIST_EVENTBUS_BROKERNAME}
-      - EventBus__ClientName=IntegrationItemTests
-      - EventBus__RetryCount=5
+      - ConnectionStrings__DefaultConnection=Data Source=db-test;Initial Catalog=TodoList.ItemsDb.Test;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true

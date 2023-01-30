@@ -33,8 +33,6 @@ namespace TodoList.Items.API
 {
     public class Startup
     {
-        protected virtual string ConnectionStringName { get; } = "DefaultConnection";
-
         private readonly IConfiguration configuration;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -46,7 +44,7 @@ namespace TodoList.Items.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = configuration.GetConnectionString(ConnectionStringName)
+            string connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new Exception("Connection string is null");
 
             services
@@ -153,7 +151,8 @@ namespace TodoList.Items.API
             app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? Array.Empty<string>()).AllowAnyHeader().AllowAnyMethod());
             app.UseAppExceptionHandler();
 
-            ConfigureAuth(app);
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -164,12 +163,6 @@ namespace TodoList.Items.API
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
                 });
             });
-        }
-
-        protected virtual void ConfigureAuth(IApplicationBuilder app)
-        {
-            app.UseAuthentication();
-            app.UseAuthorization();
         }
     }
 }

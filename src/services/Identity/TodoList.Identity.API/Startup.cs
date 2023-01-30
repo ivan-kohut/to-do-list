@@ -32,8 +32,6 @@ namespace TodoList.Identity.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
             services.AddRazorPages();
 
             string connectionString = configuration.GetConnectionString("DefaultConnection")
@@ -118,8 +116,6 @@ namespace TodoList.Identity.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapControllerRoute(name: "Delete user", pattern: "admin/users/delete/{id}", defaults: new { controller = "Admin", action = "DeleteUser" });
-                endpoints.MapDefaultControllerRoute();
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions
                 {
                     Predicate = _ => true,
