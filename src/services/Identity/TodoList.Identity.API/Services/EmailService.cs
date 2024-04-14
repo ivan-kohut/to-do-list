@@ -6,14 +6,9 @@ using TodoList.Identity.API.Options;
 
 namespace TodoList.Identity.API.Services
 {
-    public class EmailService : IEmailService
+    public class EmailService(IOptions<SendGridOptions> sendGridOptions) : IEmailService
     {
-        private readonly SendGridOptions sendGridOptions;
-
-        public EmailService(IOptions<SendGridOptions> sendGridOptions)
-        {
-            this.sendGridOptions = sendGridOptions.Value;
-        }
+        private readonly SendGridOptions sendGridOptions = sendGridOptions.Value;
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {

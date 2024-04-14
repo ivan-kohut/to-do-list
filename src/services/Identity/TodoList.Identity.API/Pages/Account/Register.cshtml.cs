@@ -10,22 +10,11 @@ using TodoList.Identity.API.Services;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class RegisterPageModel : PageModel
+    public class RegisterPageModel(
+        UserManager<User> userManager,
+        IEmailService emailService,
+        IEventBusService eventBusService) : PageModel
     {
-        private readonly UserManager<User> userManager;
-        private readonly IEmailService emailService;
-        private readonly IEventBusService eventBusService;
-
-        public RegisterPageModel(
-            UserManager<User> userManager,
-            IEmailService emailService,
-            IEventBusService eventBusService)
-        {
-            this.userManager = userManager;
-            this.emailService = emailService;
-            this.eventBusService = eventBusService;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

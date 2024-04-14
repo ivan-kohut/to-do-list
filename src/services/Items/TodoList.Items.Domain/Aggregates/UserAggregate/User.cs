@@ -2,14 +2,9 @@
 
 namespace TodoList.Items.Domain.Aggregates.UserAggregate
 {
-    public class User : Entity, IAggregateRoot
+    public class User(int identityId) : Entity, IAggregateRoot
     {
-        public int IdentityId { get; private set; }
-
-        public User(int identityId)
-        {
-            this.IdentityId = identityId;
-        }
+        public int IdentityId { get; private set; } = identityId;
 
         public void SetIdentityId(int identityId) => this.IdentityId = identityId;
     }

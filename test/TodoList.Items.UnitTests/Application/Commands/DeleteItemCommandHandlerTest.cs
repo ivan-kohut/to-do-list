@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MediatR;
 using Moq;
 using System;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace TodoList.Items.UnitTests.Application.Commands
         private readonly Mock<IUserRepository> mockUserRepository;
 
         private readonly DeleteItemCommand command;
-        private readonly IRequestHandler<DeleteItemCommand> handler;
+        private readonly DeleteItemCommandHandler handler;
 
         public DeleteItemCommandHandlerTest()
         {

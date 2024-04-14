@@ -19,17 +19,8 @@ using TodoList.Identity.API.Services.Interfaces;
 
 namespace TodoList.Identity.API
 {
-    public class Startup
+    public class Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
-        private readonly IConfiguration configuration;
-        private readonly IWebHostEnvironment webHostEnvironment;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
-        {
-            this.configuration = configuration;
-            this.webHostEnvironment = webHostEnvironment;
-        }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();

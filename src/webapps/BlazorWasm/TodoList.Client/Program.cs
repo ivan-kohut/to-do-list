@@ -32,7 +32,7 @@ namespace TodoList.Client
                 .AddHttpMessageHandler(s =>
                     s
                         .GetRequiredService<AuthorizationMessageHandler>()
-                        .ConfigureHandler(authorizedUrls: new[] { itemsUrl }, scopes: new[] { "items" }));
+                        .ConfigureHandler(authorizedUrls: [itemsUrl], scopes: ["items"]));
 
             builder.Services
                 .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("items-api"))
@@ -40,9 +40,7 @@ namespace TodoList.Client
 
             builder.RootComponents.Add<App>("#app");
 
-            await builder
-                .Build()
-                .RunAsync();
+            await builder.Build().RunAsync();
         }
     }
 }

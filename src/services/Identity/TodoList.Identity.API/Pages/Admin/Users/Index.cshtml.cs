@@ -10,15 +10,8 @@ using TodoList.Identity.API.Services.Interfaces;
 namespace TodoList.Identity.API.Pages.Admin.Users
 {
     [Authorize(Roles = "admin")]
-    public class IndexPageModel : PageModel
+    public class IndexPageModel(IUserService userService) : PageModel
     {
-        private readonly IUserService userService;
-
-        public IndexPageModel(IUserService userService)
-        {
-            this.userService = userService;
-        }
-
         public IEnumerable<UserViewModel>? Users { get; set; }
 
         public async Task<IActionResult> OnGetAsync()

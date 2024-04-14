@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MediatR;
 using Moq;
 using System;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace TodoList.Items.UnitTests.Application.Commands
         private readonly Mock<IUserRepository> mockUserRepository;
 
         private readonly UpdateItemCommand command;
-        private readonly IRequestHandler<UpdateItemCommand> handler;
+        private readonly UpdateItemCommandHandler handler;
 
         public UpdateItemCommandHandlerTest()
         {

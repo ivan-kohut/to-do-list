@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using System;
-using System.Collections.Generic;
 using TodoList.Items.Domain.Aggregates.ItemAggregate;
 using Xunit;
 
@@ -10,11 +9,12 @@ namespace TodoList.Items.UnitTests.Domain.Aggregates
 {
     public class ItemAggregateTest
     {
-        public static IEnumerable<object[]> TestIsDoneData => new List<object[]>
-        {
-            new object[] { ItemStatus.Todo, false },
-            new object[] { ItemStatus.Done, true }
-        };
+        public static TheoryData<ItemStatus, bool> TestIsDoneData =>
+            new()
+            {
+                { ItemStatus.Todo, false },
+                { ItemStatus.Done, true }
+            };
 
         [Fact]
         public void When_CreateWithStatus_Expect_ItemCreated()

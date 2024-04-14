@@ -30,14 +30,14 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
         protected async Task<HttpResponseMessage> PostAsync(string url, object requestBody)
         {
-            using HttpContent httpContent = CreateHttpContent(requestBody);
-            return await Client.PostAsync(url, httpContent);
+            using HttpContent content = CreateContent(requestBody);
+            return await Client.PostAsync(url, content);
         }
 
         protected async Task<HttpResponseMessage> PutAsync(string url, object? requestBody)
         {
-            using HttpContent httpContent = CreateHttpContent(requestBody);
-            return await Client.PutAsync(url, httpContent);
+            using HttpContent content = CreateContent(requestBody);
+            return await Client.PutAsync(url, content);
         }
 
         protected async Task<HttpResponseMessage> DeleteAsync(string url)
@@ -69,9 +69,9 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync()) ?? throw new Exception("The deserialized object is null");
         }
 
-        private static HttpContent CreateHttpContent(object? requestBody)
+        private static StringContent CreateContent(object? requestBody)
         {
-            return new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+            return new(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
         }
     }
 }

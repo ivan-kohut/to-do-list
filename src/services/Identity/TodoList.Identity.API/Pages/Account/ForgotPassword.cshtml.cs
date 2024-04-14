@@ -9,17 +9,8 @@ using TodoList.Identity.API.Services;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class ForgotPasswordPageModel : PageModel
+    public class ForgotPasswordPageModel(UserManager<User> userManager, IEmailService emailService) : PageModel
     {
-        private readonly UserManager<User> userManager;
-        private readonly IEmailService emailService;
-
-        public ForgotPasswordPageModel(UserManager<User> userManager, IEmailService emailService)
-        {
-            this.userManager = userManager;
-            this.emailService = emailService;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

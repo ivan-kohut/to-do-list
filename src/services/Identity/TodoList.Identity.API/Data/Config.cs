@@ -23,41 +23,37 @@ namespace TodoList.Identity.API.Data
             };
 
         public static IEnumerable<Role> Roles =>
-            new[]
-            {
+            [
                 new Role { Name = "admin", NormalizedName = "ADMIN" },
                 new Role { Name = "user", NormalizedName = "USER" }
-            };
+            ];
 
         public static IEnumerable<ApiScope> ApiScopes =>
-            new[]
-            {
+            [
                 new ApiScope(name: "items", displayName: "Items Service")
-            };
+            ];
 
         public static IEnumerable<ApiResource> ApiResources =>
-            new[]
-            {
-                new ApiResource(name: "items", displayName: "Items Service", userClaims: new[] { "role" })
+            [
+                new ApiResource(name: "items", displayName: "Items Service", userClaims: ["role"])
                 {
                     Scopes = { "items" }
                 }
-            };
+            ];
 
         public static IEnumerable<IdentityResource> IdentityResources =>
-            new IdentityResource[]
-            {
+            [
                 new IdentityResources.OpenId(),
-                new IdentityResource(name: "profile", userClaims: new[] { "name", "role" }, displayName: "User profile")
-            };
+                new IdentityResource(name: "profile", userClaims: ["name", "role"], displayName: "User profile")
+            ];
 
         public static IEnumerable<Client> Clients(IConfiguration configuration)
         {
             string blazorWasmClientUrl = configuration["BlazorWasmClientUrl"]
                 ?? throw new Exception("Blazor Wasm Client Url is null");
 
-            return new[]
-            {
+            return
+            [
                 new Client
                 {
                     ClientId = "wasm",
@@ -76,7 +72,7 @@ namespace TodoList.Identity.API.Data
                         "items"
                     }
                 }
-            };
+            ];
         }
     }
 }

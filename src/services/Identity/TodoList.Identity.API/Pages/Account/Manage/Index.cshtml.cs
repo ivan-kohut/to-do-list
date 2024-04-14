@@ -8,15 +8,8 @@ using TodoList.Identity.API.Data.Entities;
 namespace TodoList.Identity.API.Pages.Account.Manage
 {
     [Authorize(Roles = "user")]
-    public class IndexPageModel : PageModel
+    public class IndexPageModel(UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> userManager;
-
-        public IndexPageModel(UserManager<User> userManager)
-        {
-            this.userManager = userManager;
-        }
-
         public bool IsTwoFactorAuthenticationEnabled { get; set; }
 
         public async Task<IActionResult> OnGetAsync()

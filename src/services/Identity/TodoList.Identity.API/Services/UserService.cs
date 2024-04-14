@@ -9,15 +9,8 @@ using TodoList.Identity.API.Services.Models;
 
 namespace TodoList.Identity.API.Services
 {
-    public class UserService : IUserService
+    public class UserService(AppDbContext dbContext) : IUserService
     {
-        private readonly AppDbContext dbContext;
-
-        public UserService(AppDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
-
         public async Task<IEnumerable<UserDTO>> GetUsersAsync()
         {
             return await dbContext.Users

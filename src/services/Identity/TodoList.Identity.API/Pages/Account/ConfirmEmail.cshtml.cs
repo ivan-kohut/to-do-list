@@ -6,15 +6,8 @@ using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class ConfirmEmailPageModel : PageModel
+    public class ConfirmEmailPageModel(UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> userManager;
-
-        public ConfirmEmailPageModel(UserManager<User> userManager)
-        {
-            this.userManager = userManager;
-        }
-
         public string? ReturnUrl { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id, string? code, string? returnUrl)

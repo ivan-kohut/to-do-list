@@ -10,22 +10,11 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class LoginPageModel : PageModel
+    public class LoginPageModel(
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IIdentityServerInteractionService interaction) : PageModel
     {
-        private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
-        private readonly IIdentityServerInteractionService interaction;
-
-        public LoginPageModel(
-            UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            IIdentityServerInteractionService interaction)
-        {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.interaction = interaction;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

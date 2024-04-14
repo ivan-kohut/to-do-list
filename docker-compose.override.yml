@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   db:
     environment:
@@ -16,8 +14,9 @@ services:
   items-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
       - ASPNETCORE_HTTPS_PORT=8090
-      - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.ItemsDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true
@@ -37,8 +36,9 @@ services:
   identity-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
       - ASPNETCORE_HTTPS_PORT=8092
-      - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - ConnectionStrings__DefaultConnection=Data Source=db;Initial Catalog=TodoList.IdentityDb;MultipleActiveResultSets=True;Persist Security Info=True;User ID=sa;Password=${TODOLIST_DB_PASSWORD};Trust Server Certificate=true
@@ -63,8 +63,9 @@ services:
   blazor-wasm:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
       - ASPNETCORE_HTTPS_PORT=8091
-      - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - IdentityUrl=${TODOLIST_BASE_URL}:8092
@@ -77,8 +78,9 @@ services:
   health-monitoring:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
+      - ASPNETCORE_HTTPS_PORTS=443
       - ASPNETCORE_HTTPS_PORT=8093
-      - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${TODOLIST_CERTIFICATE_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${TODOLIST_CERTIFICATE_PASSWORD}
       - HealthChecks-UI__HealthChecks__0__Name=items-api

@@ -12,15 +12,8 @@ using TodoList.Client.Server.Options;
 
 namespace TodoList.Client.Server
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        private readonly IConfiguration configuration;
-
-        public Startup(IConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();

@@ -18,19 +18,12 @@ using TodoList.Items.API.Options;
 
 namespace TodoList.Items.API.BackgroundServices
 {
-    public class EventBusHostedService : IHostedService, IDisposable
+    public class EventBusHostedService(IServiceProvider serviceProvider, IOptions<EventBusOptions> eventBusOptions) : IHostedService, IDisposable
     {
-        private readonly IServiceProvider serviceProvider;
-        private readonly EventBusOptions eventBusOptions;
+        private readonly EventBusOptions eventBusOptions = eventBusOptions.Value;
 
         private IConnection? connection;
         private IModel? channel;
-
-        public EventBusHostedService(IServiceProvider serviceProvider, IOptions<EventBusOptions> eventBusOptions)
-        {
-            this.serviceProvider = serviceProvider;
-            this.eventBusOptions = eventBusOptions.Value;
-        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -81,7 +74,8 @@ namespace TodoList.Items.API.BackgroundServices
 
         private async Task HandleIntegrationEvent(object sender, BasicDeliverEventArgs args)
         {
-            UserCreatedIntegrationEvent userCreatedIntegrationEvent = JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(Encoding.UTF8.GetString(args.Body.ToArray()));
+            UserCreatedIntegrationEvent userCreatedIntegrationEvent = JsonConvert.DeserializeObject<UserCreatedIntegrationEvent>(Encoding.UTF8.GetString(args.Body.ToArray()))
+                ?? throw new Exception("UserCreated integration event is null after deserialization");
 
             using IServiceScope scope = serviceProvider.CreateScope();
 

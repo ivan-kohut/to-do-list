@@ -7,15 +7,8 @@ using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class ResetPasswordPageModel : PageModel
+    public class ResetPasswordPageModel(UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> userManager;
-
-        public ResetPasswordPageModel(UserManager<User> userManager)
-        {
-            this.userManager = userManager;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

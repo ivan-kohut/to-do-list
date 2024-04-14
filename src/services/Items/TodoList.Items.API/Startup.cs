@@ -31,17 +31,8 @@ using TodoList.Items.Infrastructure.Repositories;
 
 namespace TodoList.Items.API
 {
-    public class Startup
+    public class Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
-        private readonly IConfiguration configuration;
-        private readonly IWebHostEnvironment webHostEnvironment;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
-        {
-            this.configuration = configuration;
-            this.webHostEnvironment = webHostEnvironment;
-        }
-
         public void ConfigureServices(IServiceCollection services)
         {
             string connectionString = configuration.GetConnectionString("DefaultConnection")
@@ -82,7 +73,7 @@ namespace TodoList.Items.API
                 {
                     Version = "v1",
                     Title = "Todo List",
-                    Description = "Simple Todo List API developed using C#, ASP.NET Core 7.0 and EF Core 7.0"
+                    Description = "Simple Todo List API developed using C#, ASP.NET Core 8.0 and EF Core 8.0"
                 });
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -108,7 +99,7 @@ namespace TodoList.Items.API
                 .AddControllers(o => o.Filters.Add(typeof(ModelStateInvalidFilter)))
                 .AddApplicationPart(typeof(Startup).Assembly);
 
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddMediatR(serviceConfiguration => serviceConfiguration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddTransient<IRequestHandler<RemoveCachedItemsCommand<CreateItemCommand, ItemDTO>, ItemDTO>, RemoveCachedItemsCommandHandler<CreateItemCommand, ItemDTO>>();
             services.AddTransient<IRequestHandler<RemoveCachedItemsCommand<UpdateItemCommand, Unit>, Unit>, RemoveCachedItemsCommandHandler<UpdateItemCommand, Unit>>();
@@ -148,7 +139,7 @@ namespace TodoList.Items.API
             });
 
             app.UseRouting();
-            app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? Array.Empty<string>()).AllowAnyHeader().AllowAnyMethod());
+            app.UseCors(b => b.WithOrigins(configuration["Cors:Origins"]?.Split(",").Select(o => o.Trim()).ToArray() ?? []).AllowAnyHeader().AllowAnyMethod());
             app.UseAppExceptionHandler();
 
             app.UseAuthentication();

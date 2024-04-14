@@ -84,22 +84,19 @@ namespace TodoList.Client.Components
             await SwapItemsAsync(item, indexOfItem, indexOfNextItem);
         }
 
-        private Task SwapItemsAsync(ItemApiModel item, int indexOfSelectedItem, int indexOfAnotherItem)
+        private Task<ApiCallResult[]> SwapItemsAsync(ItemApiModel item, int indexOfSelectedItem, int indexOfAnotherItem)
         {
             ItemApiModel anotherItem = Items[indexOfAnotherItem];
 
             Items[indexOfSelectedItem] = anotherItem;
             Items[indexOfAnotherItem] = item;
 
-            int itemPriority = item.Priority;
-
-            item.Priority = anotherItem.Priority;
-            anotherItem.Priority = itemPriority;
-
+            (anotherItem.Priority, item.Priority) = (item.Priority, anotherItem.Priority);
+            
             return Task.WhenAll(UpdateItemAsync(item), UpdateItemAsync(anotherItem));
         }
 
-        private Task UpdateItemAsync(ItemApiModel item)
+        private Task<ApiCallResult> UpdateItemAsync(ItemApiModel item)
         {
             return AppHttpClient.PutAsync(ApiUrls.UpdateItem.Replace(ApiUrls.IdTemplate, item.Id.ToString()), item);
         }

@@ -12,19 +12,10 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace TodoList.Identity.API.Pages.Account
 {
     [Authorize(AuthenticationSchemes = "Identity.TwoFactorUserId")]
-    public class LoginWith2faPageModel : PageModel
+    public class LoginWith2faPageModel(
+        SignInManager<User> signInManager,
+        IIdentityServerInteractionService interaction) : PageModel
     {
-        private readonly SignInManager<User> signInManager;
-        private readonly IIdentityServerInteractionService interaction;
-
-        public LoginWith2faPageModel(
-            SignInManager<User> signInManager,
-            IIdentityServerInteractionService interaction)
-        {
-            this.signInManager = signInManager;
-            this.interaction = interaction;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

@@ -9,8 +9,8 @@ namespace TodoList.Items.API.Swagger
     {
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            IDictionary<string, OpenApiPathItem> newPaths = new Dictionary<string, OpenApiPathItem>();
-            IList<string> removeKeys = new List<string>();
+            var newPaths = new Dictionary<string, OpenApiPathItem>();
+            var removeKeys = new List<string>();
 
             foreach (var path in swaggerDoc.Paths)
             {

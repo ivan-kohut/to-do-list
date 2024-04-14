@@ -7,20 +7,11 @@ using TodoList.Items.Domain.Shared;
 
 namespace TodoList.Items.API.Application.Commands
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand>
+    public class CreateUserCommandHandler(
+        IUnitOfWork unitOfWork,
+        IUserRepository userRepository) : IRequestHandler<CreateUserCommand>
     {
-        private readonly IUnitOfWork unitOfWork;
-        private readonly IUserRepository userRepository;
-
-        public CreateUserCommandHandler(
-            IUnitOfWork unitOfWork,
-            IUserRepository userRepository)
-        {
-            this.unitOfWork = unitOfWork;
-            this.userRepository = userRepository;
-        }
-
-        public async Task<Unit> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             if (await userRepository.GetUserAsync(request.IdentityId) is not null)
             {
@@ -30,8 +21,6 @@ namespace TodoList.Items.API.Application.Commands
             userRepository.Create(new User(request.IdentityId));
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 }

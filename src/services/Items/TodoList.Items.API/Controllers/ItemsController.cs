@@ -19,15 +19,8 @@ namespace TodoList.Items.API.Controllers
     [Produces("application/json")]
     [ProducesResponseType(200)]
     [ProducesResponseType(401)]
-    public class ItemsController : Controller
+    public class ItemsController(IMediator mediator) : Controller
     {
-        private readonly IMediator mediator;
-
-        public ItemsController(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
         /// <response code="403">If user does not have role "user"</response> 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ItemApiModel>>> GetAllAsync(CancellationToken cancellationToken) =>

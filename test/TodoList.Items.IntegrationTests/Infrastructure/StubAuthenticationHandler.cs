@@ -9,25 +9,20 @@ using System.Threading.Tasks;
 
 namespace TodoList.Items.IntegrationTests.Infrastructure
 {
-    public class StubAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public class StubAuthenticationHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
     {
         public const string AuthenticationScheme = "IntegrationTestsScheme";
 
-        public StubAuthenticationHandler(
-            IOptionsMonitor<AuthenticationSchemeOptions> options,
-            ILoggerFactory logger,
-            UrlEncoder encoder,
-            ISystemClock clock) : base(options, logger, encoder, clock)
-        {
-        }
-
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            IEnumerable<Claim> claims = new List<Claim>
-            {
+            IEnumerable<Claim> claims =
+            [
                 new Claim(ClaimTypes.NameIdentifier, "1"),
                 new Claim(ClaimTypes.Role, "user")
-            };
+            ];
 
             IIdentity identity = new ClaimsIdentity(claims, AuthenticationScheme);
             ClaimsPrincipal principal = new(identity);

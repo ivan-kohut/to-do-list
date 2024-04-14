@@ -18,20 +18,12 @@ using Xunit;
 namespace TodoList.Items.IntegrationTests.Tests.Controllers
 {
     [Collection(nameof(IntegrationTestCollection))]
-    public class ItemsControllerTest : ControllerTestBase, IDisposable
+    public class ItemsControllerTest(ItemsWebApplicationFactory applicationFactory) : ControllerTestBase(applicationFactory), IDisposable
     {
         private const string url = "/api/v1/items";
 
-        public ItemsControllerTest(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
+        public class GetAllAsync(ItemsWebApplicationFactory applicationFactory) : ItemsControllerTest(applicationFactory)
         {
-        }
-
-        public class GetAllAsync : ItemsControllerTest
-        {
-            public GetAllAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
-            {
-            }
-
             [Fact]
             public async Task When_ItemsDoNotExist_Expect_EmptyList()
             {
@@ -48,13 +40,13 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             [Fact]
             public async Task When_ItemsExist_Expect_Returned()
             {
-                IEnumerable<Item> items = new List<Item>
-                {
+                IEnumerable<Item> items =
+                [
                     new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
                     new Item(UserId, "secondItemText", 1, ItemStatus.Done)
-                };
+                ];
 
-                IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+                var expected = (await Task.WhenAll(items.Select(SaveItemAsync)))
                     .OrderBy(i => i.Priority)
                     .ToList();
 
@@ -73,13 +65,13 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             [Fact]
             public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
             {
-                IEnumerable<Item> items = new List<Item>
-                {
+                IEnumerable<Item> items =
+                [
                     new Item(UserId, "firstItemText", 2, ItemStatus.Todo),
                     new Item(UserId, "secondItemText", 1, ItemStatus.Done)
-                };
+                ];
 
-                IEnumerable<ItemApiModel> expected = (await Task.WhenAll(items.Select(i => SaveItemAsync(i))))
+                var expected = (await Task.WhenAll(items.Select(SaveItemAsync)))
                     .OrderBy(i => i.Priority)
                     .ToList();
 
@@ -106,12 +98,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             }
         }
 
-        public class SaveAsync : ItemsControllerTest
+        public class SaveAsync(ItemsWebApplicationFactory applicationFactory) : ItemsControllerTest(applicationFactory)
         {
-            public SaveAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
-            {
-            }
-
             [Fact]
             public async Task When_InputModelIsNotValid_Expect_BadRequest()
             {
@@ -165,12 +153,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             }
         }
 
-        public class PutItemAsync : ItemsControllerTest
+        public class PutItemAsync(ItemsWebApplicationFactory applicationFactory) : ItemsControllerTest(applicationFactory)
         {
-            public PutItemAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
-            {
-            }
-
             [Fact]
             public async Task When_InputModelIsNotValid_Expect_BadRequest()
             {
@@ -242,12 +226,8 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
             }
         }
 
-        public class DeleteItemAsync : ItemsControllerTest
+        public class DeleteItemAsync(ItemsWebApplicationFactory applicationFactory) : ItemsControllerTest(applicationFactory)
         {
-            public DeleteItemAsync(ItemsWebApplicationFactory applicationFactory) : base(applicationFactory)
-            {
-            }
-
             [Fact]
             public async Task When_ItemIsNotFound_Expect_NotFound()
             {
@@ -294,8 +274,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-            return await itemsDbContext
-                .Items
+            return await itemsDbContext.Items
                 .Include(i => i.Status)
                 .ToListAsync();
         }
@@ -306,8 +285,7 @@ namespace TodoList.Items.IntegrationTests.Tests.Controllers
 
             ItemsDbContext itemsDbContext = scope.ServiceProvider.GetRequiredService<ItemsDbContext>();
 
-            User? user = await itemsDbContext
-                .Users
+            User? user = await itemsDbContext.Users
                 .SingleOrDefaultAsync(u => u.IdentityId == fromIdentityId);
 
             if (user != default)

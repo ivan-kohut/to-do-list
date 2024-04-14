@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29001.49
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{337EC26C-F807-4745-9572-8F450C087E37}"
 EndProject
@@ -33,13 +33,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "webapps", "webapps", "{5F1E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlazorWasm", "BlazorWasm", "{4184CA92-4BDB-4D4C-9423-EE6D4A7322F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Client", "src\webapps\BlazorWasm\TodoList.Client\TodoList.Client.csproj", "{6D732D86-C3E3-4B78-BB54-3E1D7B9F61EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Client", "src\webapps\BlazorWasm\TodoList.Client\TodoList.Client.csproj", "{6D732D86-C3E3-4B78-BB54-3E1D7B9F61EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Client.Server", "src\webapps\BlazorWasm\TodoList.Client.Server\TodoList.Client.Server.csproj", "{659E9A35-F5AC-48FF-933B-D7546F03E220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Client.Server", "src\webapps\BlazorWasm\TodoList.Client.Server\TodoList.Client.Server.csproj", "{659E9A35-F5AC-48FF-933B-D7546F03E220}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Health", "Health", "{107DE484-35F6-4E54-964C-C75948F07F39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Health.Monitoring", "src\webapps\Health\TodoList.Health.Monitoring\TodoList.Health.Monitoring.csproj", "{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Health.Monitoring", "src\webapps\Health\TodoList.Health.Monitoring\TodoList.Health.Monitoring.csproj", "{F9F42617-7DFB-4F9C-BB31-0BA1248140A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

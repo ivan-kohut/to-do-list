@@ -15,7 +15,7 @@ namespace TodoList.Items.UnitTests.Application.Commands
         private readonly Mock<IMemoryCache> mockMemoryCache;
 
         private readonly RemoveCachedItemsCommand<CreateItemCommand, ItemDTO> command;
-        private readonly IRequestHandler<RemoveCachedItemsCommand<CreateItemCommand, ItemDTO>, ItemDTO> handler;
+        private readonly RemoveCachedItemsCommandHandler<CreateItemCommand, ItemDTO> handler;
 
         public RemoveCachedItemsCommandHandlerTest()
         {

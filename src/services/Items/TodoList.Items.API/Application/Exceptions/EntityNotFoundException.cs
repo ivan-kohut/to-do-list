@@ -2,10 +2,7 @@
 
 namespace TodoList.Items.API.Application.Exceptions
 {
-    public class EntityNotFoundException : Exception
+    public class EntityNotFoundException(string message) : Exception(message)
     {
-        public EntityNotFoundException(string message) : base(message)
-        {
-        }
     }
 }

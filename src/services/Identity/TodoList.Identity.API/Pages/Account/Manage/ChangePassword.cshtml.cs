@@ -9,15 +9,8 @@ using TodoList.Identity.API.Data.Entities;
 namespace TodoList.Identity.API.Pages.Account.Manage
 {
     [Authorize(Roles = "user")]
-    public class ChangePasswordPageModel : PageModel
+    public class ChangePasswordPageModel(UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> userManager;
-
-        public ChangePasswordPageModel(UserManager<User> userManager)
-        {
-            this.userManager = userManager;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

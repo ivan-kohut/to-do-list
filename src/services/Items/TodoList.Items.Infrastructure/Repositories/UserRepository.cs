@@ -4,15 +4,10 @@ using TodoList.Items.Domain.Aggregates.UserAggregate;
 
 namespace TodoList.Items.Infrastructure.Repositories
 {
-    public class UserRepository : RepositoryBase<User>, IUserRepository
+    public class UserRepository(ItemsDbContext dbContext) : RepositoryBase<User>(dbContext), IUserRepository
     {
-        public UserRepository(ItemsDbContext dbContext) : base(dbContext)
-        {
-        }
-
         public async Task<User?> GetUserAsync(int identityId) =>
-            await dbContext
-                .Users
+            await dbContext.Users
                 .SingleOrDefaultAsync(u => u.IdentityId == identityId);
     }
 }

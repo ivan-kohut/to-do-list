@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using System;
@@ -23,7 +22,7 @@ namespace TodoList.Items.UnitTests.Application.Queries
         private readonly Mock<ICacheEntry> mockCacheEntry;
 
         private readonly GetItemsQuery query;
-        private readonly IRequestHandler<GetItemsQuery, IEnumerable<ItemDTO>> handler;
+        private readonly GetItemsQueryHandler handler;
 
         public GetItemsQueryHandlerTest()
         {
@@ -43,11 +42,11 @@ namespace TodoList.Items.UnitTests.Application.Queries
         [Fact]
         public async Task When_ItemsExistInCache_Expect_ReturnedFromCache()
         {
-            IEnumerable<ItemDTO> expectedItems = new[]
-            {
+            IEnumerable<ItemDTO> expectedItems =
+            [
                 new ItemDTO(1, false, "test_text1", 1),
                 new ItemDTO(5, true, "test_text2", 2)
-            };
+            ];
 
             object? value = expectedItems;
 
@@ -95,11 +94,11 @@ namespace TodoList.Items.UnitTests.Application.Queries
                 .Setup(r => r.GetUserAsync(query.IdentityId))
                 .ReturnsAsync(user);
 
-            IEnumerable<Item> items = new[]
-            {
+            IEnumerable<Item> items =
+            [
                 new Item(user.Id, "test_text1", 1, ItemStatus.Todo),
                 new Item(user.Id, "test_text2", 2, ItemStatus.Done)
-            };
+            ];
 
             mockItemRepository
                 .Setup(r => r.GetAllAsync(user.Id))

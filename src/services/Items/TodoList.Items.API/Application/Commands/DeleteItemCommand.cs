@@ -2,13 +2,8 @@
 
 namespace TodoList.Items.API.Application.Commands
 {
-    public class DeleteItemCommand : ItemCommandBase, IRequest
+    public class DeleteItemCommand(int itemId, int identityId) : ItemCommandBase(identityId), IRequest<Unit>
     {
-        public int ItemId { get; }
-
-        public DeleteItemCommand(int itemId, int identityId) : base(identityId)
-        {
-            this.ItemId = itemId;
-        }
+        public int ItemId { get; } = itemId;
     }
 }

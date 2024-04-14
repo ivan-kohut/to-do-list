@@ -6,15 +6,8 @@ using TodoList.Items.API.Application.Exceptions;
 
 namespace TodoList.Items.API.Middlewares
 {
-    public class ExceptionHandlerMiddleware
+    public class ExceptionHandlerMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate next;
-
-        public ExceptionHandlerMiddleware(RequestDelegate next)
-        {
-            this.next = next;
-        }
-
         public async Task Invoke(HttpContext context)
         {
             try

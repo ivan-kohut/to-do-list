@@ -7,17 +7,8 @@ using TodoList.Identity.API.Data.Entities;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class LogoutPageModel : PageModel
+    public class LogoutPageModel(SignInManager<User> signInManager, IIdentityServerInteractionService interaction) : PageModel
     {
-        private readonly SignInManager<User> signInManager;
-        private readonly IIdentityServerInteractionService interaction;
-
-        public LogoutPageModel(SignInManager<User> signInManager, IIdentityServerInteractionService interaction)
-        {
-            this.signInManager = signInManager;
-            this.interaction = interaction;
-        }
-
         public async Task<IActionResult> OnPostAsync(string? logoutId)
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)

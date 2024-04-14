@@ -2,22 +2,14 @@
 
 namespace TodoList.Items.API.Application.Commands
 {
-    public class UpdateItemCommand : ItemCommandBase, IRequest
+    public class UpdateItemCommand(int itemId, bool isDone, string text, int priority, int identityId) : ItemCommandBase(identityId), IRequest<Unit>
     {
-        public int ItemId { get; }
+        public int ItemId { get; } = itemId;
 
-        public bool IsDone { get; }
+        public bool IsDone { get; } = isDone;
 
-        public string Text { get; }
+        public string Text { get; } = text;
 
-        public int Priority { get; }
-
-        public UpdateItemCommand(int itemId, bool isDone, string text, int priority, int identityId) : base(identityId)
-        {
-            this.ItemId = itemId;
-            this.IsDone = isDone;
-            this.Text = text;
-            this.Priority = priority;
-        }
+        public int Priority { get; } = priority;
     }
 }

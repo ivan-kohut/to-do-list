@@ -14,31 +14,14 @@ using TodoList.Identity.API.Services;
 
 namespace TodoList.Identity.API.Pages.Account
 {
-    public class ExternalLoginPageModel : PageModel
+    public class ExternalLoginPageModel(
+        AppDbContext dbContext,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IEventBusService eventBusService,
+        IAuthenticationSchemeProvider schemeProvider,
+        IIdentityServerInteractionService interaction) : PageModel
     {
-        private readonly AppDbContext dbContext;
-        private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
-        private readonly IEventBusService eventBusService;
-        private readonly IAuthenticationSchemeProvider schemeProvider;
-        private readonly IIdentityServerInteractionService interaction;
-
-        public ExternalLoginPageModel(
-            AppDbContext dbContext,
-            UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            IEventBusService eventBusService,
-            IAuthenticationSchemeProvider schemeProvider,
-            IIdentityServerInteractionService interaction)
-        {
-            this.dbContext = dbContext;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.eventBusService = eventBusService;
-            this.schemeProvider = schemeProvider;
-            this.interaction = interaction;
-        }
-
         public async Task<IActionResult> OnGetAsync(string? scheme, string? returnUrl)
         {
             if (!interaction.IsValidReturnUrl(returnUrl)
@@ -93,7 +76,7 @@ namespace TodoList.Identity.API.Pages.Account
                 await userManager.AddLoginAsync(user, new UserLoginInfo(externalLoginProvider!, externalId!, externalLoginProvider));
             }
 
-            await signInManager.SignInWithClaimsAsync(user, isPersistent: false, new Claim[] { new Claim("amr", "pwd") });
+            await signInManager.SignInWithClaimsAsync(user, isPersistent: false, [new Claim("amr", "pwd")]);
             await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
 
             string? returnUrl = authResult.Properties?.Items["returnUrl"];

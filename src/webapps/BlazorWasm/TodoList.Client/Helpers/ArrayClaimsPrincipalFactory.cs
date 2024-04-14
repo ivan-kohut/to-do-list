@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 
 namespace TodoList.Client
 {
-    public class ArrayClaimsPrincipalFactory<TAccount> : AccountClaimsPrincipalFactory<TAccount> where TAccount : RemoteUserAccount
+    public class ArrayClaimsPrincipalFactory<TAccount>(IAccessTokenProviderAccessor accessor)
+        : AccountClaimsPrincipalFactory<TAccount>(accessor) where TAccount : RemoteUserAccount
     {
-        public ArrayClaimsPrincipalFactory(IAccessTokenProviderAccessor accessor) : base(accessor)
-        {
-        }
-
         public async override ValueTask<ClaimsPrincipal> CreateUserAsync(TAccount account, RemoteAuthenticationUserOptions options)
         {
             ClaimsPrincipal user = await base.CreateUserAsync(account, options);

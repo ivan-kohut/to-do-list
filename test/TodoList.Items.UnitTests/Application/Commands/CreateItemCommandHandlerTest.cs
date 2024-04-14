@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using MediatR;
 using Moq;
 using System;
 using System.Threading.Tasks;
@@ -20,7 +19,7 @@ namespace TodoList.Items.UnitTests.Application.Commands
         private readonly Mock<IUserRepository> mockUserRepository;
 
         private readonly CreateItemCommand command;
-        private readonly IRequestHandler<CreateItemCommand, ItemDTO> handler;
+        private readonly CreateItemCommandHandler handler;
 
         public CreateItemCommandHandlerTest()
         {

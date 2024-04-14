@@ -6,15 +6,8 @@ using System.Threading.Tasks;
 
 namespace TodoList.Identity.API.Pages
 {
-    public class ErrorPageModel : PageModel
+    public class ErrorPageModel(IIdentityServerInteractionService interaction) : PageModel
     {
-        private readonly IIdentityServerInteractionService interaction;
-
-        public ErrorPageModel(IIdentityServerInteractionService interaction)
-        {
-            this.interaction = interaction;
-        }
-
         public ErrorMessage? ErrorMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string? errorId)

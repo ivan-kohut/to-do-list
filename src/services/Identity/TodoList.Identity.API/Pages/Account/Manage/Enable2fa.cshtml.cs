@@ -9,15 +9,8 @@ using TodoList.Identity.API.Data.Entities;
 namespace TodoList.Identity.API.Pages.Account.Manage
 {
     [Authorize(Roles = "user")]
-    public class Enable2faPageModel : PageModel
+    public class Enable2faPageModel(UserManager<User> userManager) : PageModel
     {
-        private readonly UserManager<User> userManager;
-
-        public Enable2faPageModel(UserManager<User> userManager)
-        {
-            this.userManager = userManager;
-        }
-
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 

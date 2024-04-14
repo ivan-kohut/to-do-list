@@ -8,17 +8,13 @@ using TodoList.Items.Domain.Shared;
 
 namespace TodoList.Items.Infrastructure
 {
-    public class ItemsDbContext : DbContext, IUnitOfWork
+    public class ItemsDbContext(DbContextOptions<ItemsDbContext> options) : DbContext(options), IUnitOfWork
     {
         public DbSet<Item> Items { get; set; } = null!;
 
         public DbSet<User> Users { get; set; } = null!;
 
         public DbSet<ItemStatus> ItemStatuses { get; set; } = null!;
-
-        public ItemsDbContext(DbContextOptions<ItemsDbContext> options) : base(options)
-        {
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

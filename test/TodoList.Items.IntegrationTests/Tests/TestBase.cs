@@ -4,16 +4,10 @@ using TodoList.Items.IntegrationTests.Infrastructure;
 
 namespace TodoList.Items.IntegrationTests.Tests
 {
-    public abstract class TestBase
+    public abstract class TestBase(ItemsWebApplicationFactory applicationFactory)
     {
-        protected TestServer Server { get; }
+        protected TestServer Server { get; } = applicationFactory.Server;
 
-        protected HttpClient Client { get; }
-
-        protected TestBase(ItemsWebApplicationFactory applicationFactory)
-        {
-            this.Server = applicationFactory.Server;
-            this.Client = applicationFactory.CreateClient();
-        }
+        protected HttpClient Client { get; } = applicationFactory.CreateClient();
     }
 }

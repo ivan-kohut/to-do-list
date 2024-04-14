@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /usr/local/share/ca-certificates
 COPY certificates/todolist.crt .
 RUN update-ca-certificates
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY Directory.Packages.props .
 COPY ["src/webapps/BlazorWasm/TodoList.Client.Server/TodoList.Client.Server.csproj", "/src/webapps/BlazorWasm/TodoList.Client.Server/"]
